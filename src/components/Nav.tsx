@@ -1,29 +1,39 @@
+"use client";
+
 import Link from "next/link";
 import React, { ComponentProps } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faShoppingCart } from "@fortawesome/free-solid-svg-icons";
+import {
+  faShoppingBag,
+  faShoppingCart,
+} from "@fortawesome/free-solid-svg-icons";
+import { usePathname } from "next/navigation";
 
-export function Nav({ children }: { children: React.ReactNode[] }) {
+export function Nav({ children }: { children: React.ReactNode }) {
   return (
-    <nav className="h-16 w-full bg-mantle flex justify-between items-center uppercase">
-      <div className="flex justify-start pl-5">{children?.[0] ?? null}</div>
-      <div className="flex justify-center gap-4">
-        {React.Children.toArray(children)?.slice(1, -1) as React.ReactNode}
+    <nav className="sticky z-50 top-5 rounded-lg w-3/5 bg-crust uppercase h-32 flex flex-col sm:h-16 sm:flex sm:flex-row sm:justify-between sm:items-center">
+      {" "}
+      {/*  */}
+      <div className="">{Array.isArray(children) ? children[0] : children}</div>
+      <div className="">
+        {Array.isArray(children) ? children.slice(1, -1) : children}
       </div>
-      <div className="flex justify-end pr-5">
-        {React.Children.count(children) > 0
-          ? React.Children.toArray(children)[React.Children.count(children) - 1]
-          : null}
+      <div>
+        {Array.isArray(children) ? children[children.length - 1] : children}
       </div>
     </nav>
   );
 }
 
 export function NavLink(props: ComponentProps<typeof Link>) {
+  const path = usePathname();
+  const isActive = path === props.href;
   return (
     <Link
       {...props}
-      className="p-2 text-text hover:text-mantle hover:bg-text rounded-lg hover:rounded-lg hover:duration-300"
+      className={`mr-5 p-2 ${
+        isActive ? "bg-text text-mantle" : "text-text bg-crust"
+      } hover:text-mantle hover:bg-text rounded-lg hover:rounded-lg hover:duration-300`}
     />
   );
 }
@@ -37,24 +47,21 @@ export function NavLogo({
   alt: string;
 }) {
   return (
-    <Link
-      href="/"
-      className="p-2 text-text hover:text-subtext0 hover:duration-300"
-    >
-      <img src={imgSrc} alt={alt} />
+    <Link href="/" className="p-2 pl-5 text-xl text-text hover:text-blue hover:duration-300">
+      Tizmabeats
     </Link>
   );
 }
 
 export function NavShoppingCart({ count }: { count?: number }) {
   return (
-    <div>
+    <div className="pr-3">
       <Link
         href="/cart"
-        className="p-2 text-text hover:text-subtext0 hover:duration-300"
+        className="sm:p-2 text-text hover:text-blue hover:duration-300"
       >
-        <FontAwesomeIcon width="1.5rem" height="2rem" icon={faShoppingCart} />
-        <div className="absolute h-5 w-5 bg-red rounded-xl top-8 right-3 flex items-center justify-center">
+        <FontAwesomeIcon icon={faShoppingCart} size="2x"/>
+        <div className="absolute h-6 w-6 bg-red rounded-xl top-8 right-4 flex items-center justify-center">
           <div className="text-text">{count}</div>
         </div>
       </Link>

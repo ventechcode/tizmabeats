@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Nav, NavLink, NavLogo, NavShoppingCart } from "@/components/Nav";
+import { WavyBackground } from "@/components/ui/WavyBackground";
+import DotBackground from "@/components/ui/DotBackground";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,16 +19,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.className} mocha bg-base`}>
-        <Nav>
-          <NavLogo imgSrc="/logo.svg" alt="Tizmabeats" />
-          <NavLink href="/beats">Beats</NavLink>
-          <NavLink href="/beat-bundles">Beat-Bundles</NavLink>
-          <NavLink href="/contact">Kontakt</NavLink>
-          <NavShoppingCart count={3} />
-        </Nav>
+      <body
+        className={`${inter.className} mocha text-text bg-base`}
+      >
         {children}
-        </body>
+      </body>
     </html>
   );
 }
