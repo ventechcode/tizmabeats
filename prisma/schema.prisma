@@ -21,6 +21,8 @@ model Beat {
   price      Int
   producerId String
   purchased  Boolean
+  genre      String
+  length     Float
   producer   Producer @relation(fields: [producerId], references: [id])
   orders     Order[]
   downloads  Download[]
