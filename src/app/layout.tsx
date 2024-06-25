@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Nav, NavLink, NavLogo, NavShoppingCart } from "@/components/Nav";
-import { WavyBackground } from "@/components/ui/WavyBackground";
-import DotBackground from "@/components/ui/DotBackground";
+import { Nav, NavLink, NavLogo, NavShoppingCart } from "@/components/navbar";
+import { WavyBackground } from "@/components/ui/wavy-background";
+import DotBackground from "@/components/ui/dot-background";
 
 const inter = Inter({ subsets: ["latin"] });
 

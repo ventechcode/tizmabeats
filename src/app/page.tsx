@@ -1,6 +1,6 @@
 "use client";
 
-import { WavyBackground } from "@/components/ui/WavyBackground";
+import { WavyBackground } from "@/components/ui/wavy-background";
 import { TypewriterEffect } from "@/components/ui/typewriter-effect";
 import { useRouter } from "next/navigation";
 

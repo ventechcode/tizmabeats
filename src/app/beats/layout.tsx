@@ -1,7 +1,7 @@
 import React from "react";
-import { Nav, NavLink, NavLogo, NavShoppingCart } from "@/components/Nav";
-import { WavyBackground } from "@/components/ui/WavyBackground";
-import DotBackground from "@/components/ui/DotBackground";
+import { Nav, NavLink, NavLogo, NavShoppingCart } from "@/components/navbar";
+import { WavyBackground } from "@/components/ui/wavy-background";
+import DotBackground from "@/components/ui/dot-background";
 
 function BeatsLayout({
   children,
@@ -17,9 +17,7 @@ function BeatsLayout({
         <NavLink href="/contact">Kontakt</NavLink>
         <NavShoppingCart count={3} />
       </Nav>
-      <div>
-        {children}
-      </div>
+      {children}
       <footer className="text-text text-center w-full p-4">
         <p>&copy; 2024 Tizmabeats</p>
       </footer>
