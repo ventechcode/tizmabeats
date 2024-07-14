@@ -12,11 +12,9 @@ function BeatsLayout({
 }>) {
   return (
     <main>
-      <div className="flex flex-col items-center justify-center">
-        <Suspense fallback={<Loading />}>
-          <Beats />
-        </Suspense>
-      </div>
+      <Suspense fallback={<Loading />}>
+        <Beats />
+      </Suspense>
     </main>
   );
 }

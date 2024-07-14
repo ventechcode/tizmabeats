@@ -16,7 +16,7 @@ import {
 
 export function Nav({ children }: { children: React.ReactNode }) {
   return (
-    <nav className="sticky z-50 top-5 rounded-lg w-2/4 bg-crust uppercase h-32 flex flex-col sm:h-16 sm:flex sm:flex-row sm:justify-between sm:items-center">
+    <nav className="sticky z-50 top-5 rounded-lg w-2/4 bg-crust uppercase sm:flex sm:flex-row sm:items-center sm:justify-between p-4">
       <div>{Array.isArray(children) ? children[0] : children}</div>
       <div>{Array.isArray(children) ? children.slice(1, -1) : children}</div>
       <div>
@@ -64,7 +64,7 @@ export function NavShoppingCart({ count }: { count?: number }) {
         <SheetTrigger>
           <div className="hover:text-blue hover:duration-300">
             <FontAwesomeIcon icon={faShoppingCart} size="2x" />
-            <div className="absolute h-6 w-6 bg-red rounded-xl top-8 right-2 flex items-center justify-center">
+            <div className="absolute h-6 w-6 bg-red rounded-xl top-8 right-5 flex items-center justify-center">
               <div className="text-text">{count}</div>
             </div>
           </div>

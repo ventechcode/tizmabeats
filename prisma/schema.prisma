@@ -16,7 +16,7 @@ model Beat {
   updatedAt  DateTime @updatedAt
   name       String
   bpm        Int
-  key        String
+  songKey    String
   audioSrc   String
   price      Int
   producerId String

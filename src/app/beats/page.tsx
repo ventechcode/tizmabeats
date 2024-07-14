@@ -2,7 +2,6 @@ import BeatCard, {Beat} from "@/components/beat";
 import SearchFilterSection from "@/components/SearchFilterSection";
 import { BackgroundBeams } from "@/components/ui/background-beams";
 import { PrismaClient } from "@prisma/client";
-import { Selection } from "@nextui-org/react";
 
 export async function getData() {
   'use server'
@@ -33,10 +32,10 @@ async function Beats() {
       <SearchFilterSection genres={genres} />
       <div className="w-full grid sm:grid-cols-4 sm:grid-rows-none grid-cols-1 gap-8 sm:mt-5">
         {beats.map((beat, index) => (
-          <BeatCard {...beat} />
+          <BeatCard key={index} {...beat} />
         ))}
       </div>
-      <BackgroundBeams className="-z-50 bg-base" />
+      <BackgroundBeams className="-z-10 bg-base" />
     </div>
   );
 }

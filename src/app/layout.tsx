@@ -18,7 +18,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} mocha text-text bg-base`}>
-        <main className="flex flex-col justify-between items-center">
+        <main className="h-screen flex flex-col items-center justify-between">
           <Nav>
             <NavLogo imgSrc="/logo.svg" alt="Tizmabeats" />
             <NavLink href="/beats">Beats</NavLink>
@@ -27,8 +27,8 @@ export default function RootLayout({
             <NavShoppingCart count={3} />
           </Nav>
           {children}
-          <footer className="relative z-50 text-text text-center w-full p-4">
-            <p>&copy; 2024 Tizmabeats</p>
+          <footer className="relative text-center text-text w-full p-4">
+            <p>&copy; 2024 Tizmabeats</p> 
           </footer>
         </main>
       </body>
