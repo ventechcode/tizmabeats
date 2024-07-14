@@ -1,29 +1,44 @@
-'use client'
+import BeatCard, {Beat} from "@/components/beat";
+import SearchFilterSection from "@/components/SearchFilterSection";
+import { BackgroundBeams } from "@/components/ui/background-beams";
+import { PrismaClient } from "@prisma/client";
+import { Selection } from "@nextui-org/react";
 
-import Beat from "@/components/beat"
-import GenreFilter from "@/components/genre-filter"
-import Searchbar from "@/components/searchbar"
-import { BackgroundBeams } from "@/components/ui/background-beams"
-import { Separator } from "@/components/ui/separator"
+export async function getData() {
+  'use server'
+  const prisma = new PrismaClient();
+  let beats: Beat[] = [];
+  let genres: string[] = [];
 
-function Beats() {
-  return (
-    <div className="sm:w-4/5 min-h-[calc(100vh-10rem)] flex flex-col items-center">
-      <div className="mt-5 flex flex-col w-3/4 rounded-lg bg-crust text-text h-fit items-center">
-        <h1 className="sm:text-2xl p-4 ">Our database of professionally produced beats.</h1>
-        <Separator />
-        <Searchbar />
-        <div className="flex flex-row justify-center gap-4 w-full p-5">
-          <GenreFilter />
-          <GenreFilter />
-          <GenreFilter />
-        </div>
-      </div>
-      
-      <Beat />
-      <BackgroundBeams className="-z-50" />
-    </div>
-  )
+  try {
+    beats = await prisma.beat.findMany();
+    genres = beats.map((beat) => beat.genre);
+  } catch (error) {
+    console.error("Error fetching beats:", error);
+  } finally {
+    await prisma.$disconnect();
+  }
+
+  const data = {beats, genres};
+  return data;
 }
 
-export default Beats
+
+async function Beats() {
+  const {beats, genres} = await getData();
+
+  return (
+    <div className="flex flex-col items-center">
+      {/* Search & Filter Section */}
+      <SearchFilterSection genres={genres} />
+      <div className="w-full grid sm:grid-cols-4 sm:grid-rows-none grid-cols-1 gap-8 sm:mt-5">
+        {beats.map((beat, index) => (
+          <BeatCard {...beat} />
+        ))}
+      </div>
+      <BackgroundBeams className="-z-50 bg-base" />
+    </div>
+  );
+}
+
+export default Beats;

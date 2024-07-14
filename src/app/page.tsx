@@ -2,11 +2,9 @@
 
 import { WavyBackground } from "@/components/ui/wavy-background";
 import { TypewriterEffect } from "@/components/ui/typewriter-effect";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function Home() {
-  const router = useRouter();
-
   const words = [
     {
       text: "Create",
@@ -37,17 +35,18 @@ export default function Home() {
         <h1 className="relative z-10 text-lg mt-5">
           Hip-Hop, Techno, House and more!
         </h1>
-        <button
+        <Link
+          href="/beats"
+          prefetch={true}
           className="p-[3px] relative z-10 mt-5"
-          onClick={() => router.push("/beats")}
         >
           <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg" />
           <div className="px-8 py-2  bg-black rounded-[6px]  relative group transition duration-200 text-white hover:bg-transparent">
             Explore Beats
           </div>
-        </button>
-        <WavyBackground backgroundFill="bg-base" />
+        </Link>
       </div>
+      <WavyBackground className="z-50" />
       {/* More landing page content here */}
     </main>
   );

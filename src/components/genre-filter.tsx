@@ -1,10 +1,17 @@
+'use client';
+
 import React from "react";
 import { Select, SelectItem, Selection } from "@nextui-org/react";
 
-export default function GenreFilter() {
+export default function GenreFilter({ genres }: { genres: string[]}) {
+
   const [values, setValues] = React.useState<Selection>(
     new Set([])
   );
+
+  const filterGenre = (selected: Selection) => {
+    setValues(selected);
+  }
 
   return (
     <Select
@@ -18,27 +25,13 @@ export default function GenreFilter() {
         label: "mb-5 text-white/90",
         listbox: "bg-surface0 rounded-lg text-text",
       }}
-      onSelectionChange={setValues}
+      onSelectionChange={filterGenre}
     >
       {genres.map((genre) => (
-        <SelectItem key={genre.key}>{genre.label}</SelectItem>
+        <SelectItem key={genre} value={genre}>
+          {genre}
+        </SelectItem>
       ))}
     </Select>
   );
 }
-
-export const genres = [
-  { key: "hiphop", label: "Hip Hop" },
-  { key: "techno", label: "Techno" },
-  { key: "rock", label: "Rock" },
-  { key: "pop", label: "Pop" },
-  { key: "jazz", label: "Jazz" },
-  { key: "country", label: "Country" },
-  { key: "reggae", label: "Reggae" },
-  { key: "blues", label: "Blues" },
-  { key: "rnb", label: "R&B" },
-  { key: "metal", label: "Metal" },
-  { key: "classical", label: "Classical" },
-  { key: "electronic", label: "Electronic" },
-  { key: "indie", label: "Indie" },
-];

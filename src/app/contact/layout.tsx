@@ -1,6 +1,6 @@
 import React from "react";
 
-function BeatBundlesLayout({
+function ContactLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -12,4 +12,4 @@ function BeatBundlesLayout({
   );
 }
 
-export default BeatBundlesLayout;
+export default ContactLayout;
