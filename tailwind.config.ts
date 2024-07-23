@@ -1,19 +1,18 @@
-import {nextui} from '@nextui-org/theme';
 import type { Config } from "tailwindcss";
-
 const svgToDataUri = require("mini-svg-data-uri");
- 
-const colors = require("tailwindcss/colors");
+import daisyui from "daisyui"
+
 const {
   default: flattenColorPalette,
 } = require("tailwindcss/lib/util/flattenColorPalette");
+
 
 const config: Config = {
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./node_modules/@nextui-org/theme/dist/components/(input|select|listbox|divider|popover|button|ripple|spinner|scroll-shadow).js"
+    "./node_modules/@nextui-org/theme/dist/components/(input|select).{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
@@ -66,7 +65,8 @@ const config: Config = {
       );
     },
     // Replace `addVariablesForColors` and `nextui()` with actual plugin imports if they exist
-    addVariablesForColors
+    addVariablesForColors,
+    daisyui,
   ],
 };
 

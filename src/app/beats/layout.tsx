@@ -1,9 +1,9 @@
 import React, { Suspense } from "react";
-import { Nav, NavLink, NavLogo, NavShoppingCart } from "@/components/navbar";
+import { Nav, NavLink, NavLogo, NavShoppingCart } from "@/components/Nav";
 import { WavyBackground } from "@/components/ui/wavy-background";
 import DotBackground from "@/components/ui/dot-background";
-import Loading from "./loading";
 import Beats from "./page";
+import AudioPlayer from "@/components/AudioPlayer";
 
 function BeatsLayout({
   children,
@@ -11,10 +11,8 @@ function BeatsLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main>
-      <Suspense fallback={<Loading />}>
-        <Beats />
-      </Suspense>
+    <main className="overflow-hidden">
+      <Beats />
     </main>
   );
 }

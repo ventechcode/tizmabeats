@@ -1,12 +1,8 @@
 import React from "react";
-import { Spinner } from "@nextui-org/react";
 
 export default function Loading() {
   return (
-    <div>
-      <h1 className="flex flex-col justify-center items-center text-red-500 text-6xl">Loading...</h1>
-      <Spinner size="lg" />
-    </div>
+    <span className="loading loading-spinner loading-lg"></span>
   );
 }
 

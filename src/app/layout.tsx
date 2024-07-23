@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Nav, NavLink, NavLogo, NavShoppingCart } from "@/components/navbar";
+import { Nav, NavLink, NavLogo, NavShoppingCart } from "@/components/Nav";
+import { WavyBackground } from "@/components/ui/wavy-background";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,7 +29,7 @@ export default function RootLayout({
           </Nav>
           {children}
           <footer className="relative text-center text-text w-full p-4">
-            <p>&copy; 2024 Tizmabeats</p> 
+            <p>&copy; 2024 Tizmabeats</p>
           </footer>
         </main>
       </body>

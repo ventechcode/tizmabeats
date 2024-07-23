@@ -4,21 +4,7 @@ import React from "react";
 import { CardBody, CardContainer, CardItem } from "./ui/3d-card";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlay, faCircle } from "@fortawesome/free-solid-svg-icons";
-
-export type Beat = {
-  id: string;
-  createdAt: Date;
-  updatedAt: Date;
-  name: string;
-  bpm: number;
-  songKey: string;
-  audioSrc: string;
-  price: number;
-  producerId: string;
-  purchased: boolean;
-  genre: string;
-  length: number;
-};
+import { Beat } from "@/types";
 
 export default function BeatCard(beat: Beat) {
   return (
