@@ -3,22 +3,23 @@
 import React from "react";
 import {Select, SelectItem} from "@nextui-org/select";
 
-export default function GenreFilter({ genres, onGenreChange }: { genres: string[], onGenreChange: (selections: any) => void }) {
+export default function BpmFilter({ bpms, onBpmChange }: { bpms: string[], onBpmChange: (selections: any) => void }) {
 
   const [values, setValues] = React.useState(
     new Set([])
   );
 
-  const filterGenre = (selected: any) => {
+  const filterBpm = (selected: any) => {
     setValues(selected);
-    onGenreChange(selected);
+    onBpmChange(selected);
   }
 
   return (
     <Select
-      label="Filter Genres"
+      label="Filter BPMs"
       selectionMode="multiple"
       placeholder="All"
+      items={bpms.map(bpm => ({ key: bpm, label: bpm }))}
       selectedKeys={values}
 
       className="w-64 rounded-lg text-text"
@@ -28,14 +29,9 @@ export default function GenreFilter({ genres, onGenreChange }: { genres: string[
         label: "mb-5 text-white/90",
         listbox: "bg-surface0 rounded-lg text-text overflow-y-auto h-full",
       }}
-      onSelectionChange={filterGenre}
+      onSelectionChange={filterBpm}
     >
-      {genres.map((genre) => (
-
-        <SelectItem key={genre}>
-          {genre}
-        </SelectItem>
-      ))}
+      {(item) => <SelectItem key={item.key}>{item.label}</SelectItem>}
     </Select>
   );
 }
