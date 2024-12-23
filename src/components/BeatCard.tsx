@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlay, faCircle } from "@fortawesome/free-solid-svg-icons";
 import { Beat } from "@/types";
 
-export default function BeatCard(beat: Beat) {
+export default function BeatCard({beat, toggle}: {beat: Beat, toggle: () => void}) {
   return (
     <CardContainer className="inter-var">
       <CardBody className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-crust dark:border-white/[0.2] border-black/[0.1]  h-auto rounded-xl p-6 border  ">
@@ -44,7 +44,7 @@ export default function BeatCard(beat: Beat) {
           </CardItem>
         </div>
         <div className="flex flex-col items-center justify-center p-5">
-          <CardItem as="button" translateZ="61" onClick={() => console.log("Play")}>
+          <CardItem as="button" translateZ="61" onClick={toggle}>
             <FontAwesomeIcon icon={faCirclePlay} size="3x"/>
           </CardItem>
         </div>

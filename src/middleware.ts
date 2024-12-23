@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { hashPassword }from "@/utils/crypto";
+import { hashPassword } from "@/utils/crypto";
 
 export async function middleware(req: NextRequest) {
     if (await isAuthenticated(req) === false) {

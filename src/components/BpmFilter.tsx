@@ -1,27 +1,28 @@
-'use client';
+"use client";
 
 import React from "react";
-import {Select, SelectItem} from "@nextui-org/select";
+import { Select, SelectItem } from "@nextui-org/select";
 
-export default function BpmFilter({ bpms, onBpmChange }: { bpms: string[], onBpmChange: (selections: any) => void }) {
-
-  const [values, setValues] = React.useState(
-    new Set([])
-  );
+export default function BpmFilter({
+  bpms,
+  onBpmChange,
+}: {
+  bpms: string[];
+  onBpmChange: (selections: any) => void;
+}) {
+  const [values, setValues] = React.useState(new Set([]));
 
   const filterBpm = (selected: any) => {
     setValues(selected);
     onBpmChange(selected);
-  }
+  };
 
   return (
     <Select
       label="Filter BPMs"
       selectionMode="multiple"
       placeholder="All"
-      items={bpms.map(bpm => ({ key: bpm, label: bpm }))}
       selectedKeys={values}
-
       className="w-64 rounded-lg text-text"
       classNames={{
         listboxWrapper: "bg-surface0 rounded-lg",
@@ -31,7 +32,9 @@ export default function BpmFilter({ bpms, onBpmChange }: { bpms: string[], onBpm
       }}
       onSelectionChange={filterBpm}
     >
-      {(item) => <SelectItem key={item.key}>{item.label}</SelectItem>}
+      {bpms.map((bpm) => (
+        <SelectItem key={bpm.toString()}>{bpm.toString()}</SelectItem>
+      ))}
     </Select>
   );
 }
