@@ -14,6 +14,7 @@
     "@fortawesome/free-regular-svg-icons": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
+    "@headlessui/react": "^2.2.0",
     "@nextui-org/input": "^2.2.4",
     "@nextui-org/select": "^2.2.5",
     "@nextui-org/system": "^2.2.5",

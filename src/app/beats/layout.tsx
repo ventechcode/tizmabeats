@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import { Nav, NavLink, NavLogo, NavShoppingCart } from "@/components/Nav";
+import { Nav, NavLink, NavLogo } from "@/components/Nav";
 import { WavyBackground } from "@/components/ui/wavy-background";
 import DotBackground from "@/components/ui/dot-background";
 import Beats from "./page";
