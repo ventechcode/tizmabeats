@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import { Select, SelectItem } from "@nextui-org/select";
+import { useSearchParams } from "next/navigation";
 
 export default function BpmFilter({
   bpms,
@@ -10,7 +11,14 @@ export default function BpmFilter({
   bpms: string[];
   onBpmChange: (selections: any) => void;
 }) {
-  const [values, setValues] = React.useState(new Set([]));
+  const searchParams = useSearchParams();
+  const [values, setValues] = React.useState<Set<string>>(new Set([]));
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    const selectedBpms = params.get("bpm")?.split(",") || [];
+    setValues(new Set(selectedBpms));
+  }, []);
 
   const filterBpm = (selected: any) => {
     setValues(selected);

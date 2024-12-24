@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { use, useEffect } from "react";
 import { Select, SelectItem } from "@nextui-org/select";
+import { useSearchParams } from "next/navigation";
 
 export default function GenreFilter({
   genres,
@@ -10,7 +11,14 @@ export default function GenreFilter({
   genres: string[];
   onGenreChange: (selections: any) => void;
 }) {
-  const [values, setValues] = React.useState(new Set([]));
+  const searchParams = useSearchParams();
+  const [values, setValues] = React.useState<Set<string>>(new Set([]));
+
+  useEffect(() => {
+    const params = new URLSearchParams(searchParams.toString());
+    const selectedGenres = params.get("genre")?.split(",") || [];
+    setValues(new Set(selectedGenres));
+  }, []); 
 
   const filterGenre = (selected: any) => {
     setValues(selected);

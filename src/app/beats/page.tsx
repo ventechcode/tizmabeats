@@ -5,55 +5,42 @@ import SearchFilterSection from "@/components/SearchFilterSection";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import BeatCard from "@/components/BeatCard";
 import { Beat } from "@/types";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import AudioPlayer from "@/components/AudioPlayer";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export default function Beats() {
-  const [queryParams, setQueryParams] = useState<Record<string, string>>({});
+  const searchParams = useSearchParams();
+  const router = useRouter();
   const [beats, setBeats] = useState<Beat[]>([]);
   const [genres, setGenres] = useState<string[]>([]);
   const [bpms, setBpms] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showAudioPlayer, setShowAudioPlayer] = useState(false);
 
-  let baseQuery = "/api/beats";
+  const baseQuery = "/api/beats";
 
-  // Initialize state based on URL query parameters
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const initialParams: Record<string, string> = {};
-    
+    const params = new URLSearchParams(searchParams.toString());
+
+    // Fetch data based on initial query params
+    const queryArray: string[] = [];
     params.forEach((value, key) => {
-      initialParams[key] = value;
+      queryArray.push(`${key}=${value}`);
     });
+    const queryString = queryArray.join("&");
+    const query = queryString ? `${baseQuery}?${queryString}` : baseQuery;
 
-    console.log("Initial Params:", initialParams);
-    setQueryParams(initialParams);
+    router.push(`?${queryString}`);
 
-    // Initial fetch
-    const queryString = Object.entries(queryParams)
-      .map(([key, value]) => `${key}=${value}`)
-      .join("&");
-    const query = `${baseQuery}?${queryString}`;
-
-    fetch(query)
+    fetch(baseQuery)
       .then((res) => res.json())
       .then((data) => {
-        setBeats(data);
         const genres = data.map((beat: any) => beat.genre);
         const bpms = data.map((beat: any) => beat.bpm);
         setGenres(genres);
         setBpms(bpms.sort());
-        setIsLoading(false);
       });
-  }, []);
-
-  // Fetch data based on queryParams
-  useEffect(() => {
-    const queryString = Object.entries(queryParams)
-      .map(([key, value]) => `${key}=${value}`)
-      .join("&");
-    const query = `${baseQuery}?${queryString}`;
 
     fetch(query)
       .then((res) => res.json())
@@ -61,60 +48,52 @@ export default function Beats() {
         setBeats(data);
         setIsLoading(false);
       });
-  }, [queryParams]);
+  }, []);
 
-  // Update URL query parameters
+  // Fetch data whenever queryParams changes
   useEffect(() => {
-    const urlParams = new URLSearchParams();
+    const params = new URLSearchParams(searchParams.toString());
 
-    // Only append non-empty parameters to the URL
-    if (queryParams.genre) {
-      urlParams.set("genre", queryParams.genre);
-    }
-    if (queryParams.bpm) {
-      urlParams.set("bpm", queryParams.bpm);
-    }
+    const queryArray: string[] = [];
+    params.forEach((value, key) => {
+      queryArray.push(`${key}=${value}`);
+    });
+    const queryString = queryArray.join("&");
+    const query = queryString ? `${baseQuery}?${queryString}` : baseQuery;
 
-    // If there are no query parameters, we don't need to change the URL
-    if (urlParams.toString()) {
-      window.history.pushState(null, "", "?" + urlParams.toString());
-    } else {
-      // If there are no parameters, just use the base URL
-      window.history.pushState(null, "", window.location.pathname);
-    }
-  }, [queryParams]);
+    router.push(`?${queryString}`);
+
+    fetch(query)
+      .then((res) => res.json())
+      .then((data) => {
+        setBeats(data);
+        setIsLoading(false);
+      });
+  }, [searchParams]);
 
   if (isLoading) {
     console.log("Loading...");
     return <span className="loading loading-spinner loading-lg"></span>;
   }
 
+  const createQueryString = (name: string, value: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    if (value) {
+      params.set(name, value);
+    } else {
+      params.delete(name);
+    }
+    return params.toString();
+  };
+
   const onGenreChange = (selections: Set<string>) => {
     let selectedGenres = Array.from(selections).join(",");
-    // If no genres are selected, remove the genre from queryParams
-    setQueryParams((prev) => {
-      const newParams = { ...prev };
-      if (selectedGenres) {
-        newParams.genre = selectedGenres;
-      } else {
-        delete newParams.genre;
-      }
-      return newParams;
-    });
+    router.push(`?${createQueryString("genre", selectedGenres)}`);
   };
 
   const onBpmChange = (selections: Set<string>) => {
     let selectedBpms = Array.from(selections).join(",");
-    // If no bpms are selected, remove the bpm from queryParams
-    setQueryParams((prev) => {
-      const newParams = { ...prev };
-      if (selectedBpms) {
-        newParams.bpm = selectedBpms;
-      } else {
-        delete newParams.bpm;
-      }
-      return newParams;
-    });
+    router.push(`?${createQueryString("bpm", selectedBpms)}`);
   };
 
   const toogleAudioPlayer = () => {
@@ -124,7 +103,12 @@ export default function Beats() {
   return (
     <div className="flex flex-col items-center h-full overflow-hidden ">
       {/* Search & Filter Section */}
-      <SearchFilterSection genres={genres} onGenreChange={onGenreChange} bpms={bpms} onBpmChange={onBpmChange} />
+      <SearchFilterSection
+        genres={genres}
+        onGenreChange={onGenreChange}
+        bpms={bpms}
+        onBpmChange={onBpmChange}
+      />
       {/* Beats Section */}
       <ScrollArea>
         <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
