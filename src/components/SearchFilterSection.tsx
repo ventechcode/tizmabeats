@@ -2,7 +2,7 @@
 
 import React from 'react';
 import GenreFilter from "@/components/GenreFilter";
-import Searchbar from "./Searchbar";
+import Searchbar from "@/components/Searchbar";
 import { Separator } from "@/components/ui/separator";
 import BpmFilter from "@/components/BpmFilter";
 
