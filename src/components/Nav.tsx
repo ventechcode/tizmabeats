@@ -30,7 +30,7 @@ export function Nav({ children }: { children: React.ReactNode }) {
         <div className="relative flex h-20 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
             {/* Mobile menu button*/}
-            <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white">
+            <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 focus:outline-none">
               <span className="absolute -inset-0.5" />
               <span className="sr-only">Open main menu</span>
               <FontAwesomeIcon
@@ -72,7 +72,7 @@ export function Nav({ children }: { children: React.ReactNode }) {
         </div>
       </div>
       <DisclosurePanel className="sm:hidden">
-        <div className="flex flex-col space-y-1 px-2 pb-3 pt-2">{children}</div>
+        <div className="flex flex-col space-y-1 px-2 pb-4 pt-3 w-max">{children}</div>
       </DisclosurePanel>
     </Disclosure>
   );

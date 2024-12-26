@@ -109,10 +109,9 @@ export default function Beats() {
         bpms={bpms}
         onBpmChange={onBpmChange}
       />
-      {/* Space holder */}
-      <div className="h-full sm:h-96"></div>
+      
       {/* Beats Section */}
-      <ScrollArea>
+      <ScrollArea className="absolute mt-24 sm:mt-64 h-screen">
         <div className="flex flex-col mt-44 sm:mt-0 sm:grid gap-4 sm:p-4 sm:grid-cols-1 md:grid-cols-2 lg lg:grid-cols-2 xl:grid-cols-4">
           {beats.map((beat: Beat, index: number) => (
             <BeatCard key={index} beat={beat} toggle={toogleAudioPlayer} />
