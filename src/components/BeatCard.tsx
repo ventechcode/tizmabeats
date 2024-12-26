@@ -9,7 +9,7 @@ import { Beat } from "@/types";
 export default function BeatCard({beat, toggle}: {beat: Beat, toggle: () => void}) {
   return (
     <CardContainer className="inter-var">
-      <CardBody className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-crust dark:border-white/[0.2] border-black/[0.1]  h-auto rounded-xl p-6 border  ">
+      <CardBody className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-crust dark:border-white/[0.2] border-black/[0.1] w-full mr-3 ml-3 sm:m-0 sm:w-auto h-auto rounded-xl p-6 border  ">
         <CardItem translateZ="44" className="text-xl font-bold text-text">
           {beat.name}
         </CardItem>

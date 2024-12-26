@@ -26,7 +26,7 @@ export default function RootLayout({
             <NavLink href="/contact">Contact</NavLink>
           </Nav>
           {children}
-          <footer className="relative text-center text-text w-full p-4">
+          <footer className="relative bottom-0 z-40 text-center text-text w-full p-4">
             <p>&copy; 2024 Tizmabeats</p>
           </footer>
         </main>

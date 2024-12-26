@@ -2,7 +2,7 @@
 
 import { BackgroundBeams } from "@/components/ui/background-beams";
 import SearchFilterSection from "@/components/SearchFilterSection";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import BeatCard from "@/components/BeatCard";
 import { Beat } from "@/types";
 import { useCallback, useEffect, useState } from "react";
@@ -101,7 +101,7 @@ export default function Beats() {
   };
 
   return (
-    <div className="flex flex-col items-center h-full overflow-hidden ">
+    <div className="flex flex-col items-center justify-start h-full overflow-hidden">
       {/* Search & Filter Section */}
       <SearchFilterSection
         genres={genres}
@@ -109,18 +109,22 @@ export default function Beats() {
         bpms={bpms}
         onBpmChange={onBpmChange}
       />
+      {/* Space holder */}
+      <div className="h-full sm:h-96"></div>
       {/* Beats Section */}
       <ScrollArea>
-        <div className="grid grid-cols-1 gap-4 p-4 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <div className="flex flex-col mt-44 sm:mt-0 sm:grid gap-4 sm:p-4 sm:grid-cols-1 md:grid-cols-2 lg lg:grid-cols-2 xl:grid-cols-4">
           {beats.map((beat: Beat, index: number) => (
             <BeatCard key={index} beat={beat} toggle={toogleAudioPlayer} />
           ))}
         </div>
+        <ScrollBar />
       </ScrollArea>
+      
       {/* Audio Player */}
       {showAudioPlayer && <AudioPlayer />}
       {/* Background */}
-      <BackgroundBeams className="-z-10 bg-base" />
+      
     </div>
   );
 }

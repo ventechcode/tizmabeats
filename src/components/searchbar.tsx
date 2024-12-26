@@ -7,7 +7,7 @@ export default function Searchbar() {
       label="Search"
       isClearable
       classNames={{
-        base: "w-2/4 mt-5",
+        base: "w-full md:w-3/4 mt-5 px-5",
         label: "text-white/90 relative pb-5",
         input: [
           "bg-surface0",

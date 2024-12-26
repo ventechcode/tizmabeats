@@ -38,9 +38,9 @@ export const WavyBackground = ({
   const getSpeed = () => {
     switch (speed) {
       case "slow":
-        return 0.001;
-      case "fast":
         return 0.002;
+      case "fast":
+        return 0.007;
       default:
         return 0.001;
     }

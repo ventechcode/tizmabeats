@@ -25,7 +25,7 @@ import {
 
 export function Nav({ children }: { children: React.ReactNode }) {
   return (
-    <Disclosure as="nav" className="bg-crust z-50 w-full px-2 sm:px-8">
+    <Disclosure as="nav" className="bg-crust z-50 w-screen px-2 sm:px-8">
       <div className="">
         <div className="relative flex h-20 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
@@ -49,14 +49,14 @@ export function Nav({ children }: { children: React.ReactNode }) {
             <div className="flex shrink-0 items-center">
               <NavLogo imgSrc="/logo.svg" alt="TizmaBeats" />
             </div>
-            <div className="hidden sm:mr-16 md:mr-28 sm:flex sm:flex-row sm:justify-center sm:items-center">
+            <div className="hidden sm:mr-20 md:mr-32 sm:flex sm:flex-row sm:justify-center sm:items-center">
               {children}
             </div>
             <Sheet>
               <SheetTrigger>
                 <div className="absolute right-3 sm:right-1 md:right-0 top-6 hover:text-blue hover:duration-300">
                   <FontAwesomeIcon icon={faShoppingCart} size="2x" />
-                  <div className="absolute right-0 bottom-0 transform translate-x-1/2 translate-y-1/2 h-6 w-6 bg-red rounded-full flex items-center justify-center">
+                  <div className="absolute right-0 bottom-0 transform translate-x-1/2 translate-y-1/2 h-6 w-6 bg-red-400 rounded-full flex items-center justify-center">
                     <div className="text-text">{3}</div>
                   </div>
                 </div>
