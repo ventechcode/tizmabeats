@@ -1,11 +1,10 @@
 "use client";
 
-import { BackgroundBeams } from "@/components/ui/background-beams";
 import SearchFilterSection from "@/components/SearchFilterSection";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import BeatCard from "@/components/BeatCard";
 import { Beat } from "@/types";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import AudioPlayer from "@/components/AudioPlayer";
 import { useSearchParams, useRouter } from "next/navigation";
 
@@ -52,6 +51,7 @@ export default function Beats() {
 
   // Fetch data whenever queryParams changes
   useEffect(() => {
+    setIsLoading(true); // Show loading spinner
     const params = new URLSearchParams(searchParams.toString());
 
     const queryArray: string[] = [];
@@ -70,11 +70,6 @@ export default function Beats() {
         setIsLoading(false);
       });
   }, [searchParams]);
-
-  if (isLoading) {
-    console.log("Loading...");
-    return <span className="loading loading-spinner loading-lg"></span>;
-  }
 
   const createQueryString = (name: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -109,7 +104,14 @@ export default function Beats() {
         bpms={bpms}
         onBpmChange={onBpmChange}
       />
-      
+
+      {/* Loading Spinner */}
+      {isLoading && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <span className="loading loading-spinner loading-lg"></span>
+        </div>
+      )}
+
       {/* Beats Section */}
       <ScrollArea className="absolute mt-24 sm:mt-64 h-screen">
         <div className="flex flex-col mt-44 sm:mt-0 sm:grid gap-4 sm:p-4 sm:grid-cols-1 md:grid-cols-2 lg lg:grid-cols-2 xl:grid-cols-4">
@@ -119,11 +121,10 @@ export default function Beats() {
         </div>
         <ScrollBar />
       </ScrollArea>
-      
+
       {/* Audio Player */}
       {showAudioPlayer && <AudioPlayer />}
       {/* Background */}
-      
     </div>
   );
 }
