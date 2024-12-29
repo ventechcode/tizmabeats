@@ -1,13 +1,13 @@
 import React from "react";
 import { Input } from "@nextui-org/input";
+import { on } from "events";
 
-export default function Searchbar() {
+export default function Searchbar({onSearch}: {onSearch: (value: string) => void}) {
   return (
     <Input
       label="Search"
-      isClearable
       classNames={{
-        base: "w-full md:w-3/4 mt-5 px-5",
+        base: "w-full md:w-3/5 mt-5 px-5",
         label: "text-white/90 relative pb-5",
         input: [
           "bg-surface0",
@@ -22,6 +22,8 @@ export default function Searchbar() {
           "!cursor-text",
         ],
       }}
+      onValueChange={(value) => onSearch(value)}
+      
       placeholder="Type to search..."
       startContent={<SearchIcon className="" />}
     />

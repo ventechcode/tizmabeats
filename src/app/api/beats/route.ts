@@ -20,11 +20,15 @@ export async function GET(req: NextRequest) {
       : [parseInt(bpmParams, 10)]
     : undefined;
 
+  // Parse the search query parameter
+  const search = params.get("search");
+
     try {
       const beats = await prisma.beat.findMany({
         where: {
           genre: genres?.length ? { in: genres } : undefined,
           bpm: bpms?.length ? { in: bpms } : undefined,
+          name: search ? { contains: search, mode: "insensitive" } : undefined,
         },
         orderBy: {
           createdAt: "desc",

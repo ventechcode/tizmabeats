@@ -82,6 +82,10 @@ export default function Beats() {
     return params.toString();
   };
 
+  const onSearch = (value: string) => { 
+    router.push(`?${createQueryString("search", value)}`);
+  };
+
   const onGenreChange = (selections: Set<string>) => {
     let selectedGenres = Array.from(selections).join(",");
     router.push(`?${createQueryString("genre", selectedGenres)}`);
@@ -103,6 +107,7 @@ export default function Beats() {
         onGenreChange={onGenreChange}
         bpms={bpms}
         onBpmChange={onBpmChange}
+        onSearch={onSearch}
       />
 
       <ScrollArea className="absolute mt-24 sm:mt-64 h-screen w-full">
