@@ -5,13 +5,16 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import BeatCard from "@/components/BeatCard";
 import SkeletonBeatCard from "@/components/SkeletonBeatCard";
 import { Beat } from "@/types";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import AudioPlayer from "@/components/AudioPlayer";
 import { useSearchParams, useRouter } from "next/navigation";
+import { ShoppingCartContext } from "@/app/providers";
 
 export default function Beats() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  let shoppingCart  = useContext(ShoppingCartContext);
+
   const [beats, setBeats] = useState<Beat[]>([]);
   const [genres, setGenres] = useState<string[]>([]);
   const [bpms, setBpms] = useState<string[]>([]);
@@ -96,6 +99,11 @@ export default function Beats() {
     router.push(`?${createQueryString("bpm", selectedBpms)}`);
   };
 
+  const onBuy = (beat: Beat) => {
+    shoppingCart?.addToCart(beat);
+    console.log(shoppingCart);
+  };
+
   const toogleAudioPlayer = () => {
     setShowAudioPlayer(!showAudioPlayer);
   };
@@ -119,7 +127,7 @@ export default function Beats() {
                 <SkeletonBeatCard key={i} />
               )))
             : beats.map((beat: Beat, index: number) => (
-                <BeatCard key={index} beat={beat} toggle={toogleAudioPlayer} />
+                <BeatCard key={index} beat={beat} toggle={toogleAudioPlayer} onBuy={onBuy} />
               ))}
         </div>
         <ScrollBar />

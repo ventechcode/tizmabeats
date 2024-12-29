@@ -6,7 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlay, faCircle } from "@fortawesome/free-solid-svg-icons";
 import { Beat } from "@/types";
 
-export default function BeatCard({beat, toggle}: {beat: Beat, toggle: () => void}) {
+export default function BeatCard({beat, toggle, onBuy}: {beat: Beat, toggle: () => void, onBuy: (beat: Beat) => void}) {
   return (
     <CardContainer className="inter-var">
       <CardBody className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-crust dark:border-white/[0.2] border-black/[0.1] w-full mr-3 ml-3 sm:m-0 sm:w-auto h-auto rounded-xl p-6 border  ">
@@ -53,7 +53,7 @@ export default function BeatCard({beat, toggle}: {beat: Beat, toggle: () => void
             translateZ={36}
             as="button"
             className="px-4 py-2 rounded-xl bg-black dark:bg-white dark:text-black text-white text-xs font-bold"
-            onClick={() => console.log("Buy beat")}
+            onClick={() => onBuy(beat)}
           >
             Buy {beat.price}€
           </CardItem>
