@@ -3,6 +3,7 @@
 import SearchFilterSection from "@/components/SearchFilterSection";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import BeatCard from "@/components/BeatCard";
+import SkeletonBeatCard from "@/components/SkeletonBeatCard";
 import { Beat } from "@/types";
 import { useEffect, useState } from "react";
 import AudioPlayer from "@/components/AudioPlayer";
@@ -51,7 +52,7 @@ export default function Beats() {
 
   // Fetch data whenever queryParams changes
   useEffect(() => {
-    setIsLoading(true); // Show loading spinner
+    setIsLoading(true);
     const params = new URLSearchParams(searchParams.toString());
 
     const queryArray: string[] = [];
@@ -97,7 +98,6 @@ export default function Beats() {
 
   return (
     <div className="flex flex-col items-center justify-start h-full overflow-hidden">
-      {/* Search & Filter Section */}
       <SearchFilterSection
         genres={genres}
         onGenreChange={onGenreChange}
@@ -105,26 +105,23 @@ export default function Beats() {
         onBpmChange={onBpmChange}
       />
 
-      {/* Loading Spinner */}
-      {isLoading && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <span className="loading loading-spinner loading-lg"></span>
-        </div>
-      )}
-
-      {/* Beats Section */}
-      <ScrollArea className="absolute mt-24 sm:mt-64 h-screen">
-        <div className="flex flex-col mt-44 sm:mt-0 sm:grid gap-4 sm:p-4 sm:grid-cols-1 md:grid-cols-2 lg lg:grid-cols-2 xl:grid-cols-4">
-          {beats.map((beat: Beat, index: number) => (
-            <BeatCard key={index} beat={beat} toggle={toogleAudioPlayer} />
-          ))}
+      <ScrollArea className="absolute mt-24 sm:mt-64 h-screen w-full">
+        <div className="flex flex-col mt-44 sm:mt-0 sm:grid gap-4 sm:p-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
+          {isLoading
+            ? (beats.length == 0 ? [...Array(8)].map((_, i) => (
+                <SkeletonBeatCard key={i} />
+              )): beats.map((_, i) => (
+                <SkeletonBeatCard key={i} />
+              )))
+            : beats.map((beat: Beat, index: number) => (
+                <BeatCard key={index} beat={beat} toggle={toogleAudioPlayer} />
+              ))}
         </div>
         <ScrollBar />
       </ScrollArea>
 
-      {/* Audio Player */}
       {showAudioPlayer && <AudioPlayer />}
-      {/* Background */}
     </div>
   );
 }
+
