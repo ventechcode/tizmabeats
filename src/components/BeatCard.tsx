@@ -1,12 +1,26 @@
-'use client'
+"use client";
 
 import React from "react";
 import { CardBody, CardContainer, CardItem } from "./ui/3d-card";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCirclePlay, faCircle } from "@fortawesome/free-solid-svg-icons";
+import {
+  faCirclePlay,
+  faCircle,
+  faCirclePause,
+} from "@fortawesome/free-solid-svg-icons";
 import { Beat } from "@/types";
 
-export default function BeatCard({beat, toggle, onBuy}: {beat: Beat, toggle: () => void, onBuy: (beat: Beat) => void}) {
+export default function BeatCard({
+  beat,
+  play,
+  onBuy,
+  isPlaying,
+}: {
+  beat: Beat;
+  play: (beat: Beat) => void;
+  onBuy: (beat: Beat) => void;
+  isPlaying: boolean;
+}) {
   return (
     <CardContainer className="inter-var">
       <CardBody className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-crust dark:border-white/[0.2] border-black/[0.1] w-full mr-3 ml-3 sm:m-0 sm:w-auto h-auto rounded-xl p-6 border  ">
@@ -44,8 +58,11 @@ export default function BeatCard({beat, toggle, onBuy}: {beat: Beat, toggle: () 
           </CardItem>
         </div>
         <div className="flex flex-col items-center justify-center p-5">
-          <CardItem as="button" translateZ="61" onClick={toggle}>
-            <FontAwesomeIcon icon={faCirclePlay} size="3x"/>
+          <CardItem as="button" translateZ="61" onClick={() => play(beat)}>
+            <FontAwesomeIcon
+              icon={isPlaying ? faCirclePause : faCirclePlay}
+              size="3x"
+            />
           </CardItem>
         </div>
         <div className="flex justify-between items-center">
@@ -67,13 +84,13 @@ export default function BeatCard({beat, toggle, onBuy}: {beat: Beat, toggle: () 
             translateZ={36}
             className="px-4 py-2 rounded-xl text-xs text-subtext1"
           >
-            WAV 
+            WAV
           </CardItem>
           <CardItem
             translateZ={36}
             className="px-4 py-2 rounded-xl text-xs text-subtext1"
           >
-           FULL LICENCE
+            FULL LICENCE
           </CardItem>
         </div>
       </CardBody>

@@ -13,15 +13,16 @@ import { ShoppingCartContext } from "@/app/providers";
 export default function Beats() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  let shoppingCart  = useContext(ShoppingCartContext);
+  let shoppingCart = useContext(ShoppingCartContext);
 
   const [beats, setBeats] = useState<Beat[]>([]);
   const [genres, setGenres] = useState<string[]>([]);
   const [bpms, setBpms] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [showAudioPlayer, setShowAudioPlayer] = useState(false);
 
   const baseQuery = "/api/beats";
+
+  const [currentlyPlaying, setCurrentlyPlaying] = useState<Beat | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
@@ -85,7 +86,7 @@ export default function Beats() {
     return params.toString();
   };
 
-  const onSearch = (value: string) => { 
+  const onSearch = (value: string) => {
     router.push(`?${createQueryString("search", value)}`);
   };
 
@@ -104,9 +105,14 @@ export default function Beats() {
     console.log(shoppingCart);
   };
 
-  const toogleAudioPlayer = () => {
-    setShowAudioPlayer(!showAudioPlayer);
+  const play = (beat: Beat) => {
+    if (currentlyPlaying && currentlyPlaying.id == beat.id) {
+      setCurrentlyPlaying(null);
+      return;
+    }
+    setCurrentlyPlaying(beat);
   };
+
 
   return (
     <div className="flex flex-col items-center justify-start h-full overflow-hidden">
@@ -121,20 +127,23 @@ export default function Beats() {
       <ScrollArea className="absolute mt-24 sm:mt-64 h-screen w-full">
         <div className="flex flex-col mt-44 sm:mt-0 sm:grid gap-4 sm:p-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
           {isLoading
-            ? (beats.length == 0 ? [...Array(8)].map((_, i) => (
-                <SkeletonBeatCard key={i} />
-              )): beats.map((_, i) => (
-                <SkeletonBeatCard key={i} />
-              )))
+            ? beats.length == 0
+              ? [...Array(8)].map((_, i) => <SkeletonBeatCard key={i} />)
+              : beats.map((_, i) => <SkeletonBeatCard key={i} />)
             : beats.map((beat: Beat, index: number) => (
-                <BeatCard key={index} beat={beat} toggle={toogleAudioPlayer} onBuy={onBuy} />
+                <BeatCard
+                  key={index}
+                  beat={beat}
+                  play={play}
+                  isPlaying={currentlyPlaying == null ? false : currentlyPlaying.id == beat.id}
+                  onBuy={onBuy}
+                />
               ))}
         </div>
         <ScrollBar />
       </ScrollArea>
 
-      {showAudioPlayer && <AudioPlayer />}
+      {currentlyPlaying && <AudioPlayer beat={currentlyPlaying} toggle={play}/>}
     </div>
   );
 }
-

@@ -35,12 +35,13 @@
     "lucide-react": "^0.407.0",
     "mini-svg-data-uri": "^1.4.4",
     "next": "14.2.4",
+    "prisma": "^5.15.1",
     "react": "^18",
     "react-dom": "^18",
     "react-element-to-jsx-string": "^15.0.0",
     "simplex-noise": "^4.0.1",
     "tailwind-merge": "^2.3.0",
-    "prisma": "^5.15.1"
+    "wavesurfer.js": "^7.8.14"
   },
   "devDependencies": {
     "@catppuccin/tailwindcss": "^0.1.6",

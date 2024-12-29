@@ -9,8 +9,8 @@ import BpmFilter from "@/components/BpmFilter";
 const SearchFilterSection = ({ genres, onGenreChange, bpms, onBpmChange, onSearch }: { genres: string[], onGenreChange: (selections: any) => void, bpms: string[], onBpmChange: (selections: any) => void, onSearch: (value: string) => void}) => {
   return (
     <div className="absolute top-20 z-40 w-screen sm:w-3/4 bg-crust rounded-b-3xl sm:rounded-b-3xl md:rounded-b-full flex flex-col items-center justify-between" >
-      <h1 className="text-lg sm:text-xl text-center md:text-2xl p-4 ">
-        Our database of professionally produced beats.
+      <h1 className="text-lg sm:text-xl text-center md:text-2xl p-4 uppercase font-bold">
+        Our database of professionally produced beats
       </h1>
       <Separator />
       <Searchbar onSearch={onSearch} />

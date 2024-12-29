@@ -126,7 +126,7 @@ export function NavLink(props: ComponentProps<typeof Link>) {
       {...props}
       className={`py-1 px-2 mx-1 md:mx-3 ${
         isActive ? "bg-text text-mantle" : "text-text bg-crust"
-      } sm:text-lg hover:text-mantle hover:bg-text rounded-lg hover:rounded-lg hover:duration-500`}
+      } sm:text-lg hover:text-mantle hover:bg-text rounded-lg hover:rounded-lg hover:duration-500 uppercase font-bold`}
     />
   );
 }
