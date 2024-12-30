@@ -5,7 +5,7 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import BeatCard from "@/components/BeatCard";
 import SkeletonBeatCard from "@/components/SkeletonBeatCard";
 import { Beat } from "@/types";
-import { useContext, useEffect, useState } from "react";
+import { use, useContext, useEffect, useState } from "react";
 import AudioPlayer from "@/components/AudioPlayer";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ShoppingCartContext } from "@/app/providers";
@@ -105,14 +105,24 @@ export default function Beats() {
     console.log(shoppingCart);
   };
 
-  const play = (beat: Beat) => {
+  const play = (beat: Beat, pause: boolean) => {
     if (currentlyPlaying && currentlyPlaying.id == beat.id) {
-      setCurrentlyPlaying(null);
-      return;
+      if (pause) {
+        beat.wavesurferRef.current?.playPause();
+        console.log("pause");
+        return;
+      } else {
+        setCurrentlyPlaying(null);
+        console.log("stop");
+        return;
+      }
     }
     setCurrentlyPlaying(beat);
   };
 
+  useEffect(() => {
+    console.log("currentlyPlaying updated:", currentlyPlaying);
+  }, [currentlyPlaying]);
 
   return (
     <div className="flex flex-col items-center justify-start h-full overflow-hidden">
@@ -135,7 +145,7 @@ export default function Beats() {
                   key={index}
                   beat={beat}
                   play={play}
-                  isPlaying={currentlyPlaying == null ? false : currentlyPlaying.id == beat.id}
+                  isPlaying={currentlyPlaying?.id === beat.id}
                   onBuy={onBuy}
                 />
               ))}
@@ -143,7 +153,9 @@ export default function Beats() {
         <ScrollBar />
       </ScrollArea>
 
-      {currentlyPlaying && <AudioPlayer beat={currentlyPlaying} toggle={play}/>}
+      {currentlyPlaying && (
+        <AudioPlayer beat={currentlyPlaying} toggle={play} />
+      )}
     </div>
   );
 }

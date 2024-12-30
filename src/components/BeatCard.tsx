@@ -1,12 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { CardBody, CardContainer, CardItem } from "./ui/3d-card";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faCirclePlay,
-  faCirclePause,
-} from "@fortawesome/free-solid-svg-icons";
+import { faCirclePlay, faCirclePause } from "@fortawesome/free-solid-svg-icons";
 import { Beat } from "@/types";
 
 export default function BeatCard({
@@ -16,10 +13,17 @@ export default function BeatCard({
   isPlaying,
 }: {
   beat: Beat;
-  play: (beat: Beat) => void;
+  play: (beat: Beat, pause: boolean) => void;
   onBuy: (beat: Beat) => void;
   isPlaying: boolean;
 }) {
+  const [toggle, setToggle] = useState(isPlaying);
+  console.log("isPlaying", isPlaying);
+
+  useEffect(() => {
+    setToggle(isPlaying);
+  }, [isPlaying]);
+
   return (
     <CardContainer className="inter-var">
       <CardBody className="bg-gray-50 relative group/card  dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-crust dark:border-white/[0.2] border-black/[0.1] w-full mr-3 ml-3 sm:m-0 sm:w-auto h-auto rounded-xl p-6 border  ">
@@ -57,9 +61,16 @@ export default function BeatCard({
           </CardItem>
         </div>
         <div className="flex flex-col items-center justify-center p-5">
-          <CardItem as="button" translateZ="61" onClick={() => play(beat)}>
+          <CardItem
+            as="button"
+            translateZ="61"
+            onClick={() => {
+              play(beat, true);
+              setToggle(!toggle);
+            }}
+          >
             <FontAwesomeIcon
-              icon={isPlaying ? faCirclePause : faCirclePlay}
+              icon={toggle ? faCirclePause : faCirclePlay}
               size="3x"
             />
           </CardItem>

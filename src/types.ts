@@ -1,4 +1,7 @@
+import WaveSurfer from "wavesurfer.js";
+
 export interface Beat {
+  beat: any;
   id: string;
   createdAt: Date;
   updatedAt: Date;
@@ -11,4 +14,5 @@ export interface Beat {
   purchased: boolean;
   genre: string;
   length: number;
+  wavesurferRef: any;
 }
