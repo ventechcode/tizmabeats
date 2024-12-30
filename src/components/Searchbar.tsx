@@ -7,7 +7,7 @@ export default function Searchbar({onSearch}: {onSearch: (value: string) => void
       label="Search"
       classNames={{
         base: "w-full md:w-3/5 mt-5 px-5",
-        label: "text-white/90 relative pb-5",
+        label: "text-white/90 relative",
         input: [
           "bg-surface0",
           "text-text",
