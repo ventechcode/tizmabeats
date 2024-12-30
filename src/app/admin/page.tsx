@@ -1,7 +1,11 @@
+"use client"
+
 import React from 'react'
 
-export default function BeatBundles() {
+export default function AdminDashboard() {
   return (
-    <div>Admin Dashboard</div>
+    <div>
+      <h1>Admin Dashboard</h1>
+    </div>
   )
 }

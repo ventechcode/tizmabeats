@@ -46,3 +46,37 @@ export async function GET(req: NextRequest) {
       await prisma.$disconnect();
     }
 }
+
+export async function POST(req: NextRequest) {
+  const body = await req.json();
+  const { name, genre, bpm, producerId } = body;
+  console.log(body);
+
+  try {
+    const beat = await prisma.beat.create({
+      data: {
+        name,
+        genre,
+        bpm,
+        producerId,
+        songKey: body.songKey,
+        audioSrc: body.audioSrc,
+        price: body.price,
+        purchased: body.purchased,
+        length: body.length,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        id: body.id,
+        producer: { connect: { id: "00000000-0000-0000-0000-000000000001" } },
+      },
+    });
+
+    return NextResponse.json(beat, { status: 201 });
+  } catch (error) {
+    console.error("Error creating beat:", error);
+    return NextResponse.json({ error: "Error creating beat" }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
+  }
+  
+}
