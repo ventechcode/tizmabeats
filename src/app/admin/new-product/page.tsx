@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { upload } from '@vercel/blob/client';
 
 export default function NewProductPage() {
   const initialFormData = {
@@ -49,17 +50,16 @@ export default function NewProductPage() {
   
       const file = inputFileRef.current.files[0];
   
-      const uploadResponse = await fetch(`/api/upload?filename=${file.name}`, {
-        method: "POST",
-        body: file,
+      const blob = await upload("/beats/" + file.name, file, {
+        access: 'public',
+        handleUploadUrl: "/api/upload",
       });
   
-      if (!uploadResponse.ok) {
+      if (!blob) {
         throw new Error("File upload failed");
       }
   
-      const uploadData = await uploadResponse.json();
-      const audioSrc = uploadData.url;
+      const audioSrc = blob.url;
   
       const updatedFormData = { ...formData, audioSrc };
   

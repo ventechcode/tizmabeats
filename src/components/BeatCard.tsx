@@ -5,7 +5,6 @@ import { CardBody, CardContainer, CardItem } from "./ui/3d-card";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCirclePlay,
-  faCircle,
   faCirclePause,
 } from "@fortawesome/free-solid-svg-icons";
 import { Beat } from "@/types";

@@ -1,6 +1,5 @@
 import React from "react";
 import { Input } from "@nextui-org/input";
-import { on } from "events";
 
 export default function Searchbar({onSearch}: {onSearch: (value: string) => void}) {
   return (

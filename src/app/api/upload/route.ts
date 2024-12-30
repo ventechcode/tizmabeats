@@ -1,21 +1,39 @@
-import { put } from '@vercel/blob';
+import { handleUpload, type HandleUploadBody } from '@vercel/blob/client';
 import { NextResponse } from 'next/server';
  
 export async function POST(request: Request): Promise<NextResponse> {
-  const { searchParams } = new URL(request.url);
-  const filename = searchParams.get('filename');
- 
-  if (!filename) {
-    return NextResponse.json({ error: 'Filename is required' }, { status: 400 });
-  }
+  const body = (await request.json()) as HandleUploadBody;
 
-  if (!request.body) {
-    return NextResponse.json({ error: 'Request body is required' }, { status: 400 });
-  }
+  try {
+    const res = await handleUpload({
+      body,
+      request,
+      onBeforeGenerateToken: async (pathname, clientPayload, multipart) => {
+        return {
+          allowedContentTypes: ['audio/mpeg', 'audio/wav', 'audio/mp3'],
+          maximumSizeInBytes: 10485760,
+          addRandomSuffix: true,
+          cacheControlMaxAge: 3600,
+        };
+      },
+      onUploadCompleted: async () => {
 
-  const blob = await put("beats/" + filename, request.body, {
-    access: 'public',
-  });
- 
-  return NextResponse.json({ url: blob.url }, { status: 201 });
+      },
+    });
+
+    console.log(res);
+    return NextResponse.json(res, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  } catch (error) {
+    return NextResponse.json({ error: 'Upload failed' }, {
+      status: 500,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+  }
 }
