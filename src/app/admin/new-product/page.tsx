@@ -38,44 +38,54 @@ export default function NewProductPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
+  
     setUploading(true);
-
+  
     try {
+      
       if (!inputFileRef.current?.files) {
         throw new Error("No file selected");
       }
-
+  
       const file = inputFileRef.current.files[0];
-
-      const response = await fetch(`/api/upload?filename=${file.name}`, {
+  
+      const uploadResponse = await fetch(`/api/upload?filename=${file.name}`, {
         method: "POST",
         body: file,
       });
-
-      await response.json().then((data) => {
-        const audioSrc = data.url;
-        console.log("audioSrc", audioSrc);
-        setFormData({ ...formData, audioSrc });
-
-        fetch("/api/beats", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ ...formData }),
-        });
-
-        alert("Beat created successfully!");
-        setUploading(false);
-        setFormData(initialFormData);
+  
+      if (!uploadResponse.ok) {
+        throw new Error("File upload failed");
+      }
+  
+      const uploadData = await uploadResponse.json();
+      const audioSrc = uploadData.url;
+  
+      const updatedFormData = { ...formData, audioSrc };
+  
+      const createBeatResponse = await fetch("/api/beats", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedFormData),
       });
+  
+      if (!createBeatResponse.ok) {
+        throw new Error("Beat creation failed");
+      }
+  
+      // Step 5: Reset form and state
+      alert("Beat created successfully!");
+      setUploading(false);
+      setFormData(initialFormData);
     } catch (error) {
       console.error("Error creating beat:", error);
       alert("Error creating beat. Please try again.");
       setUploading(false);
     }
   };
+  
 
   return (
     <div className="container mx-auto">

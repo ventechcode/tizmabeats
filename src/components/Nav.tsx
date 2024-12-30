@@ -142,7 +142,7 @@ export function NavLogo({
   return (
     <Link
       href="/"
-      className="p-2 text-2xl text-text hover:text-blue hover:duration-300 uppercase "
+      className="p-2 text-2xl text-text hover:text-blue hover:duration-300 uppercase"
     >
       TizmaBeats
     </Link>
