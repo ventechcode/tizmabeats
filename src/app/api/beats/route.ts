@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
         songKey: body.songKey,
         audioSrc: body.audioSrc,
         price: body.price,
-        purchased: body.purchased,
+        purchased: false,
         length: body.length,
         createdAt: new Date(),
         updatedAt: new Date(),
