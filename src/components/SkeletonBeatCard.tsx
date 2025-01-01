@@ -12,28 +12,24 @@ export default function SkeletonBeatCard() {
         <div className="h-7 bg-gray-200 rounded-md dark:bg-gray-700/40 w-24"></div>
         <div className="flex flex-row justify-between mt-2">
           <CardItem
-            as="p"
             translateZ="36"
             className="text-subtext0 text-sm max-w-sm"
           >
             <div className="h-5 bg-gray-200 rounded-md dark:bg-gray-700/40 w-14"></div>
           </CardItem>
           <CardItem
-            as="p"
             translateZ="36"
             className="text-subtext0 text-sm max-w-sm"
           >
             <div className="h-5 bg-gray-200 rounded-md dark:bg-gray-700/40 w-14"></div>
           </CardItem>
           <CardItem
-            as="p"
             translateZ="36"
             className="text-subtext0 text-sm max-w-sm"
           >
             <div className="h-5 bg-gray-200 rounded-md dark:bg-gray-700/40 w-14"></div>
           </CardItem>
           <CardItem
-            as="p"
             translateZ="36"
             className="text-subtext0 text-sm max-w-sm"
           >

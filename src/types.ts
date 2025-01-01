@@ -10,6 +10,7 @@ export interface Beat {
   songKey: string;
   audioSrc: string;
   price: number;
+  stripePriceId: string;
   producerId: string;
   purchased: boolean;
   genre: string;

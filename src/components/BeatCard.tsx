@@ -72,6 +72,7 @@ export default function BeatCard({
             <FontAwesomeIcon
               icon={toggle ? faCirclePause : faCirclePlay}
               size="3x"
+              className="text-text hover:text-blue duration-300"
             />
           </CardItem>
         </div>
@@ -79,7 +80,7 @@ export default function BeatCard({
           <CardItem
             translateZ={36}
             as="button"
-            className="px-4 py-2 rounded-xl bg-black dark:bg-white dark:text-black text-white text-xs font-bold"
+            className="px-4 py-2 rounded-xl bg-text text-crust hover:bg-blue hover:text-text text-xs font-bold duration-300"
             onClick={() => onBuy(beat)}
           >
             Buy {beat.price}€
@@ -110,6 +111,6 @@ export default function BeatCard({
 
 function doubleToTimeString(doubleTime: number) {
   const minutes = Math.floor(doubleTime);
-  const seconds = Math.round((doubleTime - minutes) * 60);
+  const seconds = Math.round((doubleTime - minutes) * 100);
   return `${minutes}:${seconds.toString().padStart(2, "0")} min`;
 }

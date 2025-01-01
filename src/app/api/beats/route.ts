@@ -1,5 +1,8 @@
 import prisma from "@/utils/prisma";
 import { NextRequest, NextResponse } from "next/server";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
 export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
@@ -50,9 +53,18 @@ export async function GET(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const body = await req.json();
   const { name, genre, bpm, producerId } = body;
-  console.log(body);
 
   try {
+    const product = await stripe.products.create({
+      name: name,
+    });
+
+    const price = await stripe.prices.create({
+      product: product.id,
+      unit_amount: body.price * 100,
+      currency: "eur",
+    });
+
     const beat = await prisma.beat.create({
       data: {
         name,
@@ -67,7 +79,8 @@ export async function POST(req: NextRequest) {
         createdAt: new Date(),
         updatedAt: new Date(),
         id: body.id,
-        producer: { connect: { id: "00000000-0000-0000-0000-000000000001" } },
+        stripePriceId: price.id,
+        producer: { connect: { id: "1" } },
       },
     });
 
