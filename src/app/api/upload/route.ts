@@ -20,8 +20,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
       },
     });
-
-    console.log(res);
+    
     return NextResponse.json(res, {
       status: 200,
       headers: {
