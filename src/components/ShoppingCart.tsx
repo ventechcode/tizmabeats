@@ -30,8 +30,7 @@ export default function ShoppingCart() {
       },
       body: JSON.stringify({
         items: shoppingCart?.cart.map((beat: Beat) => ({
-          price: beat.stripePriceId,
-          quantity: 1, 
+          id: beat.id,
         })),
       }),
     });
@@ -101,7 +100,7 @@ export default function ShoppingCart() {
           </div>
           <div className="flex justify-center">
             <button
-              className="bg-text text-crust font-semibold sm:w-32 sm:h-12 px-4 py-2 rounded-md hover:bg-blue hover:text-text duration-300"
+              className= "bg-text text-crust font-semibold sm:w-32 sm:h-12 px-4 py-2 rounded-md hover:bg-blue hover:text-text duration-300"
               onClick={handleCheckout}
             >
               {isLoading ? <div className="loading loading-spinner loading-md text-center mt-1"></div> : "Checkout"}

@@ -1,18 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import prisma from "@/utils/prisma";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
 export async function POST(request: Request): Promise<NextResponse> {
   const body = await request.json();
+
+  const price_ids = await prisma.beat.findMany({
+    where: {
+      id: {
+        in: body.items.map((item: any) => item.id),
+      },
+    },
+    select: {
+      stripePriceId: true,
+      id: true,
+      name: true,
+      price: true,
+    },
+  });
+
   const session = await stripe.checkout.sessions.create({
-    payment_method_types: ["card"],
-    line_items: [...body.items],
+    payment_method_types: ["card", "klarna", "paypal"],
+    line_items: [...price_ids.map((item: any) => ({price: item.stripePriceId, quantity: 1}))],
     mode: "payment",
     success_url: `${request.headers.get(
       "origin"
-    )}/successfull_payment?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${request.headers.get("origin")}/cancelled_payment`,
+    )}/payments/success?session_id={CHECKOUT_SESSION_ID}`,
+    cancel_url: `${request.headers.get("origin")}/payments/failure`,
+    metadata: { 
+      items: JSON.stringify(price_ids),
+    }
   });
 
   return NextResponse.json({ id: session.id });
@@ -47,12 +66,23 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   const line_items_data = await line_items.json();
 
+  const items = await prisma.beat.findMany({
+    where: {
+      stripePriceId: {
+        in: line_items_data.data.map((item: any) => item.price.id),
+      },
+    },
+    select: {
+      id: true,
+      name: true,
+      price: true,
+    },
+  });
+
   const data = {
     session: session_data,
-    line_items: line_items_data.data,
+    items: items,
   };  
-
-  console.log(data);
 
   return NextResponse.json(data);
 }

@@ -25,7 +25,8 @@ model Beat {
   length     Float
   stripePriceId String
   producer   Producer @relation(fields: [producerId], references: [id])
-  orders     Order[]
+  orderId    String?
+  order      Order? @relation("OrderBeats", fields: [orderId], references: [id], onDelete: SetNull)
   downloads  Download[]
 }
 
@@ -55,9 +56,8 @@ model Order {
   updatedAt DateTime @updatedAt
   price     Float
   userId    String
-  beatId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  beat      Beat     @relation(fields: [beatId], references: [id], onDelete: Restrict)
+  beat     Beat[]     @relation("OrderBeats")
 }
 
 model Download {

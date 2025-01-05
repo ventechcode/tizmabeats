@@ -5,15 +5,13 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import BeatCard from "@/components/BeatCard";
 import SkeletonBeatCard from "@/components/SkeletonBeatCard";
 import { Beat } from "@/types";
-import { use, useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import AudioPlayer from "@/components/AudioPlayer";
 import { useSearchParams, useRouter } from "next/navigation";
-import { ShoppingCartContext } from "@/app/providers";
 
 export default function Beats() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  let shoppingCart = useContext(ShoppingCartContext);
 
   const [beats, setBeats] = useState<Beat[]>([]);
   const [genres, setGenres] = useState<string[]>([]);
@@ -100,29 +98,20 @@ export default function Beats() {
     router.push(`?${createQueryString("bpm", selectedBpms)}`);
   };
 
-  const onBuy = (beat: Beat) => {
-    shoppingCart?.addToCart(beat);
-    console.log(shoppingCart);
-  };
-
   const play = (beat: Beat, pause: boolean) => {
     if (currentlyPlaying && currentlyPlaying.id == beat.id) {
       if (pause) {
         beat.wavesurferRef.current?.playPause();
-        console.log("pause");
         return;
       } else {
         setCurrentlyPlaying(null);
-        console.log("stop");
         return;
       }
     }
     setCurrentlyPlaying(beat);
   };
 
-  useEffect(() => {
-    console.log("currentlyPlaying updated:", currentlyPlaying);
-  }, [currentlyPlaying]);
+  useEffect(() => {}, [currentlyPlaying]);
 
   return (
     <div className="flex flex-col items-center justify-start h-full overflow-hidden">
@@ -146,7 +135,6 @@ export default function Beats() {
                   beat={beat}
                   play={play}
                   isPlaying={currentlyPlaying?.id === beat.id}
-                  onBuy={onBuy}
                 />
               ))}
         </div>

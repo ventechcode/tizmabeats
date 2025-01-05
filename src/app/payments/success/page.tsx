@@ -1,7 +1,8 @@
 "use client";
 
 import { useSearchParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { ShoppingCartContext } from "@/app/providers";
 
 export default function Success() {
   const searchParams = useSearchParams();
@@ -9,8 +10,11 @@ export default function Success() {
   const session_id = searchParams.get("session_id");
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerName, setCustomerName] = useState("");
-  const [lineItems, setLineItems] = useState([]);
+  const [items, setItems] = useState<
+    { id: string; name: string; price: number }[]
+  >([]);
   const [loading, setLoading] = useState(true);
+  const shoppingCart = useContext(ShoppingCartContext);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -27,23 +31,16 @@ export default function Success() {
       const data = await res.json();
       setCustomerEmail(data.session.customer_details.email);
       setCustomerName(data.session.customer_details.name.split(" ")[0]);
-      setLineItems(data.line_items);
+      setItems(data.items);
 
-      await fetch("/api/receipt_mail", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          customerEmail: data.session.customer_details.email,
-          customerName: data.session.customer_details.name,
-          items: data.line_items.map((item: any) => ({name: item.description, quantity: item.quantity, price: item.amount_total / 100})),
-          totalAmount: data.session.amount_total / 100,
-        }),
-      });
+      if (data.session.payment_status === "paid") {
+        data.items.forEach((item: any) => {
+          shoppingCart?.removeFromCart(item.id);
+        });
+      }
     };
 
-    fetchData().then(() => setLoading(false));  
+    fetchData().then(() => setLoading(false));
   }, []);
 
   return (
@@ -56,22 +53,20 @@ export default function Success() {
             <h1 className="text-3xl font-bold text-green">
               Payment Successful!
             </h1>
-            <p className="text-subtext1 mt-2">Thanks {customerName}, for your purchase.</p>
+            <p className="text-subtext1 mt-2">
+              Thanks {customerName}, for your purchase.
+            </p>
             <p className="text-subtext0 text-xs py-3 mr-64 font-semibold">
               Your Order:
             </p>
             <div className="mb-6">
-              {lineItems.map((item: any) => (
+              {items.map((item: any) => (
                 <div
                   key={item.id}
                   className="border-t border-text py-4 flex flex-col items-start"
                 >
-                  <h2 className="text-lg font-medium text-text">
-                    {item.description}
-                  </h2>
-                  <p className="text-gray-600">
-                    Amount: {(item.amount_total / 100).toFixed(2)}€
-                  </p>
+                  <h2 className="text-lg font-medium text-text">{item.name}</h2>
+                  <p className="text-gray-600">Amount: {item.price}€</p>
                 </div>
               ))}
             </div>

@@ -1,24 +1,23 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { CardBody, CardContainer, CardItem } from "./ui/3d-card";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCirclePlay, faCirclePause } from "@fortawesome/free-solid-svg-icons";
+import { faCirclePlay, faCirclePause, faCheck } from "@fortawesome/free-solid-svg-icons";
 import { Beat } from "@/types";
+import { ShoppingCartContext } from "@/app/providers";
 
 export default function BeatCard({
   beat,
   play,
-  onBuy,
   isPlaying,
 }: {
   beat: Beat;
   play: (beat: Beat, pause: boolean) => void;
-  onBuy: (beat: Beat) => void;
   isPlaying: boolean;
 }) {
   const [toggle, setToggle] = useState(isPlaying);
-  console.log("isPlaying", isPlaying);
+  const shoppingCart = useContext(ShoppingCartContext);
 
   useEffect(() => {
     setToggle(isPlaying);
@@ -80,10 +79,17 @@ export default function BeatCard({
           <CardItem
             translateZ={36}
             as="button"
-            className="px-4 py-2 rounded-xl bg-text text-crust hover:bg-blue hover:text-text text-xs font-bold duration-300"
-            onClick={() => onBuy(beat)}
+            className="px-4 py-2 rounded-xl bg-text text-crust hover:bg-blue hover:text-text text-xs font-bold w-24 h-8 duration-300"
+            onClick={() => {
+              shoppingCart?.addToCart({ id: beat.id, name: beat.name, price: beat.price, quantity: 1 });
+            }}
           >
-            Buy {beat.price}€
+            {
+              shoppingCart?.cart.find((item) => item.id === beat.id)
+                ? <div className="flex w-16">Added <div className="w-4"></div> <FontAwesomeIcon icon={faCheck} className="text-lg"/></div>
+
+                : `Buy ${beat.price}€`
+            }
           </CardItem>
           <CardItem
             translateZ={36}
