@@ -29,11 +29,11 @@ export default function RootLayout({
             </Nav>
             {children}
           </ShoppingCartProvider>
-          <footer className="absolute bottom-0 z-40 flex flex-row items-center justify-around text-text w-full p-4 bg-mantle">
-            <p>Copyright &copy; 2025 TIZMABEATS</p>
-            <p>Privacy Policy</p>
-            <p>Terms of Service</p>
-            <p>Legal</p>
+          <footer className="absolute bottom-0 h-12 z-40 flex flex-row items-center justify-around text-text w-full p-4 bg-mantle text-sm">
+            <p className="hover:cursor-pointer">Copyright &copy; 2025 TIZMABEATS</p>
+            <p className="hover:cursor-pointer hover:underline">Privacy Policy</p>
+            <p className="hover:cursor-pointer hover:underline">Terms of Service</p>
+            <p className="hover:cursor-pointer hover:underline">Legal</p>
           </footer>
         </main>
       </body>

@@ -134,7 +134,7 @@ export default function Beats() {
         onSearch={onSearch}
       />-
 
-      <ScrollArea className="absolute mt-20 sm:mt-80 h-screen w-full z-10">
+      <ScrollArea className="absolute mt-20 sm:mt-80 h-screen w-full z-10 mb-6">
         <div className="flex flex-col mt-44 sm:mt-0 sm:grid gap-4 sm:p-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
           {isLoading
             ? beats.length == 0
