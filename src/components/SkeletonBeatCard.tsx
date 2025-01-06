@@ -8,7 +8,7 @@ import { faCirclePlay } from "@fortawesome/free-solid-svg-icons";
 export default function SkeletonBeatCard() {
   return (
     <CardContainer className="inter-var">
-      <CardBody className="bg-gray-50 relative group/card dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-crust dark:border-white/[0.2] border-black/[0.1] w-full mr-3 ml-3 sm:m-0 sm:w-auto h-auto rounded-xl p-6 border animate-pulse">
+      <CardBody className="bg-gray-50 relative group/card dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] dark:bg-crust dark:border-white/[0.2] border-black/[0.1] w-5/6 mr-3 ml-3 sm:m-0 sm:w-auto h-auto rounded-xl p-6 animate-pulse">
         <div className="h-7 bg-gray-200 rounded-md dark:bg-gray-700/40 w-24"></div>
         <div className="flex flex-row justify-between mt-2">
           <CardItem
@@ -48,13 +48,13 @@ export default function SkeletonBeatCard() {
             translateZ={36}
             className="px-4 py-2 rounded-xl text-xs text-subtext1"
           >
-            <div className="h-4 bg-gray-200 rounded-md dark:bg-gray-700/40 w-8"></div>
+            <div className="h-4 bg-gray-200 rounded-md dark:bg-gray-700/40 w-9"></div>
           </CardItem>
           <CardItem
             translateZ={36}
             className="px-4 py-2 rounded-xl text-xs text-subtext1"
           >
-            <div className="h-4 bg-gray-200 rounded-md dark:bg-gray-700/40 w-8"></div>
+            <div className="h-4 bg-gray-200 rounded-md dark:bg-gray-700/40 w-9"></div>
           </CardItem>
           <CardItem
             translateZ={36}

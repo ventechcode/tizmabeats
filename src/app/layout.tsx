@@ -1,9 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { Nav, NavLink, NavLogo } from "@/components/Nav";
-import { WavyBackground } from "@/components/ui/wavy-background";
-import { ShoppingCart } from "lucide-react";
+import { Nav, NavLink } from "@/components/Nav";
 import { ShoppingCartProvider } from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -20,8 +18,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      {/* color schemes: latte frappé macchiatio mocha */}
       <body className={`${inter.className} mocha text-text bg-base`}>
-        <main className="h-screen flex flex-col items-center justify-between">
+        <main className="h-screen flex flex-col items-center justify-center ">
           <ShoppingCartProvider>
             <Nav>
               <NavLink href="/beats">Beats</NavLink>
@@ -30,8 +29,11 @@ export default function RootLayout({
             </Nav>
             {children}
           </ShoppingCartProvider>
-          <footer className="relative bottom-0 z-40 text-center text-text w-full p-4">
-            <p>&copy; 2024 Tizmabeats</p>
+          <footer className="absolute bottom-0 z-40 flex flex-row items-center justify-around text-text w-full p-4 bg-mantle">
+            <p>Copyright &copy; 2025 TIZMABEATS</p>
+            <p>Privacy Policy</p>
+            <p>Terms of Service</p>
+            <p>Legal</p>
           </footer>
         </main>
       </body>

@@ -35,8 +35,9 @@ export default function BpmFilter({
       classNames={{
         listboxWrapper: "bg-surface0 rounded-lg",
         mainWrapper: "bg-surface0 rounded-lg",
-        label: "mb-5 text-white/90",
-        listbox: "bg-surface0 rounded-lg text-text overflow-y-auto h-full",
+        label: "mb-5 text-text",
+        value: "text-subtext0",
+        listbox: "bg-surface0 rounded-lg overflow-y-auto h-full text-subtext0",
       }}
       onSelectionChange={filterBpm}
     >

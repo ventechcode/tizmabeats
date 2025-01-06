@@ -1,19 +1,24 @@
 import React from "react";
 import { Input } from "@nextui-org/input";
 
-export default function Searchbar({onSearch}: {onSearch: (value: string) => void}) {
+export default function Searchbar({
+  onSearch,
+}: {
+  onSearch: (value: string) => void;
+}) {
   return (
     <Input
       label="Search"
       classNames={{
-        base: "w-full md:w-3/5 mt-5 px-5",
-        label: "text-white/90 relative",
+        base: "w-full md:w-3/5 mt-5 px-5 mb-4 sm:mb-0",
+        label: "text-text relative",
         input: [
           "bg-surface0",
           "text-text",
-          "placeholder:text-default-700/50 dark:placeholder:text-white/60",
+          "placeholder:text-subtext0",
         ],
-        innerWrapper: "bg-transparent flex flex-row items-center justify-center",
+        innerWrapper:
+          "bg-transparent flex flex-row items-center justify-center",
         inputWrapper: [
           "shadow-xl",
           "rounded-lg",
@@ -22,37 +27,25 @@ export default function Searchbar({onSearch}: {onSearch: (value: string) => void
         ],
       }}
       onValueChange={(value) => onSearch(value)}
-      
       placeholder="Type to search..."
-      startContent={<SearchIcon className="" />}
+      startContent={<SearchIcon />}
     />
   );
 }
 
 export const SearchIcon = (props: any) => (
   <svg
-    aria-hidden="true"
+    xmlns="http://www.w3.org/2000/svg"
     fill="none"
-    focusable="false"
-    height="1em"
-    role="presentation"
     viewBox="0 0 24 24"
-    width="1em"
-    {...props}
+    strokeWidth={1.5}
+    stroke="currentColor"
+    className="size-6 text-text"
   >
     <path
-      d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z"
-      stroke="currentColor"
       strokeLinecap="round"
       strokeLinejoin="round"
-      strokeWidth="2"
-    />
-    <path
-      d="M22 22L20 20"
-      stroke="currentColor"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
+      d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
     />
   </svg>
 );

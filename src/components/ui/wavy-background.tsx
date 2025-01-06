@@ -27,14 +27,10 @@ export const WavyBackground = ({
   [key: string]: any;
 }) => {
   const noise = createNoise3D();
-  let w: number,
-    h: number,
-    nt: number,
-    i: number,
-    x: number,
-    ctx: any,
-    canvas: any;
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const backgroundFillRef = useRef(backgroundFill); // Ref to store the latest backgroundFill value
+  const [canvasContext, setCanvasContext] = useState<CanvasRenderingContext2D | null>(null);
+
   const getSpeed = () => {
     switch (speed) {
       case "slow":
@@ -46,21 +42,6 @@ export const WavyBackground = ({
     }
   };
 
-  const init = () => {
-    canvas = canvasRef.current;
-    ctx = canvas.getContext("2d");
-    w = ctx.canvas.width = window.innerWidth;
-    h = ctx.canvas.height = window.innerHeight;
-    ctx.filter = `blur(${blur}px)`;
-    nt = 0;
-    window.onresize = function () {
-      w = ctx.canvas.width = window.innerWidth;
-      h = ctx.canvas.height = window.innerHeight;
-      ctx.filter = `blur(${blur}px)`;
-    };
-    render();
-  };
-
   const waveColors = colors ?? [
     "#38bdf8",
     "#818cf8",
@@ -68,40 +49,81 @@ export const WavyBackground = ({
     "#e879f9",
     "#22d3ee",
   ];
-  const drawWave = (n: number) => {
+
+  let animationId: number;
+  let nt = 0;
+
+  const drawWave = (ctx: CanvasRenderingContext2D, n: number) => {
     nt += getSpeed();
-    for (i = 0; i < n; i++) {
+    const w = ctx.canvas.width;
+    const h = ctx.canvas.height;
+
+    for (let i = 0; i < n; i++) {
       ctx.beginPath();
       ctx.lineWidth = waveWidth || 50;
       ctx.strokeStyle = waveColors[i % waveColors.length];
-      for (x = 0; x < w; x += 5) {
-        var y = noise(x / 800, 0.3 * i, nt) * 100;
-        ctx.lineTo(x, y + h * 0.61); // adjust for height, currently at 50% of the container
+      for (let x = 0; x < w; x += 5) {
+        const y = noise(x / 800, 0.3 * i, nt) * 100;
+        ctx.lineTo(x, y + h * 0.61); // Adjust for height
       }
       ctx.stroke();
       ctx.closePath();
     }
   };
 
-  let animationId: number;
-  const render = () => {
-    ctx.fillStyle = backgroundFill || "black";
+  const render = (ctx: CanvasRenderingContext2D) => {
+    const w = ctx.canvas.width;
+    const h = ctx.canvas.height;
+
     ctx.globalAlpha = waveOpacity || 0.5;
+    ctx.fillStyle = backgroundFillRef.current || "black"; // Use the latest backgroundFill from the ref
     ctx.fillRect(0, 0, w, h);
-    drawWave(3);
-    animationId = requestAnimationFrame(render);
+    drawWave(ctx, 3);
+    animationId = requestAnimationFrame(() => render(ctx));
+  };
+
+  const initCanvas = () => {
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        setCanvasContext(ctx);
+        ctx.canvas.width = window.innerWidth;
+        ctx.canvas.height = window.innerHeight;
+        ctx.filter = `blur(${blur}px)`;
+        render(ctx); // Start the animation loop
+        return ctx;
+      }
+    }
+    return null;
   };
 
   useEffect(() => {
-    init();
+    const ctx = initCanvas();
+    const handleResize = () => {
+      if (ctx) {
+        ctx.canvas.width = window.innerWidth;
+        ctx.canvas.height = window.innerHeight;
+        ctx.filter = `blur(${blur}px)`;
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+
     return () => {
+      window.removeEventListener("resize", handleResize);
       cancelAnimationFrame(animationId);
     };
-  }, []);
+  }, [blur, waveWidth, speed, colors]);
+
+  // Update the backgroundFillRef whenever backgroundFill changes
+  useEffect(() => {
+    backgroundFillRef.current = backgroundFill;
+    console.log("Background fill updated:", backgroundFill);
+  }, [backgroundFill]);
 
   const [isSafari, setIsSafari] = useState(false);
   useEffect(() => {
-    // I'm sorry but i have got to support it on safari.
     setIsSafari(
       typeof window !== "undefined" &&
         navigator.userAgent.includes("Safari") &&

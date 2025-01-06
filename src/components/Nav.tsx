@@ -14,9 +14,9 @@ import ShoppingCart from "./ShoppingCart";
 
 export function Nav({ children }: { children: React.ReactNode }) {
   return (
-    <Disclosure as="nav" className="bg-crust z-50 w-screen px-2 sm:px-8">
+    <Disclosure as="nav" className="bg-crust top-0 absolute z-50 w-screen px-2 sm:px-8">
       <div className="">
-        <div className="relative flex h-20 items-center justify-between">
+        <div className="flex h-20 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
             {/* Mobile menu button*/}
             <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 focus:outline-none">
@@ -30,7 +30,7 @@ export function Nav({ children }: { children: React.ReactNode }) {
               <FontAwesomeIcon
                 icon={faXmark}
                 aria-hidden="true"
-                className="hidden size-6 group-data-[open]:block"
+                className="hidden size-6 group-data-[open]:block mb-32"
               />
             </DisclosureButton>
           </div>
