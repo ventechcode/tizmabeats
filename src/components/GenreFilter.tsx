@@ -33,13 +33,13 @@ export default function GenreFilter({
       selectedKeys={values}
       className="w-64 rounded-lg text-text"
       classNames={{
-        listboxWrapper: "bg-surface0 rounded-lg",
         mainWrapper: "bg-surface0 rounded-lg",
-        label: "mb-5 text-text",
+        label: "mb-5 text-text",  
         value: "text-subtext0",
-        listbox: "bg-surface0 rounded-lg text-subtext0 overflow-y-auto h-full",
+        popoverContent: "bg-surface0 rounded-lg text-subtext0 overflow-y-auto h-full",
       }}
       onSelectionChange={filterGenre}
+
     >
       {genres.map((genre) => (
         <SelectItem key={genre}>{genre}</SelectItem>

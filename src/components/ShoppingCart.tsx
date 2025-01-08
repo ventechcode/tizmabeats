@@ -6,8 +6,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrashCan } from "@fortawesome/free-solid-svg-icons";
 import { ShoppingCartContext } from "@/app/providers";
 import { useContext, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
