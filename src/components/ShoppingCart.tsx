@@ -61,44 +61,44 @@ export default function ShoppingCart() {
 
           {shoppingCart && shoppingCart.cart.length > 0 ? (
             <div className="absolute right-0 bottom-0 transform translate-x-1/4 translate-y-1/3 h-5 w-5 bg-text rounded-full flex items-center justify-center">
-              <div className="text-sm font-semibold mb-0.5 text-crust">
+              <div className="text-sm font-semibold text-crust">
                 {shoppingCart?.cart.length}
               </div>
             </div>
           ) : null}
         </div>
       </SheetTrigger>
-      <SheetContent className="bg-mantle border-0">
+      <SheetContent className={`bg-mantle border-0 flex flex-col justify-between ${shoppingCart && shoppingCart.cart.length > 0 ? "justify-start" : "justify-between"}`}>
         <SheetHeader>
           <SheetTitle>Shopping Cart</SheetTitle>
           {shoppingCart && shoppingCart.cart.length > 0 ? (
-            <SheetDescription className="text-subtext0">Items:</SheetDescription>
+            <SheetDescription className="text-subtext0">
+              Items:
+            </SheetDescription>
           ) : (
             <SheetDescription>Your cart is currently empty.</SheetDescription>
           )}
         </SheetHeader>
-        <div className="flex flex-col space-y-2 h-max overflow-y-scroll">
+        <div className={`flex flex-col space-y-2 space-x-2 ${shoppingCart && shoppingCart.cart.length > 0 ? "overflow-y-scroll" : ""}`}>
           <ul>
             {shoppingCart?.cart.length == 0 ? (
-              <div className="flex justify-center items-center h-screen pl-2 pb-24">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="size-12"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
-                  />
-                </svg>
-              </div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={1.5}
+                stroke="currentColor"
+                className="size-12 flex flex-col items-center justify-center mx-auto"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 10.5V6a3.75 3.75 0 1 0-7.5 0v4.5m11.356-1.993 1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 0 1-1.12-1.243l1.264-12A1.125 1.125 0 0 1 5.513 7.5h12.974c.576 0 1.059.435 1.119 1.007ZM8.625 10.5a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Zm7.5 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z"
+                />
+              </svg>
             ) : (
               shoppingCart?.cart.map((beat: any) => (
-                <li key={beat.id}>
+                <li key={beat.id} className="mr-4">
                   <div className="flex justify-between items-center px-4 py-3 my-4 bg-surface0 duration-300 rounded-md shadow-sm">
                     <div className="flex flex-row items-center space-x-1">
                       <div>{beat.name}</div>
@@ -107,7 +107,9 @@ export default function ShoppingCart() {
                       </div>
                     </div>
                     <div onClick={() => shoppingCart?.removeFromCart(beat.id)}>
-                      <p className="text-xs text-subtext2 hover:text-subtext0 duration-300 hover:cursor-pointer">Remove</p>
+                      <p className="text-xs text-subtext2 hover:text-subtext0 duration-300 hover:cursor-pointer">
+                        Remove
+                      </p>
                     </div>
                   </div>
                 </li>
@@ -115,7 +117,7 @@ export default function ShoppingCart() {
             )}
           </ul>
         </div>
-        <div className="absolute bottom-0 left-0 mb-5 w-full flex flex-row items-center justify-around">
+        <div className="w-full flex flex-row items-center justify-around">
           <div className="font-bold text-text md:text-lg sm:text-xl">
             Total:{" "}
             {shoppingCart?.cart?.reduce((prev, val) => {
@@ -126,7 +128,7 @@ export default function ShoppingCart() {
               (incl. taxes and shipping costs)
             </p>
           </div>
-          
+
           <div className="flex justify-center">
             <button
               className="bg-text text-crust font-semibold sm:w-32 sm:h-12 px-4 py-2 rounded-md hover:bg-blue hover:text-text duration-300"

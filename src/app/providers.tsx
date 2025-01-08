@@ -46,14 +46,17 @@ export function ShoppingCartProvider({ children }: any) {
     }
   }, [cart]);
 
+  // const addToCart = (item: any) =>
+  //   setCart((prev) => {
+  //     const existingItem = prev.find((i) => i.id === item.id);
+  //     if (existingItem) {
+  //       return prev;
+  //     }
+  //     return [...prev, item];
+  //   });
+
   const addToCart = (item: any) =>
-    setCart((prev) => {
-      const existingItem = prev.find((i) => i.id === item.id);
-      if (existingItem) {
-        return prev;
-      }
-      return [...prev, item];
-    });
+    setCart((prev) => [...prev, item]);
 
   const removeFromCart = (id: any) =>
     setCart((prev) => prev.filter((item) => item.id !== id));
