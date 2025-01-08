@@ -17,6 +17,7 @@ export default function BeatCard({
   isPlaying: boolean;
 }) {
   const [toggle, setToggle] = useState(isPlaying);
+  const [isHovered, setIsHovered] = useState(false);
   const shoppingCart = useContext(ShoppingCartContext);
 
   useEffect(() => {
@@ -71,26 +72,37 @@ export default function BeatCard({
             <FontAwesomeIcon
               icon={toggle ? faCirclePause : faCirclePlay}
               size="3x"
-              className="text-text hover:text-blue duration-300"
+              className="text-text hover:text-accentColor duration-300"
             />
           </CardItem>
         </div>
         <div className="flex justify-between items-center">
-          <CardItem
-            translateZ={36}
-            as="button"
-            className="px-4 py-2 rounded-xl bg-text text-crust hover:bg-blue hover:text-text text-xs font-bold w-24 h-8 duration-300"
-            onClick={() => {
-              shoppingCart?.addToCart({ id: beat.id, name: beat.name, price: beat.price, quantity: 1 });
-            }}
-          >
-            {
-              shoppingCart?.cart.find((item) => item.id === beat.id)
-                ? <div className="flex w-16">Added <div className="w-4"></div> <FontAwesomeIcon icon={faCheck} className="text-lg"/></div>
-
-                : `Buy ${beat.price}€`
-            }
-          </CardItem>
+        <CardItem
+      translateZ={36}
+      as="button"
+      className={`px-4 py-2 rounded-xl bg-text text-crust ${
+        shoppingCart?.contains(beat.id) ? "hover:bg-red" : "hover:bg-accentColor"
+      } text-xs font-bold w-24 h-8 duration-300`}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+      onClick={() => {
+        if (shoppingCart?.contains(beat.id)) {
+          shoppingCart?.removeFromCart(beat.id);
+        } else {
+          shoppingCart?.addToCart(beat);
+        }
+      }}
+    >
+      {shoppingCart?.contains(beat.id) ? (
+        <div className="flex w-16">
+          {isHovered ? "Remove?" : "Added"}{" "}
+          <div className="w-4"></div>{" "}
+          <FontAwesomeIcon icon={faCheck} className="text-lg" />
+        </div>
+      ) : (
+        (isHovered ? "Add to Bag" : `Buy ${beat.price}€`)
+      )}
+    </CardItem>
           <CardItem
             translateZ={36}
             className="px-4 py-2 rounded-xl text-xs text-subtext1"

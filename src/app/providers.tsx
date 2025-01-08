@@ -10,6 +10,7 @@ interface ShoppingCartContextType {
   cart: any[];
   addToCart: (item: any) => void;
   removeFromCart: (id: any) => void;
+  contains: (id: any) => boolean;
 }
 
 const ShoppingCartContext = createContext<ShoppingCartContextType | undefined>(
@@ -46,23 +47,22 @@ export function ShoppingCartProvider({ children }: any) {
     }
   }, [cart]);
 
-  // const addToCart = (item: any) =>
-  //   setCart((prev) => {
-  //     const existingItem = prev.find((i) => i.id === item.id);
-  //     if (existingItem) {
-  //       return prev;
-  //     }
-  //     return [...prev, item];
-  //   });
-
   const addToCart = (item: any) =>
-    setCart((prev) => [...prev, item]);
+    setCart((prev) => {
+      const existingItem = prev.find((i) => i.id === item.id);
+      if (existingItem) {
+        return prev;
+      }
+      return [...prev, item];
+    });
+
+  const contains = (id: any) => cart.some((item) => item.id === id);
 
   const removeFromCart = (id: any) =>
     setCart((prev) => prev.filter((item) => item.id !== id));
 
   return (
-    <ShoppingCartContext.Provider value={{ cart, addToCart, removeFromCart }}>
+    <ShoppingCartContext.Provider value={{ cart, addToCart, removeFromCart, contains }}>
       {children}
     </ShoppingCartContext.Provider>
   );

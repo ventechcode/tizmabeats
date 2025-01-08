@@ -15,6 +15,9 @@ const config: Config = {
     "./node_modules/@nextui-org/theme/dist/components/(input|select).{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    colors: {
+      'accentColor': '#89b4fa'  
+    },
     extend: {
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
