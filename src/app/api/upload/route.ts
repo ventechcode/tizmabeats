@@ -31,6 +31,8 @@ export async function POST(request: Request): Promise<NextResponse> {
         if (!res.ok) {
           console.error("Webhook failed");
         }
+
+        console.log(await res.json().then((data) => data.message));
       },
     });
 
