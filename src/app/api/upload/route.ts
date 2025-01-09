@@ -16,13 +16,13 @@ export async function POST(request: Request): Promise<NextResponse> {
           cacheControlMaxAge: 3600,
         };
       },
-      onUploadCompleted: async (blob) => {
+      onUploadCompleted: async ({blob}) => {
         const res = await fetch('/api/upload/webhook', {
           method: 'POST',
           headers: {
-            'Content-Type': 'audio/*',
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ blob }),
+          body: JSON.stringify({url: blob.downloadUrl}),
         })
 
         console.log(await res.json());
