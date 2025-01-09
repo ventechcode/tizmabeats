@@ -2,36 +2,51 @@
 
 import Link from "next/link";
 import React, { ComponentProps } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   Disclosure,
   DisclosureButton,
   DisclosurePanel,
 } from "@headlessui/react";
-import { faXmark, faBars } from "@fortawesome/free-solid-svg-icons";
 import { usePathname } from "next/navigation";
 import ShoppingCart from "./ShoppingCart";
 
 export function Nav({ children }: { children: React.ReactNode }) {
   return (
-    <Disclosure as="nav" className="bg-crust top-0 absolute z-50 w-screen px-2 sm:px-8">
+    <Disclosure
+      as="nav"
+      className="bg-crust top-0 absolute z-50 w-screen sm:px-8"
+    >
       <div className="">
-        <div className="flex h-20 items-center justify-between">
-          <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
+        <div className="flex flex-row h-20 items-center justify-between">
+          <div className="absolute inset-y-0 flex items-center sm:hidden ml-2">
             {/* Mobile menu button*/}
-            <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 focus:outline-none">
+            <DisclosureButton className="group relative inline-flex items-center justify-center rounded-md p-2 text-text focus:outline-none hover:text-accentColor duration-300">
               <span className="absolute -inset-0.5" />
               <span className="sr-only">Open main menu</span>
-              <FontAwesomeIcon
-                icon={faBars}
-                aria-hidden="true"
-                className="block size-6 group-data-[open]:hidden"
-              />
-              <FontAwesomeIcon
-                icon={faXmark}
-                aria-hidden="true"
-                className="hidden size-6 group-data-[open]:block mb-32"
-              />
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="block size-8 group-data-[open]:hidden"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M3 6.75A.75.75 0 0 1 3.75 6h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 6.75ZM3 12a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75A.75.75 0 0 1 3 12Zm0 5.25a.75.75 0 0 1 .75-.75h16.5a.75.75 0 0 1 0 1.5H3.75a.75.75 0 0 1-.75-.75Z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                className="hidden size-8 group-data-[open]:block mb-32"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M5.47 5.47a.75.75 0 0 1 1.06 0L12 10.94l5.47-5.47a.75.75 0 1 1 1.06 1.06L13.06 12l5.47 5.47a.75.75 0 1 1-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 0 1-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 0 1 0-1.06Z"
+                  clipRule="evenodd"
+                />
+              </svg>
             </DisclosureButton>
           </div>
           <div className="w-full flex flex-row items-center justify-center sm:items-stretch sm:justify-between">
@@ -78,7 +93,7 @@ export function NavLogo({
   return (
     <Link
       href="/"
-      className="p-2 text-2xl text-text hover:text-blue hover:duration-300 uppercase"
+      className="p-2 text-2xl text-text hover:text-accentColor hover:duration-300 uppercase"
     >
       TizmaBeats
     </Link>

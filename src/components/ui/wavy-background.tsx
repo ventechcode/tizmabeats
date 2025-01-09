@@ -29,7 +29,7 @@ export const WavyBackground = ({
   const noise = createNoise3D();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const backgroundFillRef = useRef(backgroundFill); // Ref to store the latest backgroundFill value
-  const [canvasContext, setCanvasContext] = useState<CanvasRenderingContext2D | null>(null);
+  const [_, setCanvasContext] = useState<CanvasRenderingContext2D | null>(null);
 
   const getSpeed = () => {
     switch (speed) {
@@ -119,7 +119,6 @@ export const WavyBackground = ({
   // Update the backgroundFillRef whenever backgroundFill changes
   useEffect(() => {
     backgroundFillRef.current = backgroundFill;
-    console.log("Background fill updated:", backgroundFill);
   }, [backgroundFill]);
 
   const [isSafari, setIsSafari] = useState(false);
@@ -139,7 +138,7 @@ export const WavyBackground = ({
       )}
     >
       <canvas
-        className="inset-0 absolute"
+        className="inset-0 absolute hidden sm:block"
         ref={canvasRef}
         id="canvas"
         style={{

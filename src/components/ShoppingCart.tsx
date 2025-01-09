@@ -43,14 +43,14 @@ export default function ShoppingCart() {
   return (
     <Sheet>
       <SheetTrigger>
-        <div className="absolute right-4 top-5 hover:text-blue hover:duration-300 ">
+        <div className="absolute right-4 top-6 sm:top-5 hover:text-accentColor hover:duration-300 text-text">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="size-10"
+            className="size-8 sm:size-10"
           >
             <path
               strokeLinecap="round"
@@ -68,18 +68,30 @@ export default function ShoppingCart() {
           ) : null}
         </div>
       </SheetTrigger>
-      <SheetContent className={`bg-mantle border-0 flex flex-col justify-between ${shoppingCart && shoppingCart.cart.length > 0 ? "justify-start" : "justify-between"}`}>
+      <SheetContent
+        className={`bg-mantle border-0 flex flex-col justify-between ${
+          shoppingCart && shoppingCart.cart.length > 0
+            ? "justify-start"
+            : "justify-between"
+        }`}
+      >
         <SheetHeader>
-          <SheetTitle>Shopping Cart</SheetTitle>
+          <SheetTitle className="text-text">Shopping Cart</SheetTitle>
           {shoppingCart && shoppingCart.cart.length > 0 ? (
             <SheetDescription className="text-subtext0">
               Items:
             </SheetDescription>
           ) : (
-            <SheetDescription>Your cart is currently empty.</SheetDescription>
+            <SheetDescription className="text-subtext0">Your cart is currently empty.</SheetDescription>
           )}
         </SheetHeader>
-        <div className={`flex flex-col space-y-2 space-x-2 ${shoppingCart && shoppingCart.cart.length > 0 ? "overflow-y-scroll" : ""}`}>
+        <div
+          className={`flex flex-col space-y-2 space-x-2 ${
+            shoppingCart && shoppingCart.cart.length > 0
+              ? "overflow-y-scroll"
+              : ""
+          }`}
+        >
           <ul>
             {shoppingCart?.cart.length == 0 ? (
               <svg
@@ -88,7 +100,7 @@ export default function ShoppingCart() {
                 viewBox="0 0 24 24"
                 strokeWidth={1.5}
                 stroke="currentColor"
-                className="size-12 flex flex-col items-center justify-center mx-auto"
+                className="size-12 flex flex-col items-center justify-center mx-auto text-text"
               >
                 <path
                   strokeLinecap="round"
@@ -117,30 +129,27 @@ export default function ShoppingCart() {
             )}
           </ul>
         </div>
-        <div className="w-full flex flex-row items-center justify-around">
+        <div className="flex">
           <div className="font-bold text-text md:text-lg sm:text-xl">
             Total:{" "}
             {shoppingCart?.cart?.reduce((prev, val) => {
               return prev + val.price;
             }, 0)}
             €
-            <p className="text-[10px] sm:text-xs font-light text-subtext0">
+            <p className="text-[9px] sm:text-xs md:text-sm font-light text-subtext0 w-max">
               (incl. taxes and shipping costs)
             </p>
           </div>
-
-          <div className="flex justify-center">
-            <button
-              className="bg-text text-crust font-semibold sm:w-32 sm:h-12 px-4 py-2 rounded-md hover:bg-blue hover:text-text duration-300"
-              onClick={handleCheckout}
-            >
-              {isLoading ? (
-                <div className="loading loading-spinner loading-md text-center mt-1"></div>
-              ) : (
-                "Checkout"
-              )}
-            </button>
-          </div>
+          <button
+            onClick={handleCheckout}
+            className="ml-2 sm:ml-4 h-12 w-24 sm:h-14 sm:w-32 animate-shimmer flex items-center justify-center rounded-md border border-slate-800 bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] px-6 font-medium text-[#4c4f69] transition-colors focus:outline-none hover:text-[#cdd6f4] "
+          >
+            {isLoading ? (
+              <span className="loading loading-dots loading-md text-text"></span>
+            ) : (
+              "Checkout"
+            )}
+          </button>
         </div>
       </SheetContent>
     </Sheet>

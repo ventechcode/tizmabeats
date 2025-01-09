@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       {/* color schemes: latte frappé macchiatio mocha */}
       <body className={`${inter.className} mocha text-text bg-base`}>
-        <main className="h-screen flex flex-col items-center justify-center ">
+        <main className="h-screen flex flex-col items-center justify-center bg-base">
           <ShoppingCartProvider>
             <Nav>
               <NavLink href="/beats">Beats</NavLink>
@@ -29,12 +29,6 @@ export default function RootLayout({
             </Nav>
             {children}
           </ShoppingCartProvider>
-          <footer className="absolute bottom-0 h-12 z-40 flex flex-row items-center justify-around text-text w-full p-4 bg-mantle text-sm">
-            <p className="hover:cursor-pointer">Copyright &copy; 2025 TIZMABEATS</p>
-            <p className="hover:cursor-pointer hover:underline">Privacy Policy</p>
-            <p className="hover:cursor-pointer hover:underline">Terms of Service</p>
-            <p className="hover:cursor-pointer hover:underline">Legal</p>
-          </footer>
         </main>
       </body>
     </html>

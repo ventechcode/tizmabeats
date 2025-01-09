@@ -12,14 +12,17 @@ export default function Home() {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const prefersDarkMode = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      const prefersDarkMode = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
       const initialFlavor = prefersDarkMode ? "mocha" : "latte";
-      updateTheme(initialFlavor);
+      updateTheme(initialFlavor, false);
 
       const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
       const handleColorSchemeChange = (event: MediaQueryListEvent) => {
         const newFlavor = event.matches ? "mocha" : "latte";
-        updateTheme(newFlavor);
+        localStorage.setItem("theme", JSON.stringify({ flavor: newFlavor }));
+        updateTheme(newFlavor, true);
       };
 
       mediaQuery.addEventListener("change", handleColorSchemeChange);
@@ -31,11 +34,29 @@ export default function Home() {
     }
   }, []);
 
-  const updateTheme = (newFlavor: string) => {
+  const updateTheme = (newFlavor: string, manual_switch: boolean) => {
+    if (manual_switch) {
+      localStorage.setItem("theme", JSON.stringify({ flavor: newFlavor }));
+      console.log("Theme saved to local storage: ", newFlavor);
+    } 
+
+    if (!manual_switch && localStorage.getItem("theme")) {
+      const theme = JSON.parse(localStorage.getItem("theme") || "");
+      newFlavor = theme.flavor;
+      setFlavor(newFlavor);
+      console.log("Theme loaded from local storage: ", newFlavor);
+    }
+
     if (document.body.className.includes("latte")) {
-      document.body.className = document.body.className.replace("latte", newFlavor);
+      document.body.className = document.body.className.replace(
+        "latte",
+        newFlavor
+      );
     } else if (document.body.className.includes("mocha")) {
-      document.body.className = document.body.className.replace("mocha", newFlavor);
+      document.body.className = document.body.className.replace(
+        "mocha",
+        newFlavor
+      );
     } else {
       document.body.className = newFlavor;
     }
@@ -44,17 +65,13 @@ export default function Home() {
 
     // Calculate and set the background color immediately
     const flavorList = flavorEntries.map((entry) => entry[1]);
-    const selectedFlavor = flavorList.find((flavorItem) => flavorItem.name.toLowerCase() === newFlavor);
+    const selectedFlavor = flavorList.find(
+      (flavorItem) => flavorItem.name.toLowerCase() === newFlavor
+    );
     if (selectedFlavor) {
       setBackgroundColor(selectedFlavor.colors.base.hex);
     }
   };
-
-  // Debug logs
-  useEffect(() => {
-    console.log("Flavor updated:", flavor);
-    console.log("Background color updated:", backgroundColor);
-  }, [flavor, backgroundColor]);
 
   const words = [
     {
@@ -74,7 +91,7 @@ export default function Home() {
     },
     {
       text: "Beats.",
-      className: "text-blue dark:text-blue",
+      className: "text-accentColor",
     },
   ];
 
@@ -86,7 +103,7 @@ export default function Home() {
           words={words}
           className="relative z-10 sm:mt-16 text-3xl"
         />
-        <h1 className="relative z-10 text-sm sm:text-md md:text-lg">
+        <h1 className="relative z-10 text-sm sm:text-md md:text-lg text-text">
           Hip-Hop, Techno, House and more!
         </h1>
         <Link
@@ -101,9 +118,53 @@ export default function Home() {
         </Link>
       </div>
 
+      <footer className="absolute left-0 bottom-0 h-12 z-40 flex flex-row items-center justify-around text-text w-screen p-4 bg-mantle text-sm">
+        <p className="hover:cursor-pointer">Copyright &copy; 2025 TIZMABEATS</p>
+        <p className="hover:cursor-pointer hover:underline">Privacy Policy</p>
+        <p className="hover:cursor-pointer hover:underline">Terms of Service</p>
+        <p className="hover:cursor-pointer hover:underline">Legal</p>
+        {flavor == "mocha" ? (
+          <svg
+            onClick={() => updateTheme("latte", true)}
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="size-6 hover:scale-125 hover:cursor-pointer duration-300"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+            />
+          </svg>
+        ) : (
+          <svg
+            onClick={() => updateTheme("mocha", true)}
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="size-6 hover:scale-125 hover:cursor-pointer duration-300"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"
+            />
+          </svg>
+        )}
+      </footer>
+
       {/* WavyBackground updates immediately based on backgroundColor */}
       {backgroundColor && (
-        <WavyBackground speed="fast" backgroundFill={backgroundColor} blur={5} />
+        <WavyBackground
+          speed="fast"
+          backgroundFill={backgroundColor}
+          blur={5}
+        />
       )}
     </main>
   );
