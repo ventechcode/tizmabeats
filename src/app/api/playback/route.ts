@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { list } from "@vercel/blob"
 
 export async function GET(request: NextRequest) {
   const beatId = request.nextUrl.searchParams.get("id");
@@ -11,8 +12,15 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const blobUrl = `https://blhf5x3zv0lnny2n.public.blob.vercel-storage.com/beats/${beatId}/converted/playlist-R4Z5fBb9amVpzYUGY9VHN1nrzN2Lqm.m3u8`;
-    const res = await fetch(blobUrl);
+    const items = await list({prefix: `beats/${beatId}/converted`});
+    const playlist = items.blobs.find(blob => blob.pathname.endsWith('.m3u8'));
+
+    for (const item of items.blobs) {
+      console.log(item.url);
+    }
+
+    const res = await fetch(playlist!.url);
+    console.log("Playlist URL:", playlist!.url);
 
     if (!res.ok) {
       throw new Error(`Failed to fetch file from Blob Storage: ${res.statusText}`);
