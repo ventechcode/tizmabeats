@@ -24,13 +24,15 @@ export async function GET(request: NextRequest) {
 
     const playlistText = await playlistRes.text();
 
-    // Fetch the list of files in the storage folder (mocking or use appropriate API if available)
+    // Fetch the list of files in the storage folder using the Vercel Blob API
     const segmentFiles = await fetchSegmentFileNames(beatId);
+
+    console.log("Segment files:", segmentFiles);
 
     // Replace segment names with their full Blob Storage paths
     const updatedPlaylist = playlistText.replace(
       /^(segment_\d+\.ts)$/gm, // Match segment file names
-      (match) => segmentFiles[match] 
+      (match) => segmentFiles[match] || match // Replace if found, otherwise keep original
     );
 
     // Return the updated playlist
@@ -49,22 +51,20 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// Mock function to fetch segment file names (replace with actual API if available)
+// Fetch segment file names and map them to their full URLs
 async function fetchSegmentFileNames(beatId: string): Promise<Record<string, string>> {
-  // Simulate fetching the file names from storage
-  // Replace this with a proper call to Vercel Blob Storage API or any similar storage API
-  const segments = await list({ prefix: `beats/${beatId}/converted/` }); 
-  const fileNames = segments.blobs.filter((file) => file.pathname.endsWith(".ts")).map((file) => file.pathname);
-  const urls = segments.blobs.filter((file) => file.pathname.endsWith(".ts")).map((file) => file.url);
-  
-  // Map the original segment file names to their actual Blob Storage URLs
-  const segmentMap: Record<string, string> = {};
-  fileNames.forEach((_, i) => {
-    const [baseName] = fileNames[i].split("-"); // Extract the base name (e.g., `segment_000`)
-    segmentMap[`${baseName}.ts`] = `${urls[i]}`;
-  });
+  const segments = await list({ prefix: `beats/${beatId}/converted/` });
 
-  console.log("Segment map:", segmentMap);
+  // Filter out `.ts` files and create a mapping of segment base name to URL
+  const segmentMap: Record<string, string> = {};
+  segments.blobs
+    .filter((file) => file.pathname.endsWith(".ts"))
+    .forEach((file) => {
+      const baseName = file.pathname.match(/segment_\d+\.ts/)?.[0]; // Extract the base name (e.g., `segment_000.ts`)
+      if (baseName) {
+        segmentMap[baseName] = file.url; // Map base name to the full URL
+      }
+    });
 
   return segmentMap;
 }
