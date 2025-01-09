@@ -1,5 +1,12 @@
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
+import path from "path";
+import fs from "fs";
+import { exec } from "child_process";
+import { promisify } from "util";
+import { put } from "@vercel/blob";
+
+const execAsync = promisify(exec);
 
 export async function POST(request: Request): Promise<NextResponse> {
   const body = (await request.json()) as HandleUploadBody;
@@ -14,22 +21,54 @@ export async function POST(request: Request): Promise<NextResponse> {
           maximumSizeInBytes: 10485760,
           addRandomSuffix: true,
           cacheControlMaxAge: 3600,
-          tokenPayload: clientPayload
+          tokenPayload: clientPayload,
         };
       },
       onUploadCompleted: async ({ blob, tokenPayload }) => {
         console.log("Upload completed");
         console.log("Download URL:", blob.downloadUrl);
-        console.log("Client payload:", tokenPayload);
-        const res = await fetch("https://tizmabeats.vercel.app/api/upload/webhook", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ url: blob.url }),
+        console.log("Beat ID:", tokenPayload);
+
+        const beatId = tokenPayload; // Assume beat_id is passed in tokenPayload
+        if (beatId === undefined) console.error("Beat ID not found");
+        const mp3Url = blob.downloadUrl;
+
+        // Step 1: Download MP3
+        const tempDir = path.join("/tmp", beatId!);
+        const tempMp3Path = path.join(tempDir, "audio.mp3");
+        fs.mkdirSync(tempDir, { recursive: true });
+
+        await execAsync(`curl -o ${tempMp3Path} "${mp3Url}"`);
+
+        // Convert MP3 to HLS
+        const hlsOutputDir = path.join(tempDir, "hls");
+        fs.mkdirSync(hlsOutputDir, { recursive: true });
+
+        const hlsCommand = `
+          ffmpeg -i ${tempMp3Path} \
+            -codec: copy \
+            -start_number 0 \
+            -hls_time 10 \
+            -hls_list_size 0 \
+            -f hls ${hlsOutputDir}/playlist.m3u8
+        `;
+        await execAsync(hlsCommand);
+
+        // Upload HLS files to /converted folder
+        const hlsFiles = fs.readdirSync(hlsOutputDir);
+        const uploadPromises = hlsFiles.map(async (file) => {
+          const filePath = path.join(hlsOutputDir, file);
+          const fileContent = fs.readFileSync(filePath);
+
+          const res = await put(`/converted/${beatId}/${file}`, fileContent, {
+            access: "public",
+          });
+
+          return await res.url;
         });
 
-        console.log("Webhook response:", await res.json());
+        const hlsUrls = await Promise.all(uploadPromises);
+        console.log("HLS URLs:", hlsUrls);
       },
     });
 
