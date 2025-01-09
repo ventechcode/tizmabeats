@@ -1,29 +1,35 @@
 import { NextRequest, NextResponse } from "next/server";
-import { head } from "@vercel/blob";
-
 
 export async function GET(request: NextRequest) {
   const beatId = request.nextUrl.searchParams.get("id");
 
   if (!beatId) {
-    return NextResponse.json({ error: "Beat ID is required" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Beat ID is required" },
+      { status: 400 }
+    );
   }
 
   try {
-    const playlist = await head(`beats/${beatId}/converted/playlist.m3u8`);
-    console.log("Playlist:", playlist);
-    const res = await fetch(playlist.url);
+    const blobUrl = `https://blhf5x3zv0lnny2n.public.blob.vercel-storage.com/beats/${beatId}/converted/playlist-R4Z5fBb9amVpzYUGY9VHN1nrzN2Lqm.m3u8`;
+    const res = await fetch(blobUrl);
 
-    // Return the playlist content
-    return new Response((await res.blob()).stream(), {
+    if (!res.ok) {
+      throw new Error(`Failed to fetch file from Blob Storage: ${res.statusText}`);
+    }
+
+    // Stream the content back to the client
+    return new Response(res.body, {
       headers: {
-        'Content-Type': 'application/vnd.apple.mpegurl',
-        'Access-Control-Allow-Origin': '*',
+        "Content-Type": res.headers.get("Content-Type") || "application/octet-stream",
+        "Access-Control-Allow-Origin": "*",
       },
     });
   } catch (error) {
-    console.error("Error in playback API:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    console.error("Error in proxy endpoint:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
-
