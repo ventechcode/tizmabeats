@@ -1,5 +1,5 @@
+import { list } from "@vercel/blob";
 import { NextRequest, NextResponse } from "next/server";
-import { list } from "@vercel/blob"
 
 export async function GET(request: NextRequest) {
   const beatId = request.nextUrl.searchParams.get("id");
@@ -12,32 +12,57 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const items = await list({prefix: `beats/${beatId}/converted`});
-    const playlist = items.blobs.find(blob => blob.pathname.endsWith('.m3u8'));
+    const blobBaseUrl = `https://blhf5x3zv0lnny2n.public.blob.vercel-storage.com/beats/${beatId}/converted/`;
+    const playlistUrl = `${blobBaseUrl}playlist-R4Z5fBb9amVpzYUGY9VHN1nrzN2Lqm.m3u8`;
 
-    for (const item of items.blobs) {
-      console.log(item.url);
+    // Fetch the playlist file from storage
+    const playlistRes = await fetch(playlistUrl);
+
+    if (!playlistRes.ok) {
+      throw new Error(`Failed to fetch playlist: ${playlistRes.statusText}`);
     }
 
-    const res = await fetch(playlist!.url);
-    console.log("Playlist URL:", playlist!.url);
+    const playlistText = await playlistRes.text();
 
-    if (!res.ok) {
-      throw new Error(`Failed to fetch file from Blob Storage: ${res.statusText}`);
-    }
+    // Fetch the list of files in the storage folder (mocking or use appropriate API if available)
+    const segmentFiles = await fetchSegmentFileNames(beatId);
 
-    // Stream the content back to the client
-    return new Response(res.body, {
+    // Replace segment names with their full Blob Storage paths
+    const updatedPlaylist = playlistText.replace(
+      /^(segment_\d+\.ts)$/gm, // Match segment file names
+      (match) => segmentFiles[match] || `${blobBaseUrl}${match}` // Replace with mapped or default URL
+    );
+
+    // Return the updated playlist
+    return new Response(updatedPlaylist, {
       headers: {
-        "Content-Type": res.headers.get("Content-Type") || "application/octet-stream",
+        "Content-Type": "application/vnd.apple.mpegurl",
         "Access-Control-Allow-Origin": "*",
       },
     });
   } catch (error) {
-    console.error("Error in proxy endpoint:", error);
+    console.error("Error in playback API:", error);
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
     );
   }
+}
+
+// Mock function to fetch segment file names (replace with actual API if available)
+async function fetchSegmentFileNames(beatId: string): Promise<Record<string, string>> {
+  // Simulate fetching the file names from storage
+  // Replace this with a proper call to Vercel Blob Storage API or any similar storage API
+  const segments = await list({ prefix: `beats/${beatId}/converted/` }); 
+  const fileNames = segments.blobs.filter((file) => file.pathname.endsWith(".ts")).map((file) => file.pathname);
+
+  console.log("Segment files:", fileNames);
+  // Map the original segment file names to their actual Blob Storage URLs
+  const segmentMap: Record<string, string> = {};
+  fileNames.forEach((fileName) => {
+    const [baseName] = fileName.split("-"); // Extract the base name (e.g., `segment_000`)
+    segmentMap[`${baseName}.ts`] = `https://blhf5x3zv0lnny2n.public.blob.vercel-storage.com/beats/${beatId}/converted/${fileName}`;
+  });
+
+  return segmentMap;
 }
