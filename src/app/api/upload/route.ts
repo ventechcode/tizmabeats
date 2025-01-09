@@ -16,17 +16,9 @@ export async function POST(request: Request): Promise<NextResponse> {
           cacheControlMaxAge: 3600,
         };
       },
-      onUploadCompleted: async ({blob}) => {
-        const res = await fetch('/api/upload/webhook', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({url: blob.downloadUrl}),
-        })
-
-        console.log(await res.json());
-      },
+      onUploadCompleted: async () => {
+        console.log('Upload completed');
+      }
     });
     
     return NextResponse.json(res, {
