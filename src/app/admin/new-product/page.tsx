@@ -54,7 +54,7 @@ export default function NewProductPage() {
         fileName = fileName.replace("#", "");
       }
 
-      const blob = await upload("/beats/" + fileName, file, {
+      const blob = await upload("/beats/" + +  fileName, file, {
         access: "public",
         handleUploadUrl: "/api/upload",
       });
