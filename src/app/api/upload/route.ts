@@ -18,21 +18,16 @@ export async function POST(request: Request): Promise<NextResponse> {
       },
       onUploadCompleted: async ({ blob }) => {
         console.log("Upload completed");
-        const res = await fetch("/api/upload/webhook", {
+        console.log("Download URL:", blob.downloadUrl);
+        const res = await fetch("https://tizmabeats.vercel.app/api/upload/webhook", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            url: blob.url,
-          }),
+          body: JSON.stringify({ url: blob.downloadUrl }),
         });
 
-        if (!res.ok) {
-          console.error("Webhook failed");
-        }
-
-        console.log(await res.json().then((data) => data.message));
+        console.log("Webhook response:", await res.json());
       },
     });
 
