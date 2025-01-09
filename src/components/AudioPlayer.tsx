@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import WaveSurfer from "wavesurfer.js";
-import Hls from "hls.js";
 import { Beat } from "@/types";
 
 export default function AudioPlayer({
@@ -18,35 +17,12 @@ export default function AudioPlayer({
   const audioRef = useRef<HTMLAudioElement>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [volume, setVolume] = useState(0.5);
-  const [playlistUrl, setPlaylistUrl] = useState<string | null>(null);
+
+  const playlistUrl = "https://blhf5x3zv0lnny2n.public.blob.vercel-storage.com/beats/25d9497a-80fe-4481-85d7-44128a2d5010/converted/playlist-vIHcTj5dMS9KeShGg4To2aZQ2a2fNN.m3u8"
+  const blob = new Blob([playlistUrl], { type: "application/vnd.apple.mpegurl" });
+  const url = URL.createObjectURL(blob);
 
   useEffect(() => {
-    const fetchPlaylistUrl = async () => {
-      try {
-        const response = await fetch(`/api/playback?id=${beat.id}`);
-        if (!response.ok) throw new Error('Failed to fetch playlist');
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        setPlaylistUrl(url);
-      } catch (error) {
-        console.error('Error fetching playlist:', error);
-      }
-    };
-
-    fetchPlaylistUrl();
-
-    return () => {
-      if (playlistUrl) URL.revokeObjectURL(playlistUrl);
-    };
-  }, [beat.id]);
-
-  useEffect(() => {
-    if (!playlistUrl || !audioRef.current) return;
-
-    const hls = new Hls();
-    hls.loadSource(playlistUrl);
-    hls.attachMedia(audioRef.current);
-
     if (!beat.wavesurferRef.current) {
       beat.wavesurferRef.current = WaveSurfer.create({
         container: "#waveform",
@@ -56,13 +32,15 @@ export default function AudioPlayer({
         barRadius: 8,
         cursorWidth: 3,
         hideScrollbar: true,
+        autoplay: true,
         normalize: false,
         mediaControls: false,
         barGap: 3,
         height: 50,
         cursorColor: "#cdd6f4",
-        media: audioRef.current,
       });
+
+      beat.wavesurferRef.current.load(url);
 
       beat.wavesurferRef.current.on("interaction", () => {
         setElapsedTime(beat.wavesurferRef.current?.getCurrentTime() || 0);
@@ -76,7 +54,6 @@ export default function AudioPlayer({
     beat.wavesurferRef.current.setVolume(volume);
 
     return () => {
-      hls.destroy();
       if (beat.wavesurferRef.current) {
         try {
           beat.wavesurferRef.current.destroy();
@@ -86,7 +63,7 @@ export default function AudioPlayer({
         beat.wavesurferRef.current = null;
       }
     };
-  }, [beat, playlistUrl, volume]);
+  }, [beat, volume]);
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
