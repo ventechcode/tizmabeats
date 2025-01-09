@@ -36,15 +36,30 @@ export async function POST(request: Request): Promise<NextResponse> {
         // Step 1: Download MP3
         const tempDir = path.join("/tmp", beatId!);
         const tempMp3Path = path.join(tempDir, "audio.mp3");
-        fs.mkdirSync(tempDir, { recursive: true });
+        console.log("Temp directory:", tempDir);
+        console.log("Temp MP3 path:", tempMp3Path);
 
-        await execAsync(`curl -o ${tempMp3Path} "${mp3Url}"`);
+        try {
+          fs.mkdirSync(tempDir, { recursive: true });
+        } catch (error) {
+          console.log("Error creating temp directory", error);
+        }
+
+        try {
+          const res = await execAsync(`curl -o ${tempMp3Path} "${mp3Url}"`);
+          console.log("Download MP3 response:", res);
+        } catch (error) {
+          console.log("Error downloading MP3", error);
+        }
 
         // Convert MP3 to HLS
         const hlsOutputDir = path.join(tempDir, "hls");
-        fs.mkdirSync(hlsOutputDir, { recursive: true });
+        console.log("HLS output directory:", hlsOutputDir);
 
-        const hlsCommand = `
+        try {
+          fs.mkdirSync(hlsOutputDir, { recursive: true });
+
+          const hlsCommand = `
           ffmpeg -i ${tempMp3Path} \
             -codec: copy \
             -start_number 0 \
@@ -52,23 +67,31 @@ export async function POST(request: Request): Promise<NextResponse> {
             -hls_list_size 0 \
             -f hls ${hlsOutputDir}/playlist.m3u8
         `;
-        await execAsync(hlsCommand);
 
-        // Upload HLS files to /converted folder
-        const hlsFiles = fs.readdirSync(hlsOutputDir);
-        const uploadPromises = hlsFiles.map(async (file) => {
-          const filePath = path.join(hlsOutputDir, file);
-          const fileContent = fs.readFileSync(filePath);
+          await execAsync(hlsCommand);
+        } catch (error) {
+          console.log("Error converting MP3 to HLS", error);
+        }
 
-          const res = await put(`/converted/${beatId}/${file}`, fileContent, {
-            access: "public",
+        try {
+          // Upload HLS files to /converted folder
+          const hlsFiles = fs.readdirSync(hlsOutputDir);
+          const uploadPromises = hlsFiles.map(async (file) => {
+            const filePath = path.join(hlsOutputDir, file);
+            const fileContent = fs.readFileSync(filePath);
+
+            const res = await put(`/converted/${beatId}/${file}`, fileContent, {
+              access: "public",
+            });
+
+            return await res.url;
           });
 
-          return await res.url;
-        });
-
-        const hlsUrls = await Promise.all(uploadPromises);
-        console.log("HLS URLs:", hlsUrls);
+          const hlsUrls = await Promise.all(uploadPromises);
+          console.log("HLS URLs:", hlsUrls);
+        } catch (error) {
+          console.log("Error uploading HLS files", error);
+        }
       },
     });
 
