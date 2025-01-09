@@ -10,14 +10,22 @@ export async function POST(request: Request): Promise<NextResponse> {
       request,
       onBeforeGenerateToken: async (pathname, clientPayload, multipart) => {
         return {
-          allowedContentTypes: ['audio/mpeg', 'audio/wav', 'audio/mp3'],
-          maximumSizeInBytes: 10485760,
+          allowedContentTypes: ['audio/*'],
+          maximumSizeInBytes: 2*10485760,
           addRandomSuffix: true,
           cacheControlMaxAge: 3600,
         };
       },
-      onUploadCompleted: async () => {
+      onUploadCompleted: async (blob) => {
+        const res = await fetch('/api/upload/webhook', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'audio/*',
+          },
+          body: JSON.stringify({ blob }),
+        })
 
+        console.log(await res.json());
       },
     });
     

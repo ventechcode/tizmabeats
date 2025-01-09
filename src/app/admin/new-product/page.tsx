@@ -52,7 +52,6 @@ export default function NewProductPage() {
 
       if (fileName.includes("#")) {
         fileName = fileName.replace("#", "");
-        console.log(fileName);
       }
 
       const blob = await upload("/beats/" + fileName, file, {
@@ -64,7 +63,9 @@ export default function NewProductPage() {
         throw new Error("File upload failed");
       }
 
-      const audioSrc = blob.url;
+      const audioSrc = await blob.downloadUrl;
+
+      console.log("Audio source:", audioSrc);
 
       const updatedFormData = { ...formData, audioSrc };
 
