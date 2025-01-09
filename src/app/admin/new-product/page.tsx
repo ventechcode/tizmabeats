@@ -42,6 +42,20 @@ export default function NewProductPage() {
 
     setUploading(true);
 
+    const res = await fetch("/api/beats", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    });
+
+    const beat = await res.json();
+
+    if (!res.ok) {
+      throw new Error("Beat creation failed");
+    }
+
     try {
       if (!inputFileRef.current?.files) {
         throw new Error("No file selected");
@@ -54,9 +68,13 @@ export default function NewProductPage() {
         fileName = fileName.replace("#", "");
       }
 
-      const blob = await upload("/beats/" + +  fileName, file, {
+      const blob = await upload("/beats/" + beat.id +'/' + fileName, file, {
         access: "public",
         handleUploadUrl: "/api/upload",
+        clientPayload: beat.id,
+        onUploadProgress: (progress) => {
+          console.log("Upload progress:", progress);
+        },
       });
 
       if (!blob) {
@@ -66,20 +84,6 @@ export default function NewProductPage() {
       const audioSrc = await blob.downloadUrl;
 
       console.log("Audio source:", audioSrc);
-
-      const updatedFormData = { ...formData, audioSrc };
-
-      const createBeatResponse = await fetch("/api/beats", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(updatedFormData),
-      });
-
-      if (!createBeatResponse.ok) {
-        throw new Error("Beat creation failed");
-      }
 
       // Step 5: Reset form and state
       alert("Beat created successfully!");

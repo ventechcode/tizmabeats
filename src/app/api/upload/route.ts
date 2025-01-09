@@ -14,17 +14,19 @@ export async function POST(request: Request): Promise<NextResponse> {
           maximumSizeInBytes: 10485760,
           addRandomSuffix: true,
           cacheControlMaxAge: 3600,
+          tokenPayload: clientPayload
         };
       },
-      onUploadCompleted: async ({ blob }) => {
+      onUploadCompleted: async ({ blob, tokenPayload }) => {
         console.log("Upload completed");
         console.log("Download URL:", blob.downloadUrl);
-        const res = await fetch("https://tizmabeats.vercel.app/api/upload/webhook", {
+        console.log("Client payload:", tokenPayload);
+        const res = await fetch("/api/upload/webhook", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ url: blob.downloadUrl }),
+          body: JSON.stringify({ url: blob.url }),
         });
 
         console.log("Webhook response:", await res.json());
