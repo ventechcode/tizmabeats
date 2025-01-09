@@ -1,9 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { head } from "@vercel/blob";
 
-export const config = {
-  runtime: 'edge',
-};
 
 export async function GET(request: NextRequest) {
   const beatId = request.nextUrl.searchParams.get("id");
