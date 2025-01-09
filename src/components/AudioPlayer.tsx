@@ -1,10 +1,12 @@
-'use client'
+"use client";
 
 import { useEffect, useRef, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import WaveSurfer from "wavesurfer.js";
+import Hls from "hls.js";
 import { Beat } from "@/types";
+import { test } from "./test"
 
 export default function AudioPlayer({
   beat,
@@ -17,12 +19,36 @@ export default function AudioPlayer({
   const audioRef = useRef<HTMLAudioElement>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [volume, setVolume] = useState(0.5);
-
-  const playlistUrl = "https://blhf5x3zv0lnny2n.public.blob.vercel-storage.com/beats/25d9497a-80fe-4481-85d7-44128a2d5010/converted/playlist-vIHcTj5dMS9KeShGg4To2aZQ2a2fNN.m3u8"
-  const blob = new Blob([playlistUrl], { type: "application/vnd.apple.mpegurl" });
-  const url = URL.createObjectURL(blob);
+  const [playlistUrl, setPlaylistUrl] = useState<string | null>(null);
 
   useEffect(() => {
+    const fetchPlaylistUrl = async () => {
+      try {
+        const response = await fetch(`/api/playback?id=${beat.id}`);
+        if (!response.ok) throw new Error("Failed to fetch playlist");
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        console.log("Playlist URL:", url);
+        setPlaylistUrl(url);
+      } catch (error) {
+        console.error("Error fetching playlist:", error);
+      }
+    };
+
+    fetchPlaylistUrl();
+
+    return () => {
+      if (playlistUrl) URL.revokeObjectURL(playlistUrl);
+    };
+  }, [beat.id]);
+
+  useEffect(() => {
+    if (!playlistUrl || !audioRef.current) return;
+
+    const hls = new Hls();
+    hls.loadSource(playlistUrl);
+    hls.attachMedia(audioRef.current);
+
     if (!beat.wavesurferRef.current) {
       beat.wavesurferRef.current = WaveSurfer.create({
         container: "#waveform",
@@ -32,15 +58,16 @@ export default function AudioPlayer({
         barRadius: 8,
         cursorWidth: 3,
         hideScrollbar: true,
-        autoplay: true,
         normalize: false,
         mediaControls: false,
+        autoplay: true,
         barGap: 3,
         height: 50,
         cursorColor: "#cdd6f4",
-      });
-
-      beat.wavesurferRef.current.load(url);
+        peaks: [test.data],
+        duration: test.duration,
+        media: audioRef.current,
+      }); 
 
       beat.wavesurferRef.current.on("interaction", () => {
         setElapsedTime(beat.wavesurferRef.current?.getCurrentTime() || 0);
@@ -54,6 +81,7 @@ export default function AudioPlayer({
     beat.wavesurferRef.current.setVolume(volume);
 
     return () => {
+      //hls.destroy(); // Destroy HLS instance to avoid memory leaks
       if (beat.wavesurferRef.current) {
         try {
           beat.wavesurferRef.current.destroy();
@@ -63,7 +91,7 @@ export default function AudioPlayer({
         beat.wavesurferRef.current = null;
       }
     };
-  }, [beat, volume]);
+  }, [beat, playlistUrl, volume]);
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
@@ -79,7 +107,7 @@ export default function AudioPlayer({
 
   return (
     <div className="absolute bottom-0 left-0 z-50 h-16 sm:h-20 bg-mantle w-full flex flex-row justify-around items-center px-4 sm:px-8">
-      <audio ref={audioRef} style={{ display: 'none' }} />
+      <audio ref={audioRef} className="hidden"></audio>
       <div className="w-1/4 sm:w-1/6 flex flex-row flex-wrap items-center text-text mr-4 sm:mr-16 md:mr-20 lg:mr-40">
         <div className="ml-3">
           <div className="text-xs sm:text-lg font-semibold">{beat.name}</div>
@@ -101,4 +129,3 @@ export default function AudioPlayer({
     </div>
   );
 }
-

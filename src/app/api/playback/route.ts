@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 
   try {
     const blobBaseUrl = `https://blhf5x3zv0lnny2n.public.blob.vercel-storage.com/beats/${beatId}/converted/`;
-    const playlistUrl = `${blobBaseUrl}playlist-R4Z5fBb9amVpzYUGY9VHN1nrzN2Lqm.m3u8`;
+    const playlistUrl = `${blobBaseUrl}playlist-vIHcTj5dMS9KeShGg4To2aZQ2a2fNN.m3u8`;
 
     // Fetch the playlist file from storage
     const playlistRes = await fetch(playlistUrl);
@@ -22,12 +22,11 @@ export async function GET(request: NextRequest) {
       throw new Error(`Failed to fetch playlist: ${playlistRes.statusText}`);
     }
 
+    // Read the playlist content as text
     const playlistText = await playlistRes.text();
 
     // Fetch the list of files in the storage folder using the Vercel Blob API
     const segmentFiles = await fetchSegmentFileNames(beatId);
-
-    console.log("Segment files:", segmentFiles);
 
     // Replace segment names with their full Blob Storage paths
     const updatedPlaylist = playlistText.replace(
@@ -35,10 +34,12 @@ export async function GET(request: NextRequest) {
       (match) => segmentFiles[match] || match // Replace if found, otherwise keep original
     );
 
+    console.log("Updated playlist:", updatedPlaylist);
+
     // Return the updated playlist
     return new Response(updatedPlaylist, {
       headers: {
-        "Content-Type": "application/vnd.apple.mpegurl",
+        "Content-Type": "application/octet-stream",
         "Access-Control-Allow-Origin": "*",
       },
     });
