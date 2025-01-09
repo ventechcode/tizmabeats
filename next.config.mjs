@@ -19,6 +19,7 @@ const nextConfig = {
     },
   };
   
-module.exports = nextConfig;
+  // Use ES module export
+  export default nextConfig;
   
   
