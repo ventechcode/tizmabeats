@@ -4,6 +4,10 @@ import { put } from "@vercel/blob";
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
 
+export const config = {
+  runtime: 'edge',
+};
+
 export async function POST(request: Request): Promise<NextResponse> {
   const body = (await request.json()) as HandleUploadBody;
 
@@ -22,32 +26,25 @@ export async function POST(request: Request): Promise<NextResponse> {
       },
       onUploadCompleted: async ({ blob, tokenPayload }) => {
         console.log("Upload completed");
-        console.log("Download URL:", blob.downloadUrl);
+        console.log("Download URL:", blob.url);
         console.log("Beat ID:", tokenPayload);
 
         const beatId = tokenPayload;
-        const mp3Url = blob.downloadUrl;
+        const mp3Url = blob.url;
 
         try {
           // Initialize FFmpeg
           const ffmpeg = new FFmpeg();
           
-          console.log('FFmpeg initialized');
-
           // Load FFmpeg
-          const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.4/dist/umd';
+          const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.2/dist/umd';
           await ffmpeg.load({
             coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
-            wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),
           });
-
-          console.log('FFmpeg loaded');
 
           // Fetch and write input file
           const inputData = await fetchFile(mp3Url);
           await ffmpeg.writeFile('input.mp3', inputData);
-
-          console.log('Input file written');
 
           // Run FFmpeg command
           await ffmpeg.exec([
@@ -60,17 +57,12 @@ export async function POST(request: Request): Promise<NextResponse> {
             'playlist.m3u8'
           ]);
 
-          console.log('FFmpeg command executed');
-
           // Read the generated playlist
           const playlist = await ffmpeg.readFile('playlist.m3u8');
-          if (playlist) {
-            await put(`converted/${beatId}/playlist.m3u8`, new Blob([playlist]), {
-              access: 'public'
-            });
-          }
-
-          console.log('Playlist uploaded');
+          await put(`beats/${beatId}/converted/playlist.m3u8`, new Blob([playlist]), {
+            access: 'public',
+            addRandomSuffix: false
+          });
 
           // Read and upload all generated .ts files
           const files = await ffmpeg.listDir('.');
@@ -78,11 +70,10 @@ export async function POST(request: Request): Promise<NextResponse> {
           
           for (const file of tsFiles) {
             const content = await ffmpeg.readFile(file.name);
-            if (content) {
-              await put(`converted/${beatId}/${file.name}`, new Blob([content]), {
-                access: 'public'
-              });
-            }
+            await put(`beats/${beatId}/converted/${file.name}`, new Blob([content]), {
+              access: 'public',
+              addRandomSuffix: false
+            });
           }
 
           // Clean up
@@ -92,9 +83,19 @@ export async function POST(request: Request): Promise<NextResponse> {
             await ffmpeg.deleteFile(file.name);
           }
 
-        } catch (error) {
-          console.error('Error in FFmpeg processing:', error);
-          throw error;
+          // Store the HLS playlist URL
+          await put(`beats/${beatId}/audio-info.json`, JSON.stringify({
+            playlistUrl: `converted/${beatId}/playlist.m3u8`,
+            beatId: beatId
+          }), {
+            access: 'public',
+            addRandomSuffix: true,
+            contentType: 'application/json'
+          });
+
+        } catch (ffmpegError) {
+          console.error('Error in FFmpeg processing:', ffmpegError);
+          throw ffmpegError;
         }
       },
     });
