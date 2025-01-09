@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
     // Replace segment names with their full Blob Storage paths
     const updatedPlaylist = playlistText.replace(
       /^(segment_\d+\.ts)$/gm, // Match segment file names
-      (match) => segmentFiles[match] || `${blobBaseUrl}${match}` // Replace with mapped or default URL
+      (match) => segmentFiles[match] 
     );
 
     // Return the updated playlist
@@ -55,14 +55,16 @@ async function fetchSegmentFileNames(beatId: string): Promise<Record<string, str
   // Replace this with a proper call to Vercel Blob Storage API or any similar storage API
   const segments = await list({ prefix: `beats/${beatId}/converted/` }); 
   const fileNames = segments.blobs.filter((file) => file.pathname.endsWith(".ts")).map((file) => file.pathname);
-
-  console.log("Segment files:", fileNames);
+  const urls = segments.blobs.filter((file) => file.pathname.endsWith(".ts")).map((file) => file.url);
+  
   // Map the original segment file names to their actual Blob Storage URLs
   const segmentMap: Record<string, string> = {};
-  fileNames.forEach((fileName) => {
-    const [baseName] = fileName.split("-"); // Extract the base name (e.g., `segment_000`)
-    segmentMap[`${baseName}.ts`] = `https://blhf5x3zv0lnny2n.public.blob.vercel-storage.com/beats/${beatId}/converted/${fileName}`;
+  fileNames.forEach((_, i) => {
+    const [baseName] = fileNames[i].split("-"); // Extract the base name (e.g., `segment_000`)
+    segmentMap[`${baseName}.ts`] = `${urls[i]}`;
   });
+
+  console.log("Segment map:", segmentMap);
 
   return segmentMap;
 }
