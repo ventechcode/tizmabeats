@@ -4,10 +4,6 @@ import { put } from "@vercel/blob";
 import { FFmpeg } from '@ffmpeg/ffmpeg';
 import { fetchFile, toBlobURL } from '@ffmpeg/util';
 
-export const config = {
-  runtime: 'edge',
-};
-
 export async function POST(request: Request): Promise<NextResponse> {
   const body = (await request.json()) as HandleUploadBody;
 
