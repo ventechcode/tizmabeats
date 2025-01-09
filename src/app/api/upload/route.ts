@@ -21,7 +21,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         console.log("Upload completed");
         console.log("Download URL:", blob.downloadUrl);
         console.log("Client payload:", tokenPayload);
-        const res = await fetch("/api/upload/webhook", {
+        const res = await fetch("https://tizmabeats.vercel.app/api/upload/webhook", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
