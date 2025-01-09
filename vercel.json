@@ -1,7 +1,13 @@
 {
-    "build": {
-      "env": {
-        "NODE_VERSION": "20"
-      }
+  "builds": [
+    {
+      "src": "api/**/*.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "functions": {
+    "api/**/*.ts": {
+      "includeFiles": ["bin/ffmpeg"]
     }
   }
+}

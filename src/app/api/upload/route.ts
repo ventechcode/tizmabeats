@@ -54,23 +54,25 @@ export async function POST(request: Request): Promise<NextResponse> {
 
         // Convert MP3 to HLS
         const hlsOutputDir = path.join(tempDir, "hls");
+        fs.mkdirSync(hlsOutputDir, { recursive: true });
         console.log("HLS output directory:", hlsOutputDir);
 
+        const ffmpegPath = path.join(process.cwd(), 'bin', 'ffmpeg');
+        console.log("FFmpeg path:", ffmpegPath);
+        const hlsCommand = `
+          ${ffmpegPath} -i ${tempMp3Path} \
+                -codec: copy \
+                -start_number 0 \
+                -hls_time 10 \
+                -hls_list_size 0 \
+                -f hls ${hlsOutputDir}/playlist.m3u8
+            `;
+
         try {
-          fs.mkdirSync(hlsOutputDir, { recursive: true });
-
-          const hlsCommand = `
-          ffmpeg -i ${tempMp3Path} \
-            -codec: copy \
-            -start_number 0 \
-            -hls_time 10 \
-            -hls_list_size 0 \
-            -f hls ${hlsOutputDir}/playlist.m3u8
-        `;
-
           await execAsync(hlsCommand);
+          console.log("HLS conversion completed.");
         } catch (error) {
-          console.log("Error converting MP3 to HLS", error);
+          console.log("Error during HLS conversion:", error);
         }
 
         try {

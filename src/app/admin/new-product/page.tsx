@@ -81,7 +81,7 @@ export default function NewProductPage() {
         throw new Error("File upload failed");
       }
 
-      const audioSrc = await blob.downloadUrl;
+      const audioSrc = await blob.url;
 
       console.log("Audio source:", audioSrc);
 
