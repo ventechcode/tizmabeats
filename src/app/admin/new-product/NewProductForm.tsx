@@ -236,10 +236,7 @@ export default function NewProductForm() {
         messageRef.current.innerHTML = "Updating database...";
       }
 
-      setFormData((prev) => ({
-        ...prev,
-        audioSrc: URL.createObjectURL(playlistBlob),
-      }));
+      formData.audioSrc = URL.createObjectURL(playlistBlob);
 
       await fetch("/api/beats", {
         method: "POST",
