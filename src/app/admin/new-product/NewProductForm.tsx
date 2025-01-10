@@ -183,7 +183,7 @@ export default function NewProductForm() {
         progressRef.current.value = 0;
       }
 
-      await upload(
+      const blob = await upload(
         `/beats/${id}/converted/playlist.m3u8`,
         playlistBlob,
         {
@@ -236,7 +236,7 @@ export default function NewProductForm() {
         messageRef.current.innerHTML = "Updating database...";
       }
 
-      formData.audioSrc = URL.createObjectURL(playlistBlob);
+      formData.audioSrc = blob.url;
 
       await fetch("/api/beats", {
         method: "POST",

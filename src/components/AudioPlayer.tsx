@@ -19,33 +19,31 @@ export default function AudioPlayer({
   const audioRef = useRef<HTMLAudioElement>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
   const [volume, setVolume] = useState(0.5);
-  const [playlistUrl, setPlaylistUrl] = useState<string | null>(beat.audioSrc);
+  const [playlistUrl, setPlaylistUrl] = useState<string | null>();
 
-  // useEffect(() => {
-  //   const fetchPlaylistUrl = async () => {
-  //     try {
-  //       const response = await fetch(`/api/playback?id=${beat.id}`);
-  //       if (!response.ok) throw new Error("Failed to fetch playlist");
-  //       const blob = await response.blob();
-  //       const url = URL.createObjectURL(blob);
-  //       console.log("Playlist URL:", url);
-  //       setPlaylistUrl(url);
-  //     } catch (error) {
-  //       console.error("Error fetching playlist:", error);
-  //     }
-  //   };
+  useEffect(() => {
+    const fetchPlaylistUrl = async () => {
+      try {
+        const response = await fetch(beat.audioSrc);
+        if (!response.ok) throw new Error("Failed to fetch playlist");
+        const blob = await response.blob();
+        const url = URL.createObjectURL(blob);
+        console.log("Playlist URL:", url);
+        setPlaylistUrl(url);
+      } catch (error) {
+        console.error("Error fetching playlist:", error);
+      }
+    };
 
-  //   fetchPlaylistUrl();
+    fetchPlaylistUrl();
 
-  //   return () => {
-  //     if (playlistUrl) URL.revokeObjectURL(playlistUrl);
-  //   };
-  // }, [beat.id]);
+    return () => {
+      if (playlistUrl) URL.revokeObjectURL(playlistUrl);
+    };
+  }, [beat.id]);
 
   useEffect(() => {
     if (!playlistUrl || !audioRef.current) return;
-
-    console.log("Playlist URL:", beat.audioSrc);
 
     const hls = new Hls();
     hls.loadSource(playlistUrl);
