@@ -5,15 +5,12 @@ export async function GET(request: NextRequest) {
   const beatId = request.nextUrl.searchParams.get("id");
 
   if (!beatId) {
-    return NextResponse.json(
-      { error: "Beat ID is required" },
-      { status: 400 }
-    );
+    return NextResponse.json({ error: "Beat ID is required" }, { status: 400 });
   }
 
   try {
     const blobBaseUrl = `https://blhf5x3zv0lnny2n.public.blob.vercel-storage.com/beats/${beatId}/converted/`;
-    const playlistUrl = `${blobBaseUrl}playlist-vIHcTj5dMS9KeShGg4To2aZQ2a2fNN.m3u8`;
+    const playlistUrl = `${blobBaseUrl}playlist.m3u8`;
 
     // Fetch the playlist file from storage
     const playlistRes = await fetch(playlistUrl);
@@ -26,12 +23,18 @@ export async function GET(request: NextRequest) {
     const playlistText = await playlistRes.text();
 
     // Fetch the list of files in the storage folder using the Vercel Blob API
-    const segmentFiles = await fetchSegmentFileNames(beatId);
+    const segmentedFiles = await fetchSegmentFileNames(beatId);
 
-    // Replace segment names with their full Blob Storage paths
     const updatedPlaylist = playlistText.replace(
-      /^(segment_\d+\.ts)$/gm, // Match segment file names
-      (match) => segmentFiles[match] || match // Replace if found, otherwise keep original
+      /segment_(\d+)\.ts/gm, // Match segment file names with numbers
+      (match, number) => {
+
+        // Construct the expected key from the matched number
+        const segmentKey = `segment_${number.padStart(2, "0")}.ts`;
+
+        // Retrieve URL from segmentFiles if available, otherwise return match
+        return segmentedFiles[segmentKey];
+      }
     );
 
     console.log("Updated playlist:", updatedPlaylist);
@@ -53,7 +56,9 @@ export async function GET(request: NextRequest) {
 }
 
 // Fetch segment file names and map them to their full URLs
-async function fetchSegmentFileNames(beatId: string): Promise<Record<string, string>> {
+async function fetchSegmentFileNames(
+  beatId: string
+): Promise<Record<string, string>> {
   const segments = await list({ prefix: `beats/${beatId}/converted/` });
 
   // Filter out `.ts` files and create a mapping of segment base name to URL
@@ -61,8 +66,9 @@ async function fetchSegmentFileNames(beatId: string): Promise<Record<string, str
   segments.blobs
     .filter((file) => file.pathname.endsWith(".ts"))
     .forEach((file) => {
-      const baseName = file.pathname.match(/segment_\d+\.ts/)?.[0]; // Extract the base name (e.g., `segment_000.ts`)
-      if (baseName) {
+      const baseNameMatch = file.pathname.match(/segment_\d+\.ts/); // Match segment without fixed padding
+      if (baseNameMatch) {
+        const baseName = baseNameMatch[0]; // Extract the base name (e.g., `segment_00.ts`, `segment_01.ts`, etc.)
         segmentMap[baseName] = file.url; // Map base name to the full URL
       }
     });

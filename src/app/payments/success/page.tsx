@@ -21,7 +21,7 @@ export default function Success() {
       const res = await fetch(
         "/api/checkout_sessions?session_id=" + session_id,
         {
-          method: "GET",
+          method: "GET",  
           headers: {
             "Content-Type": "application/json",
           },

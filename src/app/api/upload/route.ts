@@ -1,8 +1,5 @@
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
 import { NextResponse } from "next/server";
-import { put } from "@vercel/blob";
-import { FFmpeg } from "@ffmpeg/ffmpeg";
-import { fetchFile, toBlobURL } from "@ffmpeg/util";
 
 export async function POST(request: Request): Promise<NextResponse> {
   const body = (await request.json()) as HandleUploadBody;
@@ -13,15 +10,22 @@ export async function POST(request: Request): Promise<NextResponse> {
       request,
       onBeforeGenerateToken: async (pathname, clientPayload) => {
         return {
-          allowedContentTypes: ["audio/mpeg", "audio/wav", "audio/mp3"],
+          allowedContentTypes: [
+            "audio/mpeg",
+            "audio/wav",
+            "audio/mp3",
+            "application/octet-stream",
+            "application/vnd.apple.mpegurl",
+            "video/mp2t",
+          ],
           maximumSizeInBytes: 10485760,
-          addRandomSuffix: true,
+          addRandomSuffix: false,
           cacheControlMaxAge: 3600,
           tokenPayload: clientPayload,
         };
       },
       onUploadCompleted: async ({ blob, tokenPayload }) => {
-        console.log("Upload completed");
+        console.log("Upload for", blob.pathname, "completed");
         console.log("Download URL:", blob.url);
         console.log("Beat ID:", tokenPayload);
       },

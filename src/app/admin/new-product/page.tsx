@@ -2,8 +2,13 @@
 
 import { useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
+import { FFmpeg } from "@ffmpeg/ffmpeg";
+import { fetchFile, toBlobURL } from "@ffmpeg/util";
+import { v4 as uuid } from "uuid";
 
 export default function NewProductPage() {
+  if (typeof window === "undefined") return null;
+
   const initialFormData = {
     name: "",
     bpm: 0,
@@ -18,6 +23,9 @@ export default function NewProductPage() {
   const [formData, setFormData] = useState(initialFormData);
   const [uploading, setUploading] = useState(false);
   const inputFileRef = useRef<HTMLInputElement>(null);
+  const ffmpegRef = useRef(new FFmpeg());
+  const messageRef = useRef<HTMLDivElement>(null);
+  const progressRef = useRef<HTMLProgressElement>(null);
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -42,51 +50,150 @@ export default function NewProductPage() {
 
     setUploading(true);
 
-    const res = await fetch("/api/beats", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(formData),
+    const id = uuid();
+    console.log("ID:", id);
+
+    // FFmpeg setup
+    const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
+    const ffmpeg = ffmpegRef.current;
+
+    ffmpeg.on("progress", ({ progress, time }) => {
+      console.log(`Progress: ${progress} | Time: ${time}`);
+      progressRef.current!.value = progress * 100;
+    });
+    // toBlobURL is used to bypass CORS issue, urls with the same
+    // domain can be used directly.
+    await ffmpeg.load({
+      coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
+      wasmURL: await toBlobURL(
+        `${baseURL}/ffmpeg-core.wasm`,
+        "application/wasm"
+      ),
     });
 
-    const beat = await res.json();
+    messageRef.current!.innerHTML = "Transcoding audio file...";
 
-    if (!res.ok) {
-      throw new Error("Beat creation failed");
+    // Transcode audio file
+    const file = inputFileRef.current?.files?.[0];
+
+    let fileName = file!.name;
+
+    if (fileName.includes("#")) {
+      fileName = fileName.replace("#", "");
     }
 
+    if (!file) {
+      alert("No file selected");
+      return;
+    }
+
+    const audioSrc = await fetchFile(file);
+    await ffmpeg.writeFile("input.mp3", audioSrc);
+
+    await ffmpeg.exec(
+      [
+        "-i",
+        "input.mp3", // Input file
+        "-hls_time",
+        "10", // Segment duration in seconds
+        "-hls_playlist_type",
+        "vod", // Generate a VOD playlist
+        "-hls_segment_filename",
+        "segment_%03d.ts", // Segment file pattern
+        "playlist.m3u8",
+      ] // Output playlist
+    );
+
+    // Retrieve the generated files
+    const playlist = await ffmpeg.readFile("playlist.m3u8");
+    const playlistBlob = new Blob([playlist], {
+      type: "application/vnd.apple.mpegurl",
+    });
+
+    const playlistText = await playlistBlob.text();
+
+    // Extract segment filenames from the playlist
+    const segmentFilenames = playlistText
+      .split("\n")
+      .map((line) => line.trim()) // Remove whitespace
+      .filter((line) => line && line.endsWith(".ts")); // Extract lines that end with ".ts"
+
+    console.log("Segment filenames:", segmentFilenames);
+
+    // Read all segment files dynamically
+    const segments = segmentFilenames.map((filename) =>
+      ffmpeg.readFile(filename)
+    );
+
     try {
-      if (!inputFileRef.current?.files) {
-        throw new Error("No file selected");
-      }
+      messageRef.current!.innerHTML = "Uploading .mp3 file...";
+      progressRef.current!.value = 0;
 
-      const file = inputFileRef.current.files[0];
-      let fileName = file.name;
-
-      if (fileName.includes("#")) {
-        fileName = fileName.replace("#", "");
-      }
-
-      const blob = await upload("/beats/" + beat.id +'/' + fileName, file, {
+      await upload("/beats/" + id + "/" + fileName, file, {
         access: "public",
         handleUploadUrl: "/api/upload",
-        clientPayload: beat.id,
+        clientPayload: id,
         onUploadProgress: (progress) => {
-          console.log("Upload progress:", progress);
+          progressRef.current!.value = progress.percentage;
         },
       });
 
-      if (!blob) {
-        throw new Error("File upload failed");
+      messageRef.current!.innerHTML = "Uploading playlist.m3u8 file...";
+      progressRef.current!.value = 0;
+
+      await upload(
+        "/beats/" + id + "/converted" + "/playlist.m3u8",
+        playlistBlob,
+        {
+          access: "public",
+          handleUploadUrl: "/api/upload",
+          clientPayload: id,
+          onUploadProgress: (progress) => {
+            console.log("HLS playlist upload progress:", progress);
+            progressRef.current!.value = progress.percentage;
+          },
+        }
+      );
+
+      progressRef.current!.value = 0;
+
+      console.log("Segments:", segments.length);
+
+      for (let i = 0; i < segments.length; i++) {
+        const paddedIndex = String(i).padStart(3, "0"); // Zero-pad the index
+        const segmentBlob = new Blob([await segments[i]], {
+          type: "video/mp2t",
+        });
+
+        messageRef.current!.innerHTML = `Uploading segment_${paddedIndex}.ts...`;
+
+        await upload(
+          `/beats/${id}/converted/segment_${paddedIndex}.ts`,
+          segmentBlob,
+          {
+            access: "public",
+            handleUploadUrl: "/api/upload",
+            multipart: true,
+            clientPayload: id,
+            onUploadProgress: (progress) => {
+              progressRef.current!.value = progress.percentage;
+            },
+          }
+        );
       }
 
-      const audioSrc = await blob.url;
+      messageRef.current!.innerHTML = "Updating database...";
 
-      console.log("Audio source:", audioSrc);
+      formData.audioSrc = URL.createObjectURL(playlistBlob);
 
-      // Step 5: Reset form and state
-      alert("Beat created successfully!");
+      await fetch("/api/beats", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({...formData, id}),
+      });
+
       setUploading(false);
       setFormData(initialFormData);
     } catch (error) {
@@ -190,7 +297,7 @@ export default function NewProductPage() {
           />
         </div>
 
-        <div className="form-group">
+        {/* <div className="form-group">
           <label
             className="block text-sm font-medium text-text mb-2"
             htmlFor="producerId"
@@ -210,7 +317,7 @@ export default function NewProductPage() {
               MozAppearance: "textfield",
             }}
           />
-        </div>
+        </div> */}
 
         <div className="form-group">
           <label
@@ -261,16 +368,30 @@ export default function NewProductPage() {
             className="block text-sm font-medium text-text mb-2"
             htmlFor="audioSrc"
           >
-            Audio Source (File Upload)
+            Audio Source (.mp3 for streaming)
           </label>
           <input
             type="file"
+            onChange={handleChange}
             ref={inputFileRef}
-            required
-            accept="audio/*"
-            className="w-full border-2 border-text rounded px-4 py-2 bg-surface2 focus:outline-none"
+            accept="audio/mp3"
+            className="file-input w-full bg-overlay2"
           />
         </div>
+
+        {uploading && (
+          <div className="flex flex-col space-y-2">
+            <p ref={messageRef} className="text-text text-sm">
+              "Initializing ffmpeg..."
+            </p>
+            <progress
+              ref={progressRef}
+              className="progress progress-primary w-full"
+              value={0}
+              max="100"
+            ></progress>
+          </div>
+        )}
 
         <button
           type="submit"
