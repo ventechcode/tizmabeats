@@ -6,9 +6,10 @@ import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { fetchFile, toBlobURL } from "@ffmpeg/util";
 import { v4 as uuid } from "uuid";
 
-export default function NewProductPage() {
-  if (typeof window === "undefined") return null;
+if (typeof window === "undefined") null;
 
+export default function NewProductPage() {
+  
   const initialFormData = {
     name: "",
     bpm: 0,
