@@ -22,32 +22,37 @@ export default function AudioPlayer({
   const [playlistUrl, setPlaylistUrl] = useState<string | null>();
 
   useEffect(() => {
-    const fetchPlaylistUrl = async () => {
-      try {
-        const response = await fetch(beat.audioSrc);
-        if (!response.ok) throw new Error("Failed to fetch playlist");
-        const blob = await response.blob();
-        const url = URL.createObjectURL(blob);
-        console.log("Playlist URL:", url);
-        setPlaylistUrl(url);
-      } catch (error) {
-        console.error("Error fetching playlist:", error);
-      }
+    const setupHls = async () => {
+      if (!audioRef.current) return;
+
+      const hls = new Hls();
+      
+      hls.on(Hls.Events.MEDIA_ATTACHED, () => {
+        console.log("HLS media attached");
+      });
+
+      hls.on(Hls.Events.ERROR, (event, data) => {
+        console.error("HLS error:", event, data);
+      });
+
+      hls.loadSource(beat.audioSrc);
+      hls.attachMedia(audioRef.current);
+
+      // Create a blob URL for the audio element
+      const blobUrl = URL.createObjectURL(new Blob([], { type: 'application/vnd.apple.mpegurl' }));
+      setPlaylistUrl(blobUrl);
+
+      return () => {
+        hls.destroy();
+        if (blobUrl) URL.revokeObjectURL(blobUrl);
+      };
     };
 
-    fetchPlaylistUrl();
-
-    return () => {
-      if (playlistUrl) URL.revokeObjectURL(playlistUrl);
-    };
-  }, [beat.id]);
+    setupHls();
+  }, [beat.audioSrc]);
 
   useEffect(() => {
     if (!playlistUrl || !audioRef.current) return;
-
-    const hls = new Hls();
-    hls.loadSource(playlistUrl);
-    hls.attachMedia(audioRef.current);
 
     if (!beat.wavesurferRef.current) {
       beat.wavesurferRef.current = WaveSurfer.create({
@@ -107,7 +112,7 @@ export default function AudioPlayer({
 
   return (
     <div className="absolute bottom-0 left-0 z-50 h-16 sm:h-20 bg-mantle w-full flex flex-row justify-around items-center px-4 sm:px-8">
-      <audio ref={audioRef} className="hidden"></audio>
+      <audio ref={audioRef} src={playlistUrl || undefined} className="hidden"></audio>
       <div className="w-1/4 sm:w-1/6 flex flex-row flex-wrap items-center text-text mr-4 sm:mr-16 md:mr-20 lg:mr-40">
         <div className="ml-3">
           <div className="text-xs sm:text-lg font-semibold">{beat.name}</div>
