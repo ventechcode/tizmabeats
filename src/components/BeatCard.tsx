@@ -11,7 +11,7 @@ export default function BeatCard({
   isPlaying,
 }: {
   beat: Beat;
-  play: (beat: Beat, pause: boolean) => void;
+  play: (beat: Beat, pause: boolean, next: boolean) => void;
   isPlaying: boolean;
 }) {
   const [toggle, setToggle] = useState(isPlaying);
@@ -63,7 +63,7 @@ export default function BeatCard({
             as="button"
             translateZ="61"
             onClick={() => {
-              play(beat, true);
+              play(beat, true, false);
               setToggle(!toggle);
             }}
           >

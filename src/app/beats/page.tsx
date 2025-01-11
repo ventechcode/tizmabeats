@@ -166,20 +166,32 @@ export default function Beats() {
     router.push(`?${createQueryString("bpm", selectedBpms)}`);
   };
 
-  const play = (beat: Beat, pause: boolean) => {
-    if (currentlyPlaying && currentlyPlaying.id == beat.id) {
-      if (pause) {
-        beat.wavesurferRef.current?.playPause();
-        return;
+  const play = (beat: Beat, pause: boolean, next: boolean) => {
+    if (next) {
+      const index = beats.findIndex((b) => b.id === beat.id);
+      const nextBeat = beats[index + 1];
+      if (nextBeat) {
+        setCurrentlyPlaying(nextBeat);
       } else {
         setCurrentlyPlaying(null);
-        return;
       }
+      return;
     }
-    setCurrentlyPlaying(beat);
-  };
 
-  useEffect(() => {}, [currentlyPlaying]);
+    if (currentlyPlaying && currentlyPlaying.id === beat.id) {
+      if (pause) {
+        beat.wavesurferRef.current?.playPause();
+      } else {
+        setCurrentlyPlaying(null);
+      }
+    } else {
+      if (currentlyPlaying) {
+        currentlyPlaying.wavesurferRef.current?.pause();
+      }
+      setCurrentlyPlaying(beat);
+      // We'll handle the actual playback in the AudioPlayer component
+    }
+  };
 
   // Get background color based on flavor for wavy background
   const getBgColor = () => {

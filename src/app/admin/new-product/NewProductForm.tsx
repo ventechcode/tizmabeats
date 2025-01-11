@@ -3,8 +3,7 @@
 import { useRef, useState, useEffect } from "react";
 import { upload } from "@vercel/blob/client";
 import { v4 as uuid } from "uuid";
-import { FFmpeg } from '@ffmpeg/ffmpeg';
-import { fetchFile, toBlobURL } from '@ffmpeg/util';
+import WaveSurfer from "wavesurfer.js";
 
 interface FormData {
   name: string;
@@ -39,10 +38,10 @@ export default function NewProductForm() {
   useEffect(() => {
     let isMounted = true;
     const loadFFmpeg = async () => {
-      if (typeof window !== 'undefined') {
+      if (typeof window !== "undefined") {
         try {
-          const { FFmpeg } = await import('@ffmpeg/ffmpeg');
-          const { fetchFile, toBlobURL } = await import('@ffmpeg/util');
+          const { FFmpeg } = await import("@ffmpeg/ffmpeg");
+          const { fetchFile, toBlobURL } = await import("@ffmpeg/util");
           if (isMounted) {
             setFFmpegLoaded(true);
           }
@@ -89,13 +88,13 @@ export default function NewProductForm() {
     console.log("ID:", id);
 
     try {
-      const { FFmpeg } = await import('@ffmpeg/ffmpeg');
-      const { fetchFile, toBlobURL } = await import('@ffmpeg/util');
+      const { FFmpeg } = await import("@ffmpeg/ffmpeg");
+      const { fetchFile, toBlobURL } = await import("@ffmpeg/util");
       const ffmpeg = new FFmpeg();
 
       // FFmpeg setup
       const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
-      
+
       ffmpeg.on("progress", ({ progress, time }) => {
         console.log(`Progress: ${progress} | Time: ${time}`);
         if (progressRef.current) {
@@ -104,13 +103,15 @@ export default function NewProductForm() {
       });
 
       await ffmpeg.load({
-        coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
-        wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
+        coreURL: await toBlobURL(
+          `${baseURL}/ffmpeg-core.js`,
+          "text/javascript"
+        ),
+        wasmURL: await toBlobURL(
+          `${baseURL}/ffmpeg-core.wasm`,
+          "application/wasm"
+        ),
       });
-
-      if (messageRef.current) {
-        messageRef.current.innerHTML = "Transcoding audio file...";
-      }
 
       // Transcode audio file
       const file = inputFileRef.current?.files?.[0];
@@ -125,9 +126,54 @@ export default function NewProductForm() {
       const audioSrc = await fetchFile(file);
       await ffmpeg.writeFile("input.mp3", audioSrc);
 
+      if (messageRef.current) {
+        messageRef.current.innerHTML =
+          "Extracting peaks and duration from audio file...";
+      }
+
+      const metadata: { duration: number; peaks: number[][] } = {
+        duration: 0,
+        peaks: [],
+      };
+      const wS = WaveSurfer.create({
+        container: "#waveform",
+        barWidth: 5,
+        barRadius: 8,
+        cursorWidth: 3,
+        hideScrollbar: true,
+      });
+
+      wS.on("ready", async () => {
+        const peaks = await wS.exportPeaks();
+        const duration = wS.getDuration();
+        metadata.peaks = peaks;
+        metadata.duration = duration;
+      });
+
+      wS.load(URL.createObjectURL(file));
+
+      if (messageRef.current) {
+        messageRef.current.innerHTML = "Reducing audio quality...";
+      }
+
       await ffmpeg.exec([
         "-i",
         "input.mp3",
+        "-b:a",
+        "96k",
+        "output.mp3",
+      ]);
+
+      const reducedAudio = new Blob([await ffmpeg.readFile("output.mp3")], {type: "audio/mp3"});
+
+      if (messageRef.current) {
+        messageRef.current.innerHTML =
+          "Converting audio file to streamable format...";
+      }
+
+      await ffmpeg.exec([
+        "-i",
+        "output.mp3",
         "-hls_time",
         "10",
         "-hls_playlist_type",
@@ -151,12 +197,10 @@ export default function NewProductForm() {
         .map((line) => line.trim())
         .filter((line) => line && line.endsWith(".ts"));
 
-      console.log("Segment filenames:", segmentFilenames);
-
       // Read all segment files dynamically
-      const segments = await Promise.all(segmentFilenames.map((filename) =>
-        ffmpeg.readFile(filename)
-      ));
+      const segments = await Promise.all(
+        segmentFilenames.map((filename) => ffmpeg.readFile(filename))
+      );
 
       if (messageRef.current) {
         messageRef.current.innerHTML = "Uploading .mp3 file...";
@@ -165,7 +209,7 @@ export default function NewProductForm() {
         progressRef.current.value = 0;
       }
 
-      await upload(`/beats/${id}/${fileName}`, file, {
+      await upload(`/beats/${id}/${fileName}`, reducedAudio, {
         access: "public",
         handleUploadUrl: "/api/upload",
         clientPayload: id,
@@ -203,8 +247,6 @@ export default function NewProductForm() {
         progressRef.current.value = 0;
       }
 
-      console.log("Segments:", segments.length);
-
       for (let i = 0; i < segments.length; i++) {
         const paddedIndex = String(i).padStart(3, "0");
         const segmentBlob = new Blob([segments[i]], {
@@ -233,10 +275,25 @@ export default function NewProductForm() {
       }
 
       if (messageRef.current) {
+        messageRef.current.innerHTML = `Uploading audio metadata...`;
+      }
+
+      await upload(
+        `/beats/${id}/converted/audio-info.json`,
+        JSON.stringify(metadata),
+        {
+          access: "public",
+          handleUploadUrl: "/api/upload",
+          clientPayload: id,
+        }
+      );
+
+      if (messageRef.current) {
         messageRef.current.innerHTML = "Updating database...";
       }
 
       formData.audioSrc = blob.url;
+      formData.length = metadata.duration;
 
       await fetch("/api/beats", {
         method: "POST",
@@ -258,89 +315,59 @@ export default function NewProductForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-2 bg-surface0 py-2 px-6 rounded"
+      className="space-y-3 bg-surface0 py-5 px-7 rounded flex flex-col items-start"
     >
-      <div className="form-group">
-        <label
-          className="block text-sm font-medium text-text mb-2"
-          htmlFor="name"
-        >
-          Name
-        </label>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          required
-          className="w-full border-2 border-text rounded px-4 py-2 bg-surface2 focus:outline-none"
-        />
-      </div>
+      <input
+        type="text"
+        id="name"
+        name="name"
+        placeholder="Name"
+        value={formData.name}
+        onChange={handleChange}
+        required
+        className="input input-bordered bg-surface2 focus:outline-none w-full"
+      />
 
-      <div className="form-group">
-        <label
-          className="block text-sm font-medium text-text mb-2"
-          htmlFor="bpm"
-        >
-          BPM
-        </label>
-        <input
-          type="number"
-          id="bpm"
-          name="bpm"
-          value={formData.bpm}
-          onChange={handleChange}
-          required
-          className="w-full border-2 border-text rounded px-4 py-2 bg-surface2 focus:outline-none"
-          style={{
-            WebkitAppearance: "none",
-            MozAppearance: "textfield",
-          }}
-          placeholder="0"
-        />
-      </div>
+      <input
+        type="number"
+        id="bpm"
+        name="bpm"
+        placeholder="0€"
+        value={formData.bpm}
+        onChange={handleChange}
+        required
+        style={{
+          WebkitAppearance: "none",
+          MozAppearance: "textfield",
+        }}
+        className="input input-bordered bg-surface2 focus:outline-none w-full"
+      />
 
-      <div className="form-group">
-        <label
-          className="block text-sm font-medium text-text mb-2"
-          htmlFor="songKey"
-        >
-          Song Key
-        </label>
-        <input
-          type="text"
-          id="songKey"
-          name="songKey"
-          value={formData.songKey}
-          onChange={handleChange}
-          required
-          className="w-full border-2 border-text rounded px-4 py-2 bg-surface2 focus:outline-none"
-        />
-      </div>
+      <input
+        type="text"
+        id="songKey"
+        name="songKey"
+        placeholder="Song Key"
+        value={formData.songKey}
+        onChange={handleChange}
+        required
+        className="input input-bordered bg-surface2 focus:outline-none w-full"
+      />
 
-      <div className="form-group">
-        <label
-          className="block text-sm font-medium text-text mb-2"
-          htmlFor="price"
-        >
-          Price
-        </label>
-        <input
-          type="number"
-          id="price"
-          name="price"
-          value={formData.price}
-          onChange={handleChange}
-          required
-          className="w-full border-2 border-text rounded px-4 py-2 bg-surface2 focus:outline-none"
-          style={{
-            WebkitAppearance: "none",
-            MozAppearance: "textfield",
-          }}
-          placeholder="0.00"
-        />
-      </div>
+      <input
+        type="number"
+        id="price"
+        name="price"
+        placeholder="Preis"
+        value={formData.price}
+        onChange={handleChange}
+        required
+        className="input input-bordered bg-surface2 focus:outline-none w-full"
+        style={{
+          WebkitAppearance: "none",
+          MozAppearance: "textfield",
+        }}
+      />
 
       <div className="form-group">
         <label
@@ -363,28 +390,6 @@ export default function NewProductForm() {
       <div className="form-group">
         <label
           className="block text-sm font-medium text-text mb-2"
-          htmlFor="length"
-        >
-          Length (in seconds)
-        </label>
-        <input
-          type="number"
-          id="length"
-          name="length"
-          value={formData.length}
-          onChange={handleChange}
-          required
-          className="w-full border-2 border-text rounded px-4 py-2 bg-surface2 focus:outline-none"
-          style={{
-            WebkitAppearance: "none",
-            MozAppearance: "textfield",
-          }}
-        />
-      </div>
-
-      <div className="form-group">
-        <label
-          className="block text-sm font-medium text-text mb-2"
           htmlFor="audioSrc"
         >
           Audio Source (.mp3 for streaming)
@@ -393,14 +398,14 @@ export default function NewProductForm() {
           type="file"
           onChange={handleChange}
           ref={inputFileRef}
-          accept="audio/mp3"
-          className="file-input w-full bg-overlay2"
+          accept="audio/*"
+          className="file-input bg-overlay2"
         />
       </div>
 
       {uploading && (
-        <div className="flex flex-col space-y-2">
-          <p ref={messageRef} className="text-text text-sm">
+        <div className="flex flex-col space-y-2 w-full">
+          <p ref={messageRef} className="text-text">
             Initializing ffmpeg...
           </p>
           <progress
@@ -411,7 +416,7 @@ export default function NewProductForm() {
           ></progress>
         </div>
       )}
-
+      <div id="waveform" className="hidden"></div>
       <button
         type="submit"
         className="bg-blue text-white w-24 h-12 px-6 py-2 rounded shadow hover:bg-bright-blue"
@@ -426,4 +431,3 @@ export default function NewProductForm() {
     </form>
   );
 }
-

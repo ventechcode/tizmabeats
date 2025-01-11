@@ -17,9 +17,10 @@ export async function POST(request: Request): Promise<NextResponse> {
             "application/octet-stream",
             "application/vnd.apple.mpegurl",
             "video/mp2t",
+            "application/json"
           ],
-          maximumSizeInBytes: 10485760,
-          addRandomSuffix: false,
+          maximumSizeInBytes: 10485760, // 10 MB max client upload size
+          addRandomSuffix: pathname.endsWith(".mp3") || pathname.endsWith(".wav"),
           cacheControlMaxAge: 3600,
           tokenPayload: clientPayload,
         };

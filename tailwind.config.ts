@@ -17,6 +17,7 @@ const config: Config = {
     extend: {
       colors: {
         'accentColor': '#89b4fa',
+        'primary': '#89b4fa',
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
