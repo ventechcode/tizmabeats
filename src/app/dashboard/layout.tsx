@@ -14,7 +14,7 @@ function AdminLayout({
   const pathname = usePathname();
 
   return (
-    <main className="h-screen">
+    <main className="max-h-screen">
       <nav className="flex space-x-4 py-4 pl-10 bg-mantle">
         <Link href="/dashboard" className={`${pathname == "/dashboard" ? "border-b-2 border-accentColor" : "hover:border-subtext0 hover:border-b-2"} h-8`}>Dashboard</Link>
         <Link href="/dashboard/products" className={`${pathname == "/dashboard/products" ? "border-b-2 border-accentColor" : "hover:border-subtext0 hover:border-b-2"} h-8`}>Products</Link>

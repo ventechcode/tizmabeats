@@ -163,7 +163,7 @@ export default function AudioPlayer({
           onClick={() => {
             const storedVolume = localStorage.getItem("volume");
             setVolume(storedVolume ? parseInt(storedVolume) : 100);
-            beat.wavesurferRef.current?.setVolume(storedVolume ? parseInt(storedVolume) : 100);
+            beat.wavesurferRef.current?.setVolume(storedVolume ? parseInt(storedVolume) / 100 : 1);
           }}
         />
       );

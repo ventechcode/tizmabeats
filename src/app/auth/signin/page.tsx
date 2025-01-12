@@ -1,65 +1,118 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
+
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
 
+const signInSchema = z.object({
+  username: z
+    .string()
+    .min(2, {
+      message: "Username must be at least 2 characters long",
+    })
+    .max(50),
+  password: z
+    .string()
+    .min(6, {
+      message: "Password must be at least 6 characters long",
+    })
+    .max(100),
+});
+
 export default function SignIn() {
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/dashboard"; // Default to /dashboard if no callbackUrl
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [error, setError] = useState<string | null>(null);
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const form = useForm<z.infer<typeof signInSchema>>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: {
+      username: "",
+      password: "",
+    },
+  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  async function onSubmit(values: z.infer<typeof signInSchema>) {
+    const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+    const { username, password } = values;
+
     try {
       const result = await signIn("credentials", {
-        email,
+        email: username,
         password,
-        redirect: false, // Prevent NextAuth from redirecting immediately
+        redirect: false, // Do not redirect to the callbackUrl yet
       });
 
       if (!result?.ok) {
-        setError("Invalid credentials, please try again.");
+        setError(result?.error!);
         return;
       }
 
-      // Redirect to the callbackUrl or /dashboard
       router.push(callbackUrl);
     } catch (err) {
       console.error("Failed to sign in:", err);
-      setError("Something went wrong. Please try again.");
     }
-  };
+  }
 
   return (
-    <div>
-      <h1>Sign In</h1>
-      <form onSubmit={handleSubmit}>
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <label>
-          Email:
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
+    <div className="w-1/4 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-text">
+      <h1 className="py-2 font-semibold text-2xl">Sign In</h1>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Username</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Username"
+                    {...field}
+                    className="text-text"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </label>
-        <label>
-          Password:
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Password</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Password"
+                    type="password"
+                    {...field}
+                    className="text-text"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
           />
-        </label>
-        <button type="submit">Sign In</button>
-      </form>
+          {error && <p className="text-red">{error}</p>}
+          <Button type="submit">Login</Button>
+        </form>
+      </Form>
     </div>
   );
 }

@@ -30,31 +30,9 @@ const formSchema = z.object({
 
 export default function NewProductForm() {
   const [uploading, setUploading] = useState(false);
-  const [ffmpegLoaded, setFFmpegLoaded] = useState(false);
   const inputFileRef = useRef<HTMLInputElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef<HTMLProgressElement>(null);
-
-  // useEffect(() => {
-  //   let isMounted = true;
-  //   const loadFFmpeg = async () => {
-  //     if (typeof window !== "undefined") {
-  //       try {
-  //         const { FFmpeg } = await import("@ffmpeg/ffmpeg");
-  //         const { fetchFile, toBlobURL } = await import("@ffmpeg/util");
-  //         if (isMounted) {
-  //           setFFmpegLoaded(true);
-  //         }
-  //       } catch (error) {
-  //         console.error("Failed to load FFmpeg:", error);
-  //       }
-  //     }
-  //   };
-  //   loadFFmpeg();
-  //   return () => {
-  //     isMounted = false;
-  //   };
-  // }, []);
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     // if (!ffmpegLoaded) {
@@ -116,6 +94,7 @@ export default function NewProductForm() {
         duration: 0,
         peaks: [],
       };
+
       const wS = WaveSurfer.create({
         container: "#waveform",
         barWidth: 5,
@@ -305,11 +284,11 @@ export default function NewProductForm() {
   });
 
   return (
-    <div className="w-1/4 ml-6">
+    <div className="bg-surface0 py-2 px-6 rounded-md w-full max-w-lg">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4 bg-mantle rounded py-2 px-4"
+          className="space-y-4 rounded"
         >
           <FormField
             control={form.control}
@@ -324,7 +303,6 @@ export default function NewProductForm() {
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -341,7 +319,6 @@ export default function NewProductForm() {
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -360,7 +337,6 @@ export default function NewProductForm() {
                     onChange={(e) => field.onChange(Number(e.target.value))} // Parse input as a number
                   />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -377,7 +353,6 @@ export default function NewProductForm() {
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -396,7 +371,6 @@ export default function NewProductForm() {
                     onChange={(e) => field.onChange(Number(e.target.value))} // Parse input as a number
                   />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -415,13 +389,12 @@ export default function NewProductForm() {
                     onChange={(e) => {
                       const file = e.target.files?.[0];
                       if (file) {
-                        inputFileRef!.current!.files![0] = file; // Store the file in inputFileRef
+                        inputFileRef!.current!.files = e.target.files; // Store the file in inputFileRef
                         field.onChange(file.name); // Optionally update form value with the file name or URL
                       }
                     }}
                   />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -440,7 +413,6 @@ export default function NewProductForm() {
                     {...field}
                   />
                 </FormControl>
-                <FormMessage />
               </FormItem>
             )}
           />
@@ -448,7 +420,7 @@ export default function NewProductForm() {
             <Button
               type="submit"
               disabled={uploading}
-              className="bg-accentColor w-32 mb-2"
+              className="bg-accentColor mb-2"
             >
               {uploading ? (
                 <div className="loading loading-spinner"></div>
@@ -458,7 +430,7 @@ export default function NewProductForm() {
             </Button>
             {uploading && (
               <div className="flex flex-col justify-around ml-2 w-full mb-2">
-                <div ref={messageRef} className="text-subtext0"></div>
+                <div ref={messageRef} className="text-subtext0 text-sm">Test</div>
                 <progress
                   ref={progressRef}
                   className="progress"

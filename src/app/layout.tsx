@@ -19,7 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       {/* color schemes: latte frappé macchiatio mocha */}
-      <body className={`${inter.className} mocha text-text bg-base`}>
+      <body className={`${inter.className} mocha text-text bg-base h-screen`}>
         <main>
           <ShoppingCartProvider>
             <Nav>
