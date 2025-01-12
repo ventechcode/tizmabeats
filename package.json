@@ -20,6 +20,7 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@headlessui/react": "^2.2.0",
     "@hookform/resolvers": "^3.10.0",
+    "@next-auth/prisma-adapter": "^1.0.7",
     "@nextui-org/input": "^2.2.4",
     "@nextui-org/react": "^2.6.10",
     "@nextui-org/select": "^2.2.5",
@@ -37,6 +38,7 @@
     "@stripe/stripe-js": "^5.4.0",
     "@tabler/icons-react": "^3.6.0",
     "@vercel/blob": "^0.27.0",
+    "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
@@ -65,6 +67,7 @@
   },
   "devDependencies": {
     "@catppuccin/tailwindcss": "^0.1.6",
+    "@types/bcrypt": "^5.0.2",
     "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20",
     "@types/react": "^18",

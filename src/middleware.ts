@@ -1,6 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
-import { hashPassword } from "@/utils/crypto";
-export { auth as middleware } from "@/auth"
+import { withAuth } from "next-auth/middleware";
+
+export default withAuth({
+  pages: {
+    signIn: "/auth/signin", // Redirect here if not authenticated
+  },
+});
+
+export const config = {
+  matcher: ["/dashboard/:path*"], // Protect dashboard routes
+};
+
 
 // export async function middleware(req: NextRequest) {
 //     if (await isAuthenticated(req) === false) {
