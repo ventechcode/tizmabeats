@@ -55,8 +55,6 @@ export async function POST(req: NextRequest) {
   const body = await req.json();
   const { name, genre, bpm, producerId } = body;
 
-  console.log("ID:", body.id);
-
   try {
     const product = await stripe.products.create({
       name: name,

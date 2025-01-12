@@ -25,7 +25,7 @@ export default function BeatCard({
   return (
     <CardContainer className="inter-var">
       <CardBody className="bg-gray-50 relative group/card dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] bg-transparent border-2 dark:border-text w-full mx-4 sm:m-0 sm:w-auto h-auto rounded-xl py-3 px-3 sm:p-6">
-        <CardItem translateZ="44" className="text-xl font-bold text-text">
+        <CardItem translateZ="44" className="text-xl font-bold text-text truncate overflow-hidden w-64">
           {beat.name}
         </CardItem>
         <div className="flex flex-row justify-between mt-2">

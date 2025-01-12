@@ -6,6 +6,12 @@ import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import WaveSurfer from "wavesurfer.js";
 import Hls from "hls.js";
 import { Beat } from "@/types";
+import {
+  IoVolumeLowOutline,
+  IoVolumeHighOutline,
+  IoVolumeMuteOutline,
+} from "react-icons/io5";
+import { HiMiniXMark } from "react-icons/hi2";
 
 export default function AudioPlayer({
   beat,
@@ -18,7 +24,7 @@ export default function AudioPlayer({
   const audioRef = useRef<HTMLAudioElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
-  const [volume, setVolume] = useState(50);
+  const [volume, setVolume] = useState(100);
   const [playlistUrl, setPlaylistUrl] = useState<string | null>();
   const [metadata, setMetadata] = useState({ duration: 0, peaks: [] });
 
@@ -147,78 +153,75 @@ export default function AudioPlayer({
   };
 
   const getVolumeIcon = () => {
-    if (volume > 0) {
+    if (volume == 0)
       return (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="size-7 mr-2"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z"
-          />
-        </svg>
+        <IoVolumeMuteOutline
+          className="text-text text-3xl"
+          onClick={() => {
+            setVolume(100);
+            beat.wavesurferRef.current?.setVolume(1);
+          }}
+        />
       );
-    } else {
+    else if (volume < 50)
       return (
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth={1.5}
-          stroke="currentColor"
-          className="size-7 mr-2"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            d="M17.25 9.75 19.5 12m0 0 2.25 2.25M19.5 12l2.25-2.25M19.5 12l-2.25 2.25m-10.5-6 4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z"
-          />
-        </svg>
+        <IoVolumeLowOutline
+          className="text-text text-3xl"
+          onClick={() => {
+            setVolume(0);
+            beat.wavesurferRef.current?.setVolume(0);
+          }}
+        />
       );
-    }
+    else if (volume >= 50)
+      return (
+        <IoVolumeHighOutline
+          className="text-text text-3xl"
+          onClick={() => {
+            setVolume(0);
+            beat.wavesurferRef.current?.setVolume(0);
+          }}
+        />
+      );
   };
 
   return (
-    <div className="absolute bottom-0 left-0 z-50 h-16 sm:h-20 bg-mantle w-full flex flex-row justify-around items-center px-4 sm:px-8">
+    <div className="fixed bottom-0 z-50 h-16 sm:h-20 bg-mantle w-full flex flex-row justify-between items-center px-4 sm:px-8">
       <audio ref={audioRef} className="hidden"></audio>
-      <div className="w-1/4 sm:w-1/6 flex flex-row flex-wrap items-center text-text mr-4 sm:mr-16 md:mr-20 lg:mr-40">
+      <div className="flex flex-row flex-wrap items-center w-1/5">
         <div className="ml-3">
-          <div className="text-xs sm:text-lg font-semibold">{beat.name}</div>
-          <div className="text-[12px] sm:text-sm text-muted">{beat.genre}</div>
+          <p className="font-semibold truncate overflow-hidden">
+            {beat.name}
+          </p>
+          <div className="text-[12px] sm:text-sm">{beat.genre}</div>
         </div>
       </div>
-
-      {getVolumeIcon()}
-
-      <input
-        type="range"
-        min={0}
-        max={100}
-        value={volume}
-        onChange={handleVolumeChange}
-        className="range range-sm w-1/5 sm:w-1/6 pr-4 sm:pr-12 range-primary"
-        aria-label="Volume control"
-      />
 
       <div className="w-8 pr-4 sm:pr-12 text-sm sm:text-text">
         {formatTime(elapsedTime)}
       </div>
 
-      <div id="waveform" className="w-2/3"></div>
+      <div id="waveform" className="w-3/5"></div>
 
       <div className="w-8 pl-2 sm:pl-4 text-sm sm:text-text">
         {formatTime(metadata.duration)}
       </div>
 
-      <FontAwesomeIcon
-        icon={faXmark}
-        className="text-text cursor-pointer ml-8 sm:ml-24"
+      <div className="sm:w-24 md:w-32 ml-10 hidden md:flex flex-row items-center space-x-2">
+        {getVolumeIcon()}
+        <input
+          type="range"
+          min={0}
+          max={100}
+          value={volume}
+          onChange={handleVolumeChange}
+          className="range range-xs range-primary text-text"
+          aria-label="Volume control"
+        />
+      </div>
+
+      <HiMiniXMark
+        className="text-text cursor-pointer ml-8 sm:ml-24 hover:text-accentColor duration-300"
         onClick={() => toggle(beat, false, false)}
       />
     </div>

@@ -205,7 +205,7 @@ export default function Beats() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-start h-full overflow-hidden">
+    <div className="flex flex-col min-h-screen w-screen overflow-hidden items-center">
       <SearchFilterSection
         genres={genres}
         onGenreChange={onGenreChange}
@@ -213,33 +213,25 @@ export default function Beats() {
         onBpmChange={onBpmChange}
         onSearch={onSearch}
       />
-      -
-      <ScrollArea className="absolute mt-12 sm:mt-80 h-full w-full z-10 mb-6">
-        <div className="flex flex-col mt-44 sm:mt-0 sm:grid gap-4 sm:p-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-4">
-          {isLoading ? (
-            <div className="absolute inset-0 mt-32">
-              <div className="loading loading-spinner loading-lg text-text"></div>
-            </div>
-          ) : beatsLoading ? (
-            beats.map((_, i) => <SkeletonBeatCard key={i} />)
-          ) : (
-            beats.map((beat: Beat, index: number) => (
+
+      <div className="flex-grow flex flex-col sm:grid sm:p-4 gap-x-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 z-40">
+        {beatsLoading
+          ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((_, i) => <SkeletonBeatCard key={i} />)
+          : beats.map((beat: Beat, index: number) => (
               <BeatCard
                 key={index}
                 beat={beat}
                 play={play}
                 isPlaying={currentlyPlaying?.id === beat.id}
               />
-            ))
-          )}
-        </div>
-        <ScrollBar />
-      </ScrollArea>
+            ))}
+      </div>
+
       {currentlyPlaying && (
         <AudioPlayer beat={currentlyPlaying} toggle={play} />
       )}
-      <WavyBackground speed="fast" backgroundFill={getBgColor()} blur={5} />
-      <footer className="absolute left-0 bottom-0 h-12 z-40 flex flex-row items-center justify-around text-text w-screen p-4 bg-mantle text-sm">
+      <WavyBackground speed="fast" backgroundFill={getBgColor()} blur={5} />    
+      <footer className="h-12 z-40 flex flex-row items-center justify-around text-text w-screen p-4 bg-mantle text-sm">
         <p className="hover:cursor-pointer">Copyright &copy; 2025 TIZMABEATS</p>
         <p className="hover:cursor-pointer hover:underline">Privacy Policy</p>
         <p className="hover:cursor-pointer hover:underline">Terms of Service</p>

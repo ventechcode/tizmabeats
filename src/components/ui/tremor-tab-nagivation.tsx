@@ -3,7 +3,7 @@
 import React from "react"
 import * as NavigationMenuPrimitives from "@radix-ui/react-navigation-menu"
 
-import { cx, focusRing } from "../../utils/cn"
+import { cx, focusRing } from "@/utils/cn"
 
 function getSubtree(
   options: { asChild: boolean | undefined; children: React.ReactNode },
@@ -74,7 +74,7 @@ const TabNavigationLink = React.forwardRef<
         <span
           className={cx(
             // base
-            "-mb-px flex items-center justify-center whitespace-nowrap border-b-2 border-transparent px-3 pb-2 text-sm font-medium transition-all",
+            "-mb-px flex items-center justify-center whitespace-nowrap  border-transparent px-3 pb-2 text-sm font-medium transition-all",
             // text color
             "text-gray-500 dark:text-gray-500",
             // hover
@@ -82,8 +82,8 @@ const TabNavigationLink = React.forwardRef<
             // border hover
             "group-hover:border-gray-300 group-hover:dark:border-gray-400",
             // selected
-            "group-data-[active]:border-blue group-data-[active]:text-blue",
-            "group-data-[active]:dark:border-blue group-data-[active]:dark:text-blue",
+            "group-data-[active]:border-blue-500 group-data-[active]:text-blue-500",
+            "group-data-[active]:dark:border-blue-500 group-data-[active]:dark:text-blue-500",
             // disabled
             disabled
               ? "pointer-events-none text-gray-300 dark:text-gray-700"

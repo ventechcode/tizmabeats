@@ -1,93 +1,75 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState } from "react";
 import { upload } from "@vercel/blob/client";
 import { v4 as uuid } from "uuid";
 import WaveSurfer from "wavesurfer.js";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
-interface FormData {
-  name: string;
-  bpm: number;
-  songKey: string;
-  audioSrc: string;
-  price: number;
-  producer: string;
-  genre: string;
-  length: number;
-}
+const formSchema = z.object({
+  name: z.string().min(5).max(30),
+  bpm: z.number().min(2).max(300),
+  songKey: z.string().max(10),
+  audioSrc: z.string(),
+  price: z.number().min(1),
+  genre: z.string(),
+  productSrc: z.string(),
+});
 
 export default function NewProductForm() {
-  const initialFormData: FormData = {
-    name: "",
-    bpm: 0,
-    songKey: "",
-    audioSrc: "",
-    price: 0,
-    producer: "",
-    genre: "",
-    length: 0,
-  };
-
-  const [formData, setFormData] = useState<FormData>(initialFormData);
   const [uploading, setUploading] = useState(false);
   const [ffmpegLoaded, setFFmpegLoaded] = useState(false);
   const inputFileRef = useRef<HTMLInputElement>(null);
   const messageRef = useRef<HTMLDivElement>(null);
   const progressRef = useRef<HTMLProgressElement>(null);
 
-  useEffect(() => {
-    let isMounted = true;
-    const loadFFmpeg = async () => {
-      if (typeof window !== "undefined") {
-        try {
-          const { FFmpeg } = await import("@ffmpeg/ffmpeg");
-          const { fetchFile, toBlobURL } = await import("@ffmpeg/util");
-          if (isMounted) {
-            setFFmpegLoaded(true);
-          }
-        } catch (error) {
-          console.error("Failed to load FFmpeg:", error);
-        }
-      }
-    };
-    loadFFmpeg();
-    return () => {
-      isMounted = false;
-    };
-  }, []);
+  // useEffect(() => {
+  //   let isMounted = true;
+  //   const loadFFmpeg = async () => {
+  //     if (typeof window !== "undefined") {
+  //       try {
+  //         const { FFmpeg } = await import("@ffmpeg/ffmpeg");
+  //         const { fetchFile, toBlobURL } = await import("@ffmpeg/util");
+  //         if (isMounted) {
+  //           setFFmpegLoaded(true);
+  //         }
+  //       } catch (error) {
+  //         console.error("Failed to load FFmpeg:", error);
+  //       }
+  //     }
+  //   };
+  //   loadFFmpeg();
+  //   return () => {
+  //     isMounted = false;
+  //   };
+  // }, []);
 
-  const handleChange = (
-    e: React.ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
-  ) => {
-    const { name, value, type } = e.target as HTMLInputElement;
-    const checked = (e.target as HTMLInputElement).checked;
-    setFormData((prev) => ({
-      ...prev,
-      [name]:
-        type === "checkbox"
-          ? checked
-          : type === "number"
-          ? parseFloat(value)
-          : value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!ffmpegLoaded) {
-      alert("FFmpeg is not loaded yet. Please try again in a moment.");
-      return;
-    }
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    // if (!ffmpegLoaded) {
+    //   alert("FFmpeg is not loaded yet. Please try again in a moment.");
+    //   return;
+    // }
 
     setUploading(true);
-
     const id = uuid();
-    console.log("ID:", id);
 
     try {
+      if (messageRef.current) {
+        messageRef.current.innerHTML = "Initializing ffmpeg...";
+      }
+
       const { FFmpeg } = await import("@ffmpeg/ffmpeg");
       const { fetchFile, toBlobURL } = await import("@ffmpeg/util");
       const ffmpeg = new FFmpeg();
@@ -123,12 +105,11 @@ export default function NewProductForm() {
 
       let fileName = file.name.replace("#", "");
 
-      const audioSrc = await fetchFile(file);
-      await ffmpeg.writeFile("input.mp3", audioSrc);
+      const src = await fetchFile(file);
+      await ffmpeg.writeFile("input.mp3", src);
 
       if (messageRef.current) {
-        messageRef.current.innerHTML =
-          "Extracting peaks and duration from audio file...";
+        messageRef.current.innerHTML = "Extracting peaks and duration...";
       }
 
       const metadata: { duration: number; peaks: number[][] } = {
@@ -156,15 +137,11 @@ export default function NewProductForm() {
         messageRef.current.innerHTML = "Reducing audio quality...";
       }
 
-      await ffmpeg.exec([
-        "-i",
-        "input.mp3",
-        "-b:a",
-        "96k",
-        "output.mp3",
-      ]);
+      await ffmpeg.exec(["-i", "input.mp3", "-b:a", "96k", "output.mp3"]);
 
-      const reducedAudio = new Blob([await ffmpeg.readFile("output.mp3")], {type: "audio/mp3"});
+      const reducedAudio = new Blob([await ffmpeg.readFile("output.mp3")], {
+        type: "audio/mp3",
+      });
 
       if (messageRef.current) {
         messageRef.current.innerHTML =
@@ -292,142 +269,208 @@ export default function NewProductForm() {
         messageRef.current.innerHTML = "Updating database...";
       }
 
-      formData.audioSrc = blob.url;
-      formData.length = metadata.duration;
+      const audioSrc = blob.url;
+      const length = metadata.duration;
 
       await fetch("/api/beats", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ ...formData, id }),
+        body: JSON.stringify({ ...values, id, audioSrc, length }),
       });
-
-      setFormData(initialFormData);
     } catch (error) {
       console.error("Error creating beat:", error);
       alert("Error creating beat. Please try again.");
     } finally {
       setUploading(false);
+      inputFileRef!.current!.value = "";
+      console.log("Resetting form...");
+      form.reset();
+      console.log("Form reset called.");
     }
   };
 
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: "",
+      bpm: 0,
+      songKey: "",
+      price: 0,
+      genre: "",
+      audioSrc: "",
+      productSrc: "",
+    },
+  });
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-3 bg-surface0 py-5 px-7 rounded flex flex-col items-start"
-    >
-      <input
-        type="text"
-        id="name"
-        name="name"
-        placeholder="Name"
-        value={formData.name}
-        onChange={handleChange}
-        required
-        className="input input-bordered bg-surface2 focus:outline-none w-full"
-      />
-
-      <input
-        type="number"
-        id="bpm"
-        name="bpm"
-        placeholder="0€"
-        value={formData.bpm}
-        onChange={handleChange}
-        required
-        style={{
-          WebkitAppearance: "none",
-          MozAppearance: "textfield",
-        }}
-        className="input input-bordered bg-surface2 focus:outline-none w-full"
-      />
-
-      <input
-        type="text"
-        id="songKey"
-        name="songKey"
-        placeholder="Song Key"
-        value={formData.songKey}
-        onChange={handleChange}
-        required
-        className="input input-bordered bg-surface2 focus:outline-none w-full"
-      />
-
-      <input
-        type="number"
-        id="price"
-        name="price"
-        placeholder="Preis"
-        value={formData.price}
-        onChange={handleChange}
-        required
-        className="input input-bordered bg-surface2 focus:outline-none w-full"
-        style={{
-          WebkitAppearance: "none",
-          MozAppearance: "textfield",
-        }}
-      />
-
-      <div className="form-group">
-        <label
-          className="block text-sm font-medium text-text mb-2"
-          htmlFor="genre"
+    <div className="w-1/4 ml-6">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="space-y-4 bg-mantle rounded py-2 px-4"
         >
-          Genre
-        </label>
-        <input
-          type="text"
-          id="genre"
-          name="genre"
-          value={formData.genre}
-          onChange={handleChange}
-          required
-          className="w-full border-2 border-text rounded px-4 py-2 bg-surface2 focus:outline-none"
-        />
-      </div>
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Title</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="e.g. Trap Beat"
+                    className="text-text"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="genre"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Genre</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="e.g. Techno"
+                    className="text-text"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="bpm"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Bpm</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="e.g. 90"
+                    type="number"
+                    className="text-text"
+                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value))} // Parse input as a number
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="songKey"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Song key</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="e.g. F#M"
+                    className="text-text"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="price"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Price</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="e.g. 30"
+                    type="number"
+                    className="text-text"
+                    {...field}
+                    onChange={(e) => field.onChange(Number(e.target.value))} // Parse input as a number
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="audioSrc"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Audio for streaming (mp3)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="file"
+                    accept="audio/mp3"
+                    className="text-text"
+                    ref={inputFileRef}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        inputFileRef!.current!.files![0] = file; // Store the file in inputFileRef
+                        field.onChange(file.name); // Optionally update form value with the file name or URL
+                      }
+                    }}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-      <div className="form-group">
-        <label
-          className="block text-sm font-medium text-text mb-2"
-          htmlFor="audioSrc"
-        >
-          Audio Source (.mp3 for streaming)
-        </label>
-        <input
-          type="file"
-          onChange={handleChange}
-          ref={inputFileRef}
-          accept="audio/*"
-          className="file-input bg-overlay2"
-        />
-      </div>
-
-      {uploading && (
-        <div className="flex flex-col space-y-2 w-full">
-          <p ref={messageRef} className="text-text">
-            Initializing ffmpeg...
-          </p>
-          <progress
-            ref={progressRef}
-            className="progress progress-primary w-full"
-            value={0}
-            max="100"
-          ></progress>
-        </div>
-      )}
+          <FormField
+            control={form.control}
+            name="productSrc"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Product for selling (mp3, wav, stems)</FormLabel>
+                <FormControl>
+                  <Input
+                    type="file"
+                    accept="audio/*"
+                    className="text-text"
+                    {...field}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <div className="flex flex-row">
+            <Button
+              type="submit"
+              disabled={uploading}
+              className="bg-accentColor w-32 mb-2"
+            >
+              {uploading ? (
+                <div className="loading loading-spinner"></div>
+              ) : (
+                "Create Beat"
+              )}
+            </Button>
+            {uploading && (
+              <div className="flex flex-col justify-around ml-2 w-full mb-2">
+                <div ref={messageRef} className="text-subtext0"></div>
+                <progress
+                  ref={progressRef}
+                  className="progress"
+                  value={0}
+                  max={100}
+                />
+              </div>
+            )}
+          </div>
+        </form>
+      </Form>
       <div id="waveform" className="hidden"></div>
-      <button
-        type="submit"
-        className="bg-blue text-white w-24 h-12 px-6 py-2 rounded shadow hover:bg-bright-blue"
-        disabled={!ffmpegLoaded}
-      >
-        {uploading ? (
-          <span className="loading loading-spinner loading-md mt-1"></span>
-        ) : (
-          "Create"
-        )}
-      </button>
-    </form>
+    </div>
   );
 }

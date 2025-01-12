@@ -20,7 +20,7 @@ export default function RootLayout({
     <html lang="en">
       {/* color schemes: latte frappé macchiatio mocha */}
       <body className={`${inter.className} mocha text-text bg-base`}>
-        <main className="h-screen flex flex-col items-center justify-center bg-base">
+        <main>
           <ShoppingCartProvider>
             <Nav>
               <NavLink href="/beats">Beats</NavLink>

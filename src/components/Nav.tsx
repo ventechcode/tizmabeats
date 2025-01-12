@@ -14,7 +14,7 @@ export function Nav({ children }: { children: React.ReactNode }) {
   return (
     <Disclosure
       as="nav"
-      className="bg-crust top-0 absolute z-50 w-screen sm:px-8"
+      className="bg-crust top-0 sticky z-50 w-screen sm:px-8"
     >
       <div className="">
         <div className="flex flex-row h-20 items-center justify-between">

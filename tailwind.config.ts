@@ -1,6 +1,7 @@
 import type { Config } from "tailwindcss";
 const svgToDataUri = require("mini-svg-data-uri");
 import daisyui from "daisyui";
+import { nextui } from "@nextui-org/theme";
 
 const {
   default: flattenColorPalette,

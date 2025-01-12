@@ -6,8 +6,8 @@ const NewProductForm = dynamic(() => import('./NewProductForm'), {
 
 export default function NewProductPage() {
   return (
-    <div className="container mx-auto">
-      <h1 className="text-2xl font-bold my-2">Create new Beat</h1>
+    <div>
+      <h1 className="text-2xl font-bold ml-6">Create a new beat</h1>
       <NewProductForm />
     </div>
   )

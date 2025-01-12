@@ -1,6 +1,5 @@
 "use client"
 
-import { TabNavigation, TabNavigationLink } from "@/components/ui/tremor-tab-nagivation";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import React from "react";
@@ -10,17 +9,17 @@ function AdminLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const pathname  = usePathname();
+  const pathname = usePathname();
 
   return (
-    <main className="absolute top-24 flex flex-col items-center">
-      <TabNavigation>
-        <TabNavigationLink active={pathname === "/admin"}><Link href="/admin">Dashboard</Link></TabNavigationLink>
-        <TabNavigationLink active={pathname === "/admin/products"}><Link href="/admin/products">Products</Link></TabNavigationLink>
-        <TabNavigationLink active={pathname === "/admin/new-product"}><Link href="/admin/new-product">New Product</Link></TabNavigationLink>
-        <TabNavigationLink active={pathname === "/admin/customers"}><Link href="/admin/customers">Customers</Link></TabNavigationLink>
-        <TabNavigationLink active={pathname === "/admin/settings"}><Link href="/admin/settings">Settings</Link></TabNavigationLink>
-      </TabNavigation>
+    <main className="h-screen">
+      <nav className="flex space-x-4 my-6 ml-10">
+        <Link href="/admin" className={`${pathname == "/admin" ? "border-b-2 border-accentColor" : "hover:border-subtext0 hover:border-b-2"} h-8`}>Dashboard</Link>
+        <Link href="/admin/products" className={`${pathname == "/admin/products" ? "border-b-2 border-accentColor" : "hover:border-subtext0 hover:border-b-2"} h-8`}>Products</Link>
+        <Link href="/admin/customers" className={`${pathname == "/admin/customers" ? "border-b-2 border-accentColor" : "hover:border-subtext0 hover:border-b-2"} h-8`}>Customers</Link>
+        <Link href="/admin/new-product" className={`${pathname == "/admin/new-product" ? "border-b-2 border-accentColor" : "hover:border-subtext0 hover:border-b-2"} h-8`}>New Product</Link>
+        <Link href="/admin/settings" className={`${pathname == "/admin/settings" ? "border-b-2 border-accentColor" : "hover:border-subtext0 hover:border-b-2"} h-8`}>Settings</Link>
+      </nav>
       {children}
     </main>
   );
