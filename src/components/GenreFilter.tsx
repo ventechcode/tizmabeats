@@ -27,11 +27,11 @@ export default function GenreFilter({
 
   return (
     <Select
-      label="Filter Genres"
+      label="Genres"
       selectionMode="multiple"
       placeholder="All"
       selectedKeys={values}
-      className="w-64 rounded-lg text-text"
+      className="w-36 lg:w-64 rounded-lg text-text"
       classNames={{
         mainWrapper: "bg-surface0 rounded-lg",
         label: "mb-5 text-text",  

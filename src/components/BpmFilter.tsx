@@ -27,11 +27,11 @@ export default function BpmFilter({
 
   return (
     <Select
-      label="Filter BPMs"
+      label="BPMs"
       selectionMode="multiple"
       placeholder="All"
       selectedKeys={values}
-      className="w-64 rounded-lg text-text"
+      className="w-36 lg:w-64 rounded-lg text-text"
       classNames={{
         listboxWrapper: "bg-surface0 rounded-lg",
         mainWrapper: "bg-surface0 rounded-lg",

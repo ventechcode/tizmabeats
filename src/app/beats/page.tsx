@@ -22,6 +22,7 @@ export default function Beats() {
   const [beatsLoading, setBeatsLoading] = useState(false);
   const [flavor, setFlavor] = useState("");
   const [backgroundColor, setBackgroundColor] = useState("");
+  const [initialSearch, setInitialSearch] = useState("");
 
   const baseQuery = "/api/beats";
 
@@ -29,6 +30,10 @@ export default function Beats() {
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
+    
+    if (params.has("search")) {
+      setInitialSearch(params.get("search") || "");
+    }
 
     // Fetch data based on initial query params
     const queryArray: string[] = [];
@@ -212,9 +217,10 @@ export default function Beats() {
         bpms={bpms}
         onBpmChange={onBpmChange}
         onSearch={onSearch}
+        initialSearch={initialSearch}
       />
 
-      <div className="flex-grow flex flex-col sm:grid sm:p-4 gap-x-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 z-40">
+      <div className="flex-grow flex flex-col sm:grid sm:p-4 gap-x-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 z-40 grid-flow-row auto-rows-max">
         {beatsLoading
           ? [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((_, i) => <SkeletonBeatCard key={i} />)
           : beats.map((beat: Beat, index: number) => (

@@ -70,6 +70,8 @@ export default function AudioPlayer({
 
     setupHls();
 
+    setVolume(parseInt(localStorage.getItem("volume") || "100"));
+
     return () => {
       if (hlsRef.current) {
         hlsRef.current.detachMedia();
@@ -146,10 +148,11 @@ export default function AudioPlayer({
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  const handleVolumeChange = (e: any) => {
+  const handleVolumeChange = (e: any)  => {
     const newVolume = parseInt(e.target.value, 10);
     setVolume(newVolume);
     beat.wavesurferRef.current?.setVolume(newVolume / 100);
+    localStorage.setItem("volume", newVolume.toString());
   };
 
   const getVolumeIcon = () => {
@@ -158,8 +161,9 @@ export default function AudioPlayer({
         <IoVolumeMuteOutline
           className="text-text text-3xl"
           onClick={() => {
-            setVolume(100);
-            beat.wavesurferRef.current?.setVolume(1);
+            const storedVolume = localStorage.getItem("volume");
+            setVolume(storedVolume ? parseInt(storedVolume) : 100);
+            beat.wavesurferRef.current?.setVolume(storedVolume ? parseInt(storedVolume) : 100);
           }}
         />
       );
