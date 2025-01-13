@@ -1,40 +1,41 @@
-import NextAuth from "next-auth";
-import { hashPassword } from "@/utils/crypto";
-import Credentials from "next-auth/providers/credentials";
+import { NextAuthOptions } from "next-auth";
 import prisma from "./utils/prisma";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import bcrypt from "bcryptjs";
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
   providers: [
-    Credentials({
-      // You can specify which fields should be submitted, by adding keys to the `credentials` object.
-      // e.g. domain, username, password, 2FA token, etc.
+    {
+      id: "credentials",
+      name: "Credentials",
+      type: "credentials",
       credentials: {
-        email: {},
-        password: {},
+        email: { label: "Email", type: "text" },
+        password: { label: "Password", type: "password" },
       },
-      authorize: async (credentials) => {
-        let user = null;
-
-        // logic to salt and hash password
-        const pwHash = await hashPassword(credentials!.password);
-
-        // logic to verify if the user exists
-        user = await prisma.producer.findUnique({
-          where: {
-            email: credentials!.email,
-            password: pwHash,
-          },
-        });
-        
-        if (!user) {
-          // No user found, so this is their first attempt to login
-          // Optionally, this is also the place you could do a user registration
-          throw new Error("Invalid credentials.");
+      async authorize(credentials) {
+        if (!credentials?.email || !credentials?.password) {
+          throw new Error("Missing email or password");
         }
 
-        // return user object with their profile data
-        return user;
+        const user = await prisma.producer.findUnique({
+          where: { email: credentials.email },
+        });
+
+        if (!user || !(await bcrypt.compare(credentials.password, user.password))) {
+          throw new Error("Invalid email or password");
+        }
+
+        return { id: user.id, email: user.email, name: user.name };
       },
-    }),
+    },
   ],
-});
+  session: {
+    strategy: "jwt", // Use JWT-based session strategy
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+  pages: {
+    signIn: "/auth/signin", // Redirect here for unauthenticated users
+  },
+};
