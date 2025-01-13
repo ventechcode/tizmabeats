@@ -38,6 +38,7 @@ export default function SignIn() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const form = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -48,6 +49,7 @@ export default function SignIn() {
   });
 
   async function onSubmit(values: z.infer<typeof signInSchema>) {
+    setLoading(true);
     const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
     const { username, password } = values;
 
@@ -64,6 +66,7 @@ export default function SignIn() {
       }
 
       router.push(callbackUrl);
+      setLoading(false);
     } catch (err) {
       console.error("Failed to sign in:", err);
     }
@@ -110,7 +113,7 @@ export default function SignIn() {
             )}
           />
           {error && <p className="text-red">{error}</p>}
-          <Button type="submit">Login</Button>
+          <Button type="submit">{!loading ? "Login": <div className="loading loading-spinner"></div>}</Button>
         </form>
       </Form>
     </div>
