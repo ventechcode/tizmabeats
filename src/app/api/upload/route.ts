@@ -1,7 +1,16 @@
 import { handleUpload, type HandleUploadBody } from "@vercel/blob/client";
-import { NextResponse } from "next/server";
+import { getToken } from "next-auth/jwt";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function POST(request: Request): Promise<NextResponse> {
+export async function POST(request: NextRequest): Promise<NextResponse> {
+  const token = await getToken({
+    req: request,
+    secret: process.env.NEXTAUTH_SECRET,
+  });
+  if (!token) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  
   const body = (await request.json()) as HandleUploadBody;
 
   try {
@@ -17,10 +26,11 @@ export async function POST(request: Request): Promise<NextResponse> {
             "application/octet-stream",
             "application/vnd.apple.mpegurl",
             "video/mp2t",
-            "application/json"
+            "application/json",
           ],
           maximumSizeInBytes: 10485760, // 10 MB max client upload size
-          addRandomSuffix: pathname.endsWith(".mp3") || pathname.endsWith(".wav"),
+          addRandomSuffix:
+            pathname.endsWith(".mp3") || pathname.endsWith(".wav"),
           cacheControlMaxAge: 3600,
           tokenPayload: clientPayload,
         };

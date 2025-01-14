@@ -1,4 +1,5 @@
 import prisma from "@/utils/prisma";
+import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
@@ -26,32 +27,40 @@ export async function GET(req: NextRequest) {
   // Parse the search query parameter
   const search = params.get("search");
 
-    try {
-      const beats = await prisma.beat.findMany({
-        where: {
-          genre: genres?.length ? { in: genres } : undefined,
-          bpm: bpms?.length ? { in: bpms } : undefined,
-          name: search ? { contains: search, mode: "insensitive" } : undefined,
-          purchased: false,
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-        include: {
-          producer: { select: { name: true } },
-        },
-      });
-  
-      return NextResponse.json(beats);
-    } catch (error) {
-      console.error("Error fetching beats:", error);
-      return NextResponse.json({ error: "Error fetching beats" }, { status: 500 });
-    } finally {
-      await prisma.$disconnect();
-    }
+  try {
+    const beats = await prisma.beat.findMany({
+      where: {
+        genre: genres?.length ? { in: genres } : undefined,
+        bpm: bpms?.length ? { in: bpms } : undefined,
+        name: search ? { contains: search, mode: "insensitive" } : undefined,
+        purchased: false,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        producer: { select: { name: true } },
+      },
+    });
+
+    return NextResponse.json(beats);
+  } catch (error) {
+    console.error("Error fetching beats:", error);
+    return NextResponse.json(
+      { error: "Error fetching beats" },
+      { status: 500 }
+    );
+  } finally {
+    await prisma.$disconnect();
+  }
 }
 
 export async function POST(req: NextRequest) {
+  const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+  if (!token) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const body = await req.json();
   const { name, genre, bpm, producerId } = body;
 
@@ -92,5 +101,4 @@ export async function POST(req: NextRequest) {
   } finally {
     await prisma.$disconnect();
   }
-  
 }
