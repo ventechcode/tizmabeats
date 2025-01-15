@@ -33,14 +33,21 @@ export async function POST(request: NextRequest) {
 
       console.log(`Session ${session.id} was successful`);
 
-      // Create user in database
-      const user = await prisma.user.create({
-        data: {
-          email: email,
-          name: name,
-          address: JSON.stringify(session.customer_details?.address),
-        },
+      // Check if user already exists
+      let user = await prisma.user.findUnique({
+        where: { email: email },
       });
+
+      if (!user) {
+        // Create user in database
+        user = await prisma.user.create({
+          data: {
+            email: email,
+            name: name,
+            address: JSON.stringify(session.customer_details?.address),
+          },
+        });
+      }
 
       // Create order in database
       const order = await prisma.order.create({
@@ -78,7 +85,7 @@ export async function POST(request: NextRequest) {
       for (const item of items) {
         await prisma.beat.update({
           where: { id: item.id },
-          data: { purchased: true },
+          data: { purchased: true, order: { connect: { id: order.id } } },
         });
       }
 

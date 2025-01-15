@@ -57,7 +57,7 @@ model Order {
   price     Float
   userId    String
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  beat     Beat[]     @relation("OrderBeats")
+  beat      Beat[]   @relation("OrderBeats")
 }
 
 model Download {

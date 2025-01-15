@@ -5,6 +5,18 @@ import { CardBody, CardContainer, CardItem } from "./ui/3d-card";
 import { Beat } from "@/types";
 import { ShoppingCartContext } from "@/app/providers";
 
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+
+import { TbShoppingBagPlus } from "react-icons/tb";
+
 export default function BeatCard({
   beat,
   play,
@@ -17,6 +29,7 @@ export default function BeatCard({
   const [toggle, setToggle] = useState(isPlaying);
   const [isHovered, setIsHovered] = useState(false);
   const shoppingCart = useContext(ShoppingCartContext);
+  const [selectedLicense, setSelectedLicense] = useState("Basic");
 
   useEffect(() => {
     setToggle(isPlaying);
@@ -25,7 +38,10 @@ export default function BeatCard({
   return (
     <CardContainer className="inter-var">
       <CardBody className="bg-gray-50 relative group/card dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] bg-transparent border-2 dark:border-text w-full mx-4 sm:m-0 sm:w-auto h-auto rounded-xl py-3 px-3 sm:p-6">
-        <CardItem translateZ="44" className="text-xl font-bold text-text truncate overflow-hidden w-64">
+        <CardItem
+          translateZ="44"
+          className="text-xl font-bold text-text truncate overflow-hidden w-64"
+        >
           {beat.name}
         </CardItem>
         <div className="flex flex-row justify-between mt-2">
@@ -97,54 +113,105 @@ export default function BeatCard({
           </CardItem>
         </div>
         <div className="flex justify-between items-center">
-          <CardItem
-            translateZ={36}
-            as="button"
-            className={`px-4 py-2 rounded-xl bg-text text-crust ${
-              shoppingCart?.contains(beat.id)
-                ? "hover:bg-[#f38ba8]"
-                : "duration-300"
-            } text-xs font-bold w-24 h-8 duration-300`}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            onClick={() => {
-              if (shoppingCart?.contains(beat.id)) {
-                shoppingCart?.removeFromCart(beat.id);
-              } else {
-                shoppingCart?.addToCart(beat);
-              }
-            }}
-          >
-            {shoppingCart?.contains(beat.id) ? (
-              <div>
-                {isHovered ? (
-                  <div>
-                    <p>Remove?</p>
-                  </div>
-                ) : (
-                  <div className="flex flex-row items-center justify-between -space-y-2">
-                    <p>Added</p>
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      fill="currentColor"
-                      className="size-6 pt-2"
-                    >
-                      <path
-                        fillRule="evenodd"
-                        d="M19.916 4.626a.75.75 0 0 1 .208 1.04l-9 13.5a.75.75 0 0 1-1.154.114l-6-6a.75.75 0 0 1 1.06-1.06l5.353 5.353 8.493-12.74a.75.75 0 0 1 1.04-.207Z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                  </div>
-                )}
-              </div>
-            ) : isHovered ? (
-              <p className="text-[11px]">Add to cart</p>
+          <Dialog>
+            {shoppingCart!.contains(beat.id) ? (
+              <CardItem
+                translateZ={36}
+                as="button"
+                className={`px-4 py-2 rounded-xl bg-text text-crust hover:bg-[#f38ba8] text-xs font-bold w-24 h-8 duration-300`}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                onClick={() => shoppingCart?.removeFromCart(beat.id)}
+              >
+                <div>
+                  {isHovered ? (
+                    <div>
+                      <p>Remove?</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-row items-center justify-between -space-y-2">
+                      <p>Added</p>
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        className="size-6 pt-2"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M19.916 4.626a.75.75 0 0 1 .208 1.04l-9 13.5a.75.75 0 0 1-1.154.114l-6-6a.75.75 0 0 1 1.06-1.06l5.353 5.353 8.493-12.74a.75.75 0 0 1 1.04-.207Z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                  )}
+                </div>
+              </CardItem>
             ) : (
-              `Buy ${beat.price}€`
+              <DialogTrigger>
+                <CardItem
+                  translateZ={36}
+                  as="button"
+                  className={`px-4 py-2 rounded-xl bg-text text-crust text-xs font-bold w-24 h-8 duration-300`}
+                  onMouseEnter={() => setIsHovered(true)}
+                  onMouseLeave={() => setIsHovered(false)}
+                >
+                  {isHovered ? (
+                    <p className="text-[11px]">Add to cart</p>
+                  ) : (
+                    `Buy`
+                  )}
+                </CardItem>
+              </DialogTrigger>
             )}
-          </CardItem>
+            <DialogContent className="bg-base border-none">
+              <DialogHeader>
+                <DialogTitle>Choose License</DialogTitle>
+                <DialogDescription className="text-subtext0">
+                  Select the license that best fits your needs
+                </DialogDescription>
+              </DialogHeader>
+              <DialogClose />
+              <div className="flex justify-between items-center space-x-3">
+                <div className="h-20 w-1/3 bg-mantle border-accentColor hover:bg-mantle hover:cursor-pointer border-2 rounded-md flex flex-col justify-around pl-2 py-1">
+                  <p className="text-md">Basic</p>
+                  <p className="text-subtext1 text-sm">{beat.price}€</p>
+                  <p className="text-subtext0 text-[10px]">MP3</p>
+                </div>
+                <div className="h-20 w-1/3 hover:bg-mantle hover:cursor-pointer border-2 rounded-md flex flex-col justify-around pl-2 py-1">
+                  <p className="text-md">Standard</p>
+                  <p className="text-subtext1 text-sm">{beat.price}€</p>
+                  <p className="text-subtext0 text-[10px]">MP3, WAV</p>
+                </div>
+                <div className="h-20 w-1/3 hover:bg-mantle hover:cursor-pointer border-2 rounded-md flex flex-col justify-around pl-2 py-1">
+                  <p className="text-md">Exclusive</p>
+                  <p className="text-subtext1 text-sm">{beat.price}€</p>
+                  <p className="text-subtext0 text-[10px]">MP3, WAV, STEMS</p>
+                </div>
+              </div>
+              <div className="flex justify-between items-center space-x-4">
+                <div className="flex space-x-1">
+                  <p className="font-semibold">Subtotal:</p>{" "}
+                  <p>{beat.price}€</p>
+                </div>
+                <DialogTrigger>
+                  <div
+                    className="flex w-24 justify-around items-center bg-text text-crust rounded-md p-2 hover:bg-crust hover:text-text cursor-pointer duration-300"
+                    onClick={() => {
+                      if (shoppingCart?.contains(beat.id)) {
+                        shoppingCart?.removeFromCart(beat.id);
+                      } else {
+                        shoppingCart?.addToCart(beat);
+                      }
+                    }}
+                  >
+                    <TbShoppingBagPlus className="h-7 w-7" />
+                    <div className="font-semibold">Add</div>
+                  </div>
+                </DialogTrigger>
+              </div>
+            </DialogContent>
+          </Dialog>
           <CardItem
             translateZ={36}
             className="px-4 py-2 rounded-xl text-xs text-subtext1"

@@ -19,6 +19,8 @@ const config: Config = {
       colors: {
         'accentColor': '#89b4fa',
         'primary': '#89b4fa',
+        'mocha-red': '#f38ba8',
+        'mocha-green': '#a6e3a1',
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
