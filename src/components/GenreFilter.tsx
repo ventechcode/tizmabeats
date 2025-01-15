@@ -8,7 +8,7 @@ export default function GenreFilter({
   genres,
   onGenreChange,
 }: {
-  genres: string[];
+  genres: Set<string>;
   onGenreChange: (selections: any) => void;
 }) {
   const searchParams = useSearchParams();
@@ -41,7 +41,7 @@ export default function GenreFilter({
       onSelectionChange={filterGenre}
 
     >
-      {genres.map((genre) => (
+      {Array.from(genres).map((genre) => (
         <SelectItem key={genre}>{genre}</SelectItem>
       ))}
     </Select>

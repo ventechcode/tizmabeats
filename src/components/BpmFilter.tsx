@@ -8,16 +8,16 @@ export default function BpmFilter({
   bpms,
   onBpmChange,
 }: {
-  bpms: string[];
+  bpms: Set<number>;
   onBpmChange: (selections: any) => void;
 }) {
   const searchParams = useSearchParams();
-  const [values, setValues] = React.useState<Set<string>>(new Set([]));
+  const [values, setValues] = React.useState<Set<number>>(new Set([]));
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
     const selectedBpms = params.get("bpm")?.split(",") || [];
-    setValues(new Set(selectedBpms));
+    setValues(new Set(selectedBpms.map((bpm) => parseInt(bpm))));
   }, []);
 
   const filterBpm = (selected: any) => {
@@ -41,7 +41,7 @@ export default function BpmFilter({
       }}
       onSelectionChange={filterBpm}
     >
-      {bpms.map((bpm) => (
+      {Array.from(bpms).map((bpm) => (
         <SelectItem key={bpm.toString()}>{bpm.toString()}</SelectItem>
       ))}
     </Select>

@@ -5,6 +5,7 @@ import { TypewriterEffectSmooth } from "@/components/ui/typewriter-effect";
 import Link from "next/link";
 import { flavorEntries } from "@catppuccin/palette";
 import { useEffect, useState } from "react";
+import TizmaBackground from "@/components/TizmaBackground";
 
 export default function Home() {
   const [flavor, setFlavor] = useState("");
@@ -158,14 +159,16 @@ export default function Home() {
         )}
       </footer>
 
+      
+
       {/* WavyBackground updates immediately based on backgroundColor */}
-      {backgroundColor && (
+      {/* {backgroundColor && (
         <WavyBackground
           speed="fast"
           backgroundFill={backgroundColor}
           blur={5}
         />
-      )}
+      )} */}
     </main>
   );
 }

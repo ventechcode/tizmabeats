@@ -16,8 +16,8 @@ export default function Beats() {
   const router = useRouter();
 
   const [beats, setBeats] = useState<Beat[]>([]);
-  const [genres, setGenres] = useState<string[]>([]);
-  const [bpms, setBpms] = useState<string[]>([]);
+  const [genres, setGenres] = useState<Set<string>>(new Set([]));
+  const [bpms, setBpms] = useState<Set<number>>(new Set([]));
   const [isLoading, setIsLoading] = useState(true);
   const [beatsLoading, setBeatsLoading] = useState(false);
   const [flavor, setFlavor] = useState("");
@@ -48,10 +48,12 @@ export default function Beats() {
     fetch(baseQuery)
       .then((res) => res.json())
       .then((data) => {
-        const genres = data.map((beat: any) => beat.genre);
-        const bpms = data.map((beat: any) => beat.bpm);
-        setGenres(genres);
-        setBpms(bpms.sort());
+        const genres: string[] = data.map((beat: any) => beat.genre).sort((a: string, b: string) => a.localeCompare(b));
+        const bpms: number[] = data.map((beat: any) => parseInt(beat.bpm)).sort((a: number, b: number) => a - b)
+        const unqiueBpms = new Set(bpms);
+        const uniqueGenres = new Set(genres);
+        setGenres(uniqueGenres);
+        setBpms(unqiueBpms);
       });
 
     fetch(query)

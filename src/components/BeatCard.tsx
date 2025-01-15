@@ -57,7 +57,7 @@ export default function BeatCard({
             translateZ="36"
             className="text-subtext0 text-sm max-w-sm"
           >
-            {doubleToTimeString(beat.length)}
+            {convertDuration(beat.length)}
           </CardItem>
           <CardItem
             as="p"
@@ -236,8 +236,8 @@ export default function BeatCard({
   );
 }
 
-function doubleToTimeString(doubleTime: number) {
-  const minutes = Math.floor(doubleTime);
-  const seconds = Math.round((doubleTime - minutes) * 100);
+function convertDuration(duration: number) {
+  const minutes = Math.floor(duration / 60);
+  const seconds = Math.floor(duration % 60);
   return `${minutes}:${seconds.toString().padStart(2, "0")} min`;
 }

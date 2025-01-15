@@ -6,7 +6,7 @@ import Searchbar from "@/components/Searchbar";
 import { Separator } from "@/components/ui/separator";
 import BpmFilter from "@/components/BpmFilter";
 
-const SearchFilterSection = ({ genres, onGenreChange, bpms, onBpmChange, onSearch, initialSearch }: { genres: string[], onGenreChange: (selections: any) => void, bpms: string[], onBpmChange: (selections: any) => void, onSearch: (value: string) => void, initialSearch: string}) => {
+const SearchFilterSection = ({ genres, onGenreChange, bpms, onBpmChange, onSearch, initialSearch }: { genres: Set<string>, onGenreChange: (selections: any) => void, bpms: Set<number>, onBpmChange: (selections: any) => void, onSearch: (value: string) => void, initialSearch: string}) => {
   return (
     <div className="z-40 w-screen sm:w-3/4 bg-crust rounded-b-3xl sm:rounded-b-3xl md:rounded-b-full flex flex-col sm:items-center justify-between mb-2" >
       <h1 className="text-xs sm:text-lg text-center md:text-2xl p-4 uppercase font-bold text-text">
