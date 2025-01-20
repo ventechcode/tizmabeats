@@ -1,5 +1,6 @@
 "use client";
 import { cn } from "@/utils/cn";
+import { init } from "next/dist/compiled/webpack/webpack";
 import React, { useEffect, useRef, useState } from "react";
 import { createNoise3D } from "simplex-noise";
 
@@ -114,7 +115,7 @@ export const WavyBackground = ({
       window.removeEventListener("resize", handleResize);
       cancelAnimationFrame(animationId);
     };
-  }, [blur, waveWidth, speed, colors]);
+  }, [blur, waveWidth, speed, colors, initCanvas]);
 
   // Update the backgroundFillRef whenever backgroundFill changes
   useEffect(() => {

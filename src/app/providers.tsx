@@ -1,10 +1,8 @@
 "use client";
 
-import {
-  createContext,
-  useState,
-  useEffect,
-} from "react";
+import { Beat } from "@/types";
+import { BeatLicense } from "@prisma/client";
+import { createContext, useState, useEffect } from "react";
 
 interface ShoppingCartContextType {
   cart: any[];
@@ -25,7 +23,7 @@ export function ShoppingCartProvider({ children }: any) {
     if (typeof window !== "undefined") {
       const savedCart = localStorage.getItem("cart");
       if (savedCart) {
-        setCart(JSON.parse(savedCart)); 
+        setCart(JSON.parse(savedCart));
       }
     }
     setInitialized(true);
@@ -36,19 +34,21 @@ export function ShoppingCartProvider({ children }: any) {
       localStorage.setItem(
         "cart",
         JSON.stringify(
-          cart.map((item) => ({
+          cart.map((item: any) => ({
             id: item.id,
             name: item.name,
+            license: item.license,
             price: item.price,
             quantity: 1,
           }))
         )
       );
     }
-  }, [cart]);
+  }, [cart, initialized]);
 
   const addToCart = (item: any) =>
     setCart((prev) => {
+      console.log(item);
       const existingItem = prev.find((i) => i.id === item.id);
       if (existingItem) {
         return prev;
@@ -56,13 +56,26 @@ export function ShoppingCartProvider({ children }: any) {
       return [...prev, item];
     });
 
-  const contains = (id: any) => cart.some((item) => item.id === id);
+  const contains = (beat: Beat) =>
+    cart.some((item) =>
+      beat.licenses.some((license) => license.id === item.id)
+    );
 
-  const removeFromCart = (id: any) =>
-    setCart((prev) => prev.filter((item) => item.id !== id));
+  const removeFromCart = (beat: any) => {
+    if (typeof beat === "string") {
+      return setCart((prev) => prev.filter((item) => item.id !== beat));
+    }
+    return setCart((prev) =>
+      prev.filter((item) =>
+      !beat.licenses.some((license: any) => license.id === item.id)
+      )
+    );
+  };
 
   return (
-    <ShoppingCartContext.Provider value={{ cart, addToCart, removeFromCart, contains }}>
+    <ShoppingCartContext.Provider
+      value={{ cart, addToCart, removeFromCart, contains }}
+    >
       {children}
     </ShoppingCartContext.Provider>
   );

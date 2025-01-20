@@ -115,7 +115,7 @@ export default function ShoppingCart() {
                     <div className="flex flex-row items-center space-x-1">
                       <div>{beat.name}</div>
                       <div className="text-sm text-subtext0">
-                        ({beat.price}€)
+                        ({beat.license} {beat.price}€)
                       </div>
                     </div>
                     <div onClick={() => shoppingCart?.removeFromCart(beat.id)}>

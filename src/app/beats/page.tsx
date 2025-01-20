@@ -85,7 +85,7 @@ export default function Beats() {
         mediaQuery.removeEventListener("change", handleColorSchemeChange);
       };
     }
-  });
+  }, [searchParams, router]);
 
   // Update theme based on color scheme
   const updateTheme = (newFlavor: string, manual_switch: boolean) => {

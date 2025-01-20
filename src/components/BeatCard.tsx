@@ -30,18 +30,18 @@ export default function BeatCard({
   const [isHovered, setIsHovered] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false); // Track dialog open state
   const shoppingCart = useContext(ShoppingCartContext);
-  const [selectedLicense, setSelectedLicense] = useState<BeatLicense>(beat.licenses[0]);
+  const [selectedLicense, setSelectedLicense] = useState<BeatLicense>();
+
+  useEffect(() => {
+    setSelectedLicense(beat.licenses[0]);
+  }, []);
 
   useEffect(() => {
     setToggle(isPlaying);
   }, [isPlaying]);
 
   return (
-    <CardContainer
-      className="inter-var"
-      isDialogOpen={isDialogOpen}
-      key={beat.id}
-    >
+    <CardContainer className="inter-var" isDialogOpen={isDialogOpen}>
       <CardBody className="bg-gray-50 relative group/card dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] bg-transparent border-2 dark:border-text w-full mx-4 sm:m-0 sm:w-auto h-auto rounded-xl py-3 px-3 sm:p-6">
         <CardItem
           translateZ="44"
@@ -121,14 +121,14 @@ export default function BeatCard({
           <Dialog
             onOpenChange={(open) => setIsDialogOpen(open)} // Update state when dialog opens/closes
           >
-            {shoppingCart!.contains(beat.id) ? (
+            {shoppingCart!.contains(beat) ? (
               <CardItem
                 translateZ={36}
                 as="button"
                 className={`px-4 py-2 rounded-xl bg-text text-crust hover:bg-[#f38ba8] text-xs font-bold w-24 h-8 duration-300`}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
-                onClick={() => shoppingCart?.removeFromCart(beat.id)}
+                onClick={() => shoppingCart?.removeFromCart(beat)}
               >
                 <div>
                   {isHovered ? (
@@ -182,10 +182,16 @@ export default function BeatCard({
               <div className="grid grid-cols-3 grid-rows-1 gap-x-2 flex-wrap">
                 {beat.licenses.map((license: BeatLicense) => (
                   <div
+                    key={license.id}
                     onClick={() => {
                       setSelectedLicense(license);
+                      beat.selectedLicense = license;
                     }}
-                    className={`h-20 ${selectedLicense.id == license.id ? "bg-mantle border-accentColor": ""} hover:bg-mantle hover:cursor-pointer border-2 rounded-md flex flex-col justify-around pl-2 py-1`}
+                    className={`h-20 ${
+                      selectedLicense?.id == license.id
+                        ? "bg-mantle border-accentColor"
+                        : ""
+                    } hover:bg-mantle hover:cursor-pointer border-2 rounded-md flex flex-col justify-around pl-2 py-1`}
                   >
                     <p className="text-md">{license.licenseOption.name}</p>
                     <p className="text-subtext1 text-sm">{license.price}€</p>
@@ -198,17 +204,19 @@ export default function BeatCard({
               <div className="flex justify-between items-center space-x-4">
                 <div className="flex space-x-1">
                   <p className="font-semibold">Subtotal:</p>{" "}
-                  <p>{selectedLicense.price}€</p>
+                  <p>{selectedLicense?.price}€</p>
                 </div>
                 <DialogTrigger>
                   <div
                     className="flex w-24 justify-around items-center bg-text text-crust rounded-md p-2 hover:bg-crust hover:text-text cursor-pointer duration-300"
                     onClick={() => {
-                      if (shoppingCart?.contains(beat.id)) {
-                        shoppingCart?.removeFromCart(beat.id);
-                      } else {
-                        shoppingCart?.addToCart(beat);
-                      }
+                      shoppingCart?.addToCart({
+                        id: selectedLicense?.id,
+                        name: beat.name,
+                        license: selectedLicense?.licenseOption.name,
+                        price: selectedLicense?.price,
+                        quantity: 1,
+                      });
                     }}
                   >
                     <TbShoppingBagPlus className="h-7 w-7" />

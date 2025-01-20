@@ -14,10 +14,8 @@ export async function POST(request: Request): Promise<NextResponse> {
       },
     },
     select: {
-      stripePriceId: true,
       id: true,
       name: true,
-      price: true,
     },
   });
 
@@ -66,22 +64,10 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
   const line_items_data = await line_items.json();
 
-  const items = await prisma.beat.findMany({
-    where: {
-      stripePriceId: {
-        in: line_items_data.data.map((item: any) => item.price.id),
-      },
-    },
-    select: {
-      id: true,
-      name: true,
-      price: true,
-    },
-  });
+  
 
   const data = {
     session: session_data,
-    items: items,
   };  
 
   return NextResponse.json(data);

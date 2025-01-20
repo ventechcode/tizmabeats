@@ -79,7 +79,7 @@ export default function AudioPlayer({
         hlsRef.current = null;
       }
     };
-  }, [beat.id]);
+  }, [beat.id, beat.audioSrc]);
 
   useEffect(() => {
     if (!playlistUrl || !audioRef.current) return;
@@ -140,7 +140,7 @@ export default function AudioPlayer({
         beat.wavesurferRef.current = null;
       }
     };
-  }, [beat, playlistUrl, metadata]);
+  }, [beat, playlistUrl, metadata, toggle, volume]);
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);

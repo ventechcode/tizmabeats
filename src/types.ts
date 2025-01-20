@@ -16,12 +16,12 @@ export interface Beat {
   genre: string;
   length: number;
   wavesurferRef: any;
+  selectedLicense: BeatLicense;
   licenses: BeatLicense[];
 }
 
 export interface BeatLicense {
   id: string;
-  name: string;
   price: number;
   licenseOption: LicenseOption;
 }

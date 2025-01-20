@@ -66,7 +66,7 @@ export default function Success() {
     };
 
     fetchData().then(() => setLoading(false));
-  }, []);
+  }, [session_id, shoppingCart]);
 
   const updateTheme = (newFlavor: string, manual_switch: boolean) => {
     if (manual_switch) {
@@ -121,11 +121,10 @@ export default function Success() {
             </div>
             <div className="mb-6">
               {items.map((item: any) => (
-                <div className="flex flex-col w-full">
+                <div className="flex flex-col w-full" key={item.id}>
                   <Separator className="w-full" />
                   <div className="flex flex-row justify-between items-center">
-                    <div
-                      key={item.id}
+                    <div        
                       className="border-text py-4 flex flex-col items-start"
                     >
                       <h2 className="text-lg font-medium text-text">
