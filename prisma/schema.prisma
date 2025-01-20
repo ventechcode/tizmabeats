@@ -11,33 +11,57 @@ datasource db {
 }
 
 model Beat {
-  id         String   @id @default(uuid())
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id         String        @id @default(uuid())
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
   name       String
   bpm        Int
   songKey    String
   audioSrc   String
-  price      Int
-  producerId String
   purchased  Boolean
   genre      String
   length     Float
-  stripePriceId String
-  producer   Producer @relation(fields: [producerId], references: [id])
+  producerId String
+  producer   Producer      @relation(fields: [producerId], references: [id])
   orderId    String?
-  order      Order? @relation("OrderBeats", fields: [orderId], references: [id], onDelete: SetNull)
-  downloads  Download[]
+  order      Order?        @relation("OrderBeats", fields: [orderId], references: [id], onDelete: SetNull)
+  licenses   BeatLicense[]
+}
+
+model BeatLicense {
+  id              String        @id @default(uuid())
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  beatId          String
+  beat            Beat          @relation(fields: [beatId], references: [id], onDelete: Cascade)
+  price           Float
+  stripePriceId   String
+  licenseOptionId String
+  licenseOption   LicenseOption @relation(fields: [licenseOptionId], references: [id])
+  downloads       Download[]
+}
+
+model LicenseOption {
+  id           String        @id @default(uuid())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  name         String
+  basePrice    Float         @default(0)
+  contents     String[]
+  usageTerms   String[]
+  beatLicenses BeatLicense[]
 }
 
 model Producer {
   id        String   @id @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  name      String
+  surname   String
+  lastname  String
+  username  String   @unique
   email     String   @unique
   password  String
-  beats     Beat[]   
+  beats     Beat[]
 }
 
 model User {
@@ -61,9 +85,10 @@ model Order {
 }
 
 model Download {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  expiresAt DateTime
-  beatId    String
-  beat      Beat     @relation(fields: [beatId], references: [id], onDelete: Cascade)
+  id        String      @id @default(uuid())
+  createdAt DateTime    @default(now())
+  expiresAt DateTime    @default(dbgenerated("now() + interval '48 hours'"))
+  url       String
+  licenseId String
+  license   BeatLicense @relation(fields: [licenseId], references: [id])
 }

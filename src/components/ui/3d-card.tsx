@@ -1,7 +1,6 @@
 "use client";
 
 import { cn } from "@/utils/cn";
-import Image from "next/image";
 import React, {
   createContext,
   useState,
@@ -18,16 +17,18 @@ export const CardContainer = ({
   children,
   className,
   containerClassName,
+  isDialogOpen = false, // Default to false
 }: {
   children?: React.ReactNode;
   className?: string;
   containerClassName?: string;
+  isDialogOpen?: boolean; // Prop to control dialog state
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isMouseEntered, setIsMouseEntered] = useState(false);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || isDialogOpen) return;
     const { left, top, width, height } =
       containerRef.current.getBoundingClientRect();
     const x = (e.clientX - left - width / 2) / 25;
@@ -35,16 +36,24 @@ export const CardContainer = ({
     containerRef.current.style.transform = `rotateY(${x}deg) rotateX(${y}deg)`;
   };
 
-  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseEnter = () => {
+    if (isDialogOpen) return;
     setIsMouseEntered(true);
-    if (!containerRef.current) return;
   };
 
-  const handleMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!containerRef.current) return;
+  const handleMouseLeave = () => {
+    if (!containerRef.current || isDialogOpen) return;
     setIsMouseEntered(false);
     containerRef.current.style.transform = `rotateY(0deg) rotateX(0deg)`;
   };
+
+  // Reset transform when the dialog opens
+  useEffect(() => {
+    if (containerRef.current && isDialogOpen) {
+      containerRef.current.style.transform = `rotateY(0deg) rotateX(0deg)`;
+    }
+  }, [isDialogOpen]);
+
   return (
     <MouseEnterContext.Provider value={[isMouseEntered, setIsMouseEntered]}>
       <div

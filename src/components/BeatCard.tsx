@@ -2,7 +2,7 @@
 
 import React, { useContext, useEffect, useState } from "react";
 import { CardBody, CardContainer, CardItem } from "./ui/3d-card";
-import { Beat } from "@/types";
+import { Beat, BeatLicense } from "@/types";
 import { ShoppingCartContext } from "@/app/providers";
 
 import {
@@ -28,15 +28,19 @@ export default function BeatCard({
 }) {
   const [toggle, setToggle] = useState(isPlaying);
   const [isHovered, setIsHovered] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false); // Track dialog open state
   const shoppingCart = useContext(ShoppingCartContext);
-  const [selectedLicense, setSelectedLicense] = useState("Basic");
+  const [selectedLicense, setSelectedLicense] = useState<BeatLicense>(beat.licenses[0]);
 
   useEffect(() => {
     setToggle(isPlaying);
   }, [isPlaying]);
 
   return (
-    <CardContainer className="inter-var">
+    <CardContainer
+      className="inter-var"
+      isDialogOpen={isDialogOpen}
+    >
       <CardBody className="bg-gray-50 relative group/card dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] bg-transparent border-2 dark:border-text w-full mx-4 sm:m-0 sm:w-auto h-auto rounded-xl py-3 px-3 sm:p-6">
         <CardItem
           translateZ="44"
@@ -113,7 +117,9 @@ export default function BeatCard({
           </CardItem>
         </div>
         <div className="flex justify-between items-center">
-          <Dialog>
+          <Dialog
+            onOpenChange={(open) => setIsDialogOpen(open)} // Update state when dialog opens/closes
+          >
             {shoppingCart!.contains(beat.id) ? (
               <CardItem
                 translateZ={36}
@@ -172,27 +178,26 @@ export default function BeatCard({
                 </DialogDescription>
               </DialogHeader>
               <DialogClose />
-              <div className="flex justify-between items-center space-x-3">
-                <div className="h-20 w-1/3 bg-mantle border-accentColor hover:bg-mantle hover:cursor-pointer border-2 rounded-md flex flex-col justify-around pl-2 py-1">
-                  <p className="text-md">Basic</p>
-                  <p className="text-subtext1 text-sm">{beat.price}€</p>
-                  <p className="text-subtext0 text-[10px]">MP3</p>
-                </div>
-                <div className="h-20 w-1/3 hover:bg-mantle hover:cursor-pointer border-2 rounded-md flex flex-col justify-around pl-2 py-1">
-                  <p className="text-md">Standard</p>
-                  <p className="text-subtext1 text-sm">{beat.price}€</p>
-                  <p className="text-subtext0 text-[10px]">MP3, WAV</p>
-                </div>
-                <div className="h-20 w-1/3 hover:bg-mantle hover:cursor-pointer border-2 rounded-md flex flex-col justify-around pl-2 py-1">
-                  <p className="text-md">Exclusive</p>
-                  <p className="text-subtext1 text-sm">{beat.price}€</p>
-                  <p className="text-subtext0 text-[10px]">MP3, WAV, STEMS</p>
-                </div>
+              <div className="grid grid-cols-3 grid-rows-1 gap-x-2 flex-wrap">
+                {beat.licenses.map((license: BeatLicense) => (
+                  <div
+                    onClick={() => {
+                      setSelectedLicense(license);
+                    }}
+                    className={`h-20 ${selectedLicense.id == license.id ? "bg-mantle border-accentColor": ""} hover:bg-mantle hover:cursor-pointer border-2 rounded-md flex flex-col justify-around pl-2 py-1`}
+                  >
+                    <p className="text-md">{license.licenseOption.name}</p>
+                    <p className="text-subtext1 text-sm">{license.price}€</p>
+                    <p className="text-subtext0 text-[10px]">
+                      {license.licenseOption.contents.map((s) => s).join(", ")}
+                    </p>
+                  </div>
+                ))}
               </div>
               <div className="flex justify-between items-center space-x-4">
                 <div className="flex space-x-1">
                   <p className="font-semibold">Subtotal:</p>{" "}
-                  <p>{beat.price}€</p>
+                  <p>{selectedLicense.price}€</p>
                 </div>
                 <DialogTrigger>
                   <div

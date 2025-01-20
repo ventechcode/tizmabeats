@@ -187,13 +187,13 @@ export default function Beats() {
 
     if (currentlyPlaying && currentlyPlaying.id === beat.id) {
       if (pause) {
-        beat.wavesurferRef.current?.playPause();
+        beat.wavesurferRef.current.playPause();
       } else {
         setCurrentlyPlaying(null);
       }
     } else {
       if (currentlyPlaying) {
-        currentlyPlaying.wavesurferRef.current?.pause();
+        currentlyPlaying.wavesurferRef.current.pause();
       }
       setCurrentlyPlaying(beat);
       // We'll handle the actual playback in the AudioPlayer component

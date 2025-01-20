@@ -16,4 +16,20 @@ export interface Beat {
   genre: string;
   length: number;
   wavesurferRef: any;
+  licenses: BeatLicense[];
+}
+
+export interface BeatLicense {
+  id: string;
+  name: string;
+  price: number;
+  licenseOption: LicenseOption;
+}
+
+export interface LicenseOption {
+  id: string;
+  name: string;
+  basePrice: number;
+  productSrc: string;
+  contents: string[];
 }
