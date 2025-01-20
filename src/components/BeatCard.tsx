@@ -40,6 +40,7 @@ export default function BeatCard({
     <CardContainer
       className="inter-var"
       isDialogOpen={isDialogOpen}
+      key={beat.id}
     >
       <CardBody className="bg-gray-50 relative group/card dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] bg-transparent border-2 dark:border-text w-full mx-4 sm:m-0 sm:w-auto h-auto rounded-xl py-3 px-3 sm:p-6">
         <CardItem
