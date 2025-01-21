@@ -27,6 +27,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
             "application/vnd.apple.mpegurl",
             "video/mp2t",
             "application/json",
+            "application/zip"
           ],
           maximumSizeInBytes: 10485760, // 10 MB max client upload size
           addRandomSuffix:

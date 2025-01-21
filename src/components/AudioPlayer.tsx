@@ -33,7 +33,7 @@ export default function AudioPlayer({
       if (!audioRef.current) return;
 
       const audio_info = await fetch(
-        `https://blhf5x3zv0lnny2n.public.blob.vercel-storage.com/beats/${beat.id}/converted/audio-info.json`
+        `https://blhf5x3zv0lnny2n.public.blob.vercel-storage.com/beats/${beat.id}/stream/audio-info.json`
       );
       const metadata = await audio_info.json();
       setMetadata(metadata);
@@ -140,7 +140,7 @@ export default function AudioPlayer({
         beat.wavesurferRef.current = null;
       }
     };
-  }, [beat, playlistUrl, metadata, toggle, volume]);
+  }, [beat, playlistUrl, metadata]);
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);

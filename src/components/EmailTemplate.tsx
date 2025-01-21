@@ -4,11 +4,7 @@ interface EmailTemplateProps {
   firstName: string;
   orderId: string;
   orderDate: Date;
-  items: {
-    name: string;
-    quantity: number;
-    price: number;
-  }[];
+  items: any[];
   totalAmount: number;
   supportEmail: string;
 }
@@ -73,7 +69,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
           {items.map((item, index) => (
             <tr key={index}>
               <td style={{ padding: "10px", borderBottom: "1px solid #cdd6f4" }}>
-                {item.name}
+                {item.beat.name}
               </td>
               <td
                 style={{
@@ -82,7 +78,7 @@ export const EmailTemplate: React.FC<Readonly<EmailTemplateProps>> = ({
                   borderBottom: "1px solid #cdd6f4",
                 }}
               >
-                {item.quantity}
+                {item.licenseOption.name}
               </td>
               <td
                 style={{

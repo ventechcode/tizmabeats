@@ -9,6 +9,7 @@ interface ShoppingCartContextType {
   addToCart: (item: any) => void;
   removeFromCart: (id: any) => void;
   contains: (id: any) => boolean;
+  clear: () => void;
 }
 
 const ShoppingCartContext = createContext<ShoppingCartContextType | undefined>(
@@ -72,9 +73,11 @@ export function ShoppingCartProvider({ children }: any) {
     );
   };
 
+  const clear = () => setCart([]);
+
   return (
     <ShoppingCartContext.Provider
-      value={{ cart, addToCart, removeFromCart, contains }}
+      value={{ cart, addToCart, removeFromCart, contains, clear }}
     >
       {children}
     </ShoppingCartContext.Provider>

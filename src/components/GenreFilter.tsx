@@ -18,7 +18,7 @@ export default function GenreFilter({
     const params = new URLSearchParams(searchParams.toString());
     const selectedGenres = params.get("genre")?.split(",") || [];
     setValues(new Set(selectedGenres));
-  }, [searchParams]); 
+  }, []); 
 
   const filterGenre = (selected: any) => {
     setValues(selected);

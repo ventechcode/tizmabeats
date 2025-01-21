@@ -38,7 +38,7 @@ model BeatLicense {
   stripePriceId   String
   licenseOptionId String
   licenseOption   LicenseOption @relation(fields: [licenseOptionId], references: [id])
-  downloads       Download[]
+  download        Download?
 }
 
 model LicenseOption {
@@ -85,10 +85,19 @@ model Order {
 }
 
 model Download {
-  id        String      @id @default(uuid())
-  createdAt DateTime    @default(now())
-  expiresAt DateTime    @default(dbgenerated("now() + interval '48 hours'"))
-  url       String
-  licenseId String
-  license   BeatLicense @relation(fields: [licenseId], references: [id])
+  id           String         @id @default(uuid())
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @default(now())
+  url          String
+  licenseId    String         @unique
+  license      BeatLicense    @relation(fields: [licenseId], references: [id])
+  DownloadLink DownloadLink[]
+}
+
+model DownloadLink {
+  id         String   @id @default(uuid())
+  createdAt  DateTime @default(now())
+  expiresAt  DateTime @default(dbgenerated("now() + interval '48 hours'"))
+  downloadId String
+  download   Download @relation(fields: [downloadId], references: [id])
 }

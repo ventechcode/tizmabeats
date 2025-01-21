@@ -10,11 +10,11 @@ import {
 import { usePathname } from "next/navigation";
 import ShoppingCart from "./ShoppingCart";
 
-export function Nav({ children }: { children: React.ReactNode }) {
+export function Nav({ children, className }: { children: React.ReactNode, className?: string }) {
   return (
     <Disclosure
       as="nav"
-      className="bg-crust top-0 sticky z-50 w-screen sm:px-8"
+      className={className}
     >
       <div className="">
         <div className="flex flex-row h-20 items-center justify-between">

@@ -5,6 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import { ShoppingCartContext } from "@/app/providers";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { Separator } from "@/components/ui/separator";
+import { set } from "zod";
 
 export default function Success() {
   const searchParams = useSearchParams();
@@ -12,11 +13,10 @@ export default function Success() {
   const session_id = searchParams.get("session_id");
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerName, setCustomerName] = useState("");
-  const [items, setItems] = useState<
-    { id: string; name: string; price: number }[]
-  >([]);
+  const [items, setItems] = useState<any>([]);
   const [loading, setLoading] = useState(true);
   const shoppingCart = useContext(ShoppingCartContext);
+  const [order_id, setOrder_id] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -31,15 +31,13 @@ export default function Success() {
       );
 
       const data = await res.json();
-      setCustomerEmail(data.session.customer_details.email);
-      setCustomerName(data.session.customer_details.name.split(" ")[0]);
-      setItems(data.items);
 
-      if (data.session.payment_status === "paid") {
-        data.items.forEach((item: any) => {
-          shoppingCart?.removeFromCart(item.id);
-        });
-      }
+      setCustomerEmail(data.customerEmail);
+      setCustomerName(data.customerName);
+      setItems(await JSON.parse(data.products));
+      setOrder_id(data.order_id);
+
+      if (data.session.payment_status == "paid") shoppingCart!.clear();
 
       // set theme
       if (typeof window !== "undefined") {
@@ -65,8 +63,10 @@ export default function Success() {
       }
     };
 
-    fetchData().then(() => setLoading(false));
-  }, [session_id, shoppingCart]);
+    fetchData().then(() => {
+      setLoading(false);
+    });
+  }, []);
 
   const updateTheme = (newFlavor: string, manual_switch: boolean) => {
     if (manual_switch) {
@@ -96,7 +96,7 @@ export default function Success() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-4 mt-32 h-max">
+    <div className="flex flex-col items-center justify-center">
       <div>
         {loading ? (
           <div className="loading loading-spinner loading-lg mt-2"></div>
@@ -108,32 +108,51 @@ export default function Success() {
                 Payment Successful
               </h1>
             </div>
-            <p className="text-subtext1 mt-2">
+            <p className="text-subtext1 mt-2 mb-8">
               Thanks for your purchase, {customerName}!
             </p>
-            <div className="flex justify-between items-center">
-            <p className="text-subtext0 text-xs py-3 font-semibold">
-              Your Order:
-            </p>
-            <p>
-              <span className="text-subtext0 text-xs font-semibold">#1337</span>{" "}
-            </p>
+            <div className="flex flex-row justify-between items-center">
+              <p className="text-subtext2 text-xs py-3 font-semibold">Order:</p>
+              <p className="text-subtext0 text-xs py-3 font-semibold">
+                {"#" + order_id}
+              </p>
             </div>
-            <div className="mb-6">
+            <div className="mb-8">
               {items.map((item: any) => (
                 <div className="flex flex-col w-full" key={item.id}>
                   <Separator className="w-full" />
-                  <div className="flex flex-row justify-between items-center">
-                    <div        
-                      className="border-text py-4 flex flex-col items-start"
-                    >
+                  <div className="flex flex-row items-center">
+                    <div className="border-text py-4 flex flex-col items-start w-2/3">
                       <h2 className="text-lg font-medium text-text">
-                        {item.name}
+                        {item.beat.name}
                       </h2>
-                      <p className="text-gray-600">Amount: {item.price}€</p>
+                      <div className="flex flex-row items-center">
+                        <p className="text-sm text-subtext2">
+                          {item.licenseOption.name}
+                        </p>
+                        <p className=" ml-1 mt-0.5 text-xs text-subtext0">
+                          ({item.licenseOption.contents.join(", ")})
+                        </p>
+                      </div>
                     </div>
-                    <p className="text-sm">x1</p>
-                    <p className="text-sm">MP3</p>
+                    <p className="text-subtext0">{item.price}€</p>
+                    <button
+                      className="text-xs text-accentColor hover:underline ml-8"
+                      onClick={async () => {
+                        const res = await fetch(
+                          `/api/download?id=${item.download.id}`
+                        );
+                        const blob = await res.blob();
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement("a");
+                        a.href = url;
+                        a.download = `${item.beat.name}-${item.licenseOption.name}`; // Adjust filename and extension as needed
+                        a.click();
+                        window.URL.revokeObjectURL(url);
+                      }}
+                    >
+                      Download
+                    </button>
                   </div>
                 </div>
               ))}

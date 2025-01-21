@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
           stripePriceId: "",
         },
       });
-      const download = await prisma.download.create({
+      await prisma.download.create({
         data: {
           url: license.productSrc,
           license: { connect: { id: beatLicense.id } },
@@ -128,6 +128,33 @@ export async function POST(req: NextRequest) {
         },
       },
     });
+
+    const product = await stripe.products.create({
+      name: beat.name,
+      type: "good",
+      metadata: {
+        beatId: beat.id,
+      },
+    });
+
+    for (const license of beatLicenses) {
+      const price = await stripe.prices.create({
+        unit_amount: license.price * 100,
+        currency: "eur",
+        product: product.id,
+        metadata: {
+          beatId: beat.id,
+          licenseId: license.id,
+        },
+      });
+
+      await prisma.beatLicense.update({
+        where: { id: license.id },
+        data: {
+          stripePriceId: price.id,
+        },
+      });
+    }
 
     return NextResponse.json(beat, { status: 200 });
   } catch (error) {

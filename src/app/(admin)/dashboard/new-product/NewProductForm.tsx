@@ -291,24 +291,6 @@ export default function NewProductForm({
       );
 
       if (messageRef.current) {
-        messageRef.current.innerHTML = "Uploading .mp3 file...";
-      }
-      if (progressRef.current) {
-        progressRef.current.value = 0;
-      }
-
-      await upload(`/beats/${id}/${fileName}`, reducedAudio, {
-        access: "public",
-        handleUploadUrl: "/api/upload",
-        clientPayload: id,
-        onUploadProgress: (progress) => {
-          if (progressRef.current) {
-            progressRef.current.value = progress.percentage;
-          }
-        },
-      });
-
-      if (messageRef.current) {
         messageRef.current.innerHTML = "Uploading playlist.m3u8 file...";
       }
       if (progressRef.current) {
@@ -316,7 +298,7 @@ export default function NewProductForm({
       }
 
       const blob = await upload(
-        `/beats/${id}/converted/playlist.m3u8`,
+        `/beats/${id}/stream/playlist.m3u8`,
         playlistBlob,
         {
           access: "public",
@@ -346,7 +328,7 @@ export default function NewProductForm({
         }
 
         await upload(
-          `/beats/${id}/converted/segment_${paddedIndex}.ts`,
+          `/beats/${id}/stream/segment_${paddedIndex}.ts`,
           segmentBlob,
           {
             access: "public",
@@ -367,7 +349,7 @@ export default function NewProductForm({
       }
 
       await upload(
-        `/beats/${id}/converted/audio-info.json`,
+        `/beats/${id}/stream/audio-info.json`,
         JSON.stringify(metadata),
         {
           access: "public",
@@ -388,7 +370,8 @@ export default function NewProductForm({
           messageRef.current.innerHTML = `Uploading ${file?.name}...`;
         }
         if (file) {
-          const res = await upload(`/beats/${id}/products/${license.name}/${file.name}`, file, {
+          const fileName = file.name.replace("#", "");
+          const res = await upload(`/beats/${id}/products/${license.name}/${fileName}`, file, {
             access: "public",
             handleUploadUrl: "/api/upload",
             clientPayload: id,

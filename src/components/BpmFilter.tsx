@@ -18,7 +18,7 @@ export default function BpmFilter({
     const params = new URLSearchParams(searchParams.toString());
     const selectedBpms = params.get("bpm")?.split(",") || [];
     setValues(new Set(selectedBpms.map((bpm) => parseInt(bpm))));
-  }, [searchParams]);
+  }, []);
 
   const filterBpm = (selected: any) => {
     setValues(selected);

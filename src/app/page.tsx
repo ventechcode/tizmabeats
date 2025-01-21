@@ -6,6 +6,7 @@ import Link from "next/link";
 import { flavorEntries } from "@catppuccin/palette";
 import { useEffect, useState } from "react";
 import TizmaBackground from "@/components/TizmaBackground";
+import { Nav, NavLink } from "@/components/Nav";
 
 export default function Home() {
   const [flavor, setFlavor] = useState("");
@@ -39,7 +40,7 @@ export default function Home() {
     if (manual_switch) {
       localStorage.setItem("theme", JSON.stringify({ flavor: newFlavor }));
       console.log("Theme saved to local storage: ", newFlavor);
-    } 
+    }
 
     if (!manual_switch && localStorage.getItem("theme")) {
       const theme = JSON.parse(localStorage.getItem("theme") || "");
@@ -97,7 +98,13 @@ export default function Home() {
   ];
 
   return (
-    <main>
+    <main className="flex flex-col justify-center h-screen">
+      <Nav className="bg-crust top-0 absolute z-50 w-screen sm:px-8">
+        <NavLink href="/beats">Beats</NavLink>
+        <NavLink href="/beat-bundles">Beat-Bundles</NavLink>
+        <NavLink href="/contact">Contact</NavLink>
+      </Nav>
+
       {/* Hero flex container */}
       <div className="flex flex-col items-center mb-96">
         <TypewriterEffectSmooth
@@ -158,8 +165,6 @@ export default function Home() {
           </svg>
         )}
       </footer>
-
-      
 
       {/* WavyBackground updates immediately based on backgroundColor */}
       {/* {backgroundColor && (

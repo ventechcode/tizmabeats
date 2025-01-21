@@ -16,18 +16,12 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="en">
       {/* color schemes: latte frappé macchiatio mocha */}
       <body className={`${inter.className} mocha text-text bg-base h-screen`}>
         <main>
           <ShoppingCartProvider>
-            <Nav>
-              <NavLink href="/beats">Beats</NavLink>
-              <NavLink href="/beat-bundles">Beat-Bundles</NavLink>
-              <NavLink href="/contact">Contact</NavLink>
-            </Nav>
             {children}
           </ShoppingCartProvider>
         </main>
