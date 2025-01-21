@@ -73,11 +73,8 @@ export async function POST(req: NextRequest) {
   const { name, genre, bpm, licenses } = body;
 
   try {
-    console.log(licenses);
-
     const beatLicenses = [];
 
-    // Step 1: Create the beat first
     const beat = await prisma.beat.create({
       data: {
         id: body.id,
@@ -96,7 +93,6 @@ export async function POST(req: NextRequest) {
 
     console.log("Beat created:", beat);
 
-    // Step 2: Create the licenses associated with the beat
     for (const license of licenses) {
       const beatLicense = await prisma.beatLicense.create({
         data: {
@@ -119,7 +115,6 @@ export async function POST(req: NextRequest) {
 
     console.log("Beat licenses created:", beatLicenses);
 
-    // Step 3: Update the beat's `licenses` field
     await prisma.beat.update({
       where: { id: beat.id },
       data: {
@@ -137,6 +132,10 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    if (!product) {
+      return NextResponse.json({ error: "Error creating product" }, { status: 500 });
+    }
+
     for (const license of beatLicenses) {
       const price = await stripe.prices.create({
         unit_amount: license.price * 100,
@@ -148,12 +147,20 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      await prisma.beatLicense.update({
+      if (!price) {
+        return NextResponse.json({ error: "Error creating price" }, { status: 500 });
+      }
+
+      const res = await prisma.beatLicense.update({
         where: { id: license.id },
         data: {
           stripePriceId: price.id,
         },
       });
+
+      if (!res) {
+        return NextResponse.json({ error: "Error updating beat license" }, { status: 500 });
+      }
     }
 
     return NextResponse.json(beat, { status: 200 });

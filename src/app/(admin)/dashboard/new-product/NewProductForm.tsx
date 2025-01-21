@@ -371,16 +371,20 @@ export default function NewProductForm({
         }
         if (file) {
           const fileName = file.name.replace("#", "");
-          const res = await upload(`/beats/${id}/products/${license.name}/${fileName}`, file, {
-            access: "public",
-            handleUploadUrl: "/api/upload",
-            clientPayload: id,
-            onUploadProgress: (progress) => {
-              if (progressRef.current) {
-                progressRef.current.value = progress.percentage;
-              }
-            },
-          });
+          const res = await upload(
+            `/beats/${id}/products/${license.name}/${fileName}`,
+            file,
+            {
+              access: "public",
+              handleUploadUrl: "/api/upload",
+              clientPayload: id,
+              onUploadProgress: (progress) => {
+                if (progressRef.current) {
+                  progressRef.current.value = progress.percentage;
+                }
+              },
+            }
+          );
           productSrcs.push(res.url);
         }
       }
@@ -392,7 +396,7 @@ export default function NewProductForm({
       const audioSrc = blob.url;
       const length = metadata.duration;
 
-      await fetch("/api/beats", {
+      const res = await fetch("/api/beats", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -410,7 +414,9 @@ export default function NewProductForm({
           })),
         }),
       });
-      console.log("Beat created successfully");
+      if (res.ok) {
+        alert("Beat created successfully");
+      }
     } catch (error) {
       console.error("Error creating beat:", error);
       alert("Error creating beat. Please try again.");

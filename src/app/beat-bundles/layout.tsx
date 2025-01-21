@@ -1,15 +1,16 @@
-import React from "react";
+import { Nav, NavLink } from "@/components/Nav";
 
-function BeatBundlesLayout({
+export default function BeatBundlesLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
-    <main className="flex flex-col justify-between items-center max-h-screen">
+    <main className="flex flex-col justify-center">
+      <Nav className="bg-crust top-0 sticky z-50 w-screen sm:px-8">
+        <NavLink href="/beats">Beats</NavLink>
+        <NavLink href="/beat-bundles">Beat-Bundles</NavLink>
+        <NavLink href="/contact">Contact</NavLink>
+      </Nav>
       {children}
     </main>
   );
 }
-
-export default BeatBundlesLayout;
