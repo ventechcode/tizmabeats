@@ -9,6 +9,7 @@ import { EmailTemplate } from "@/components/EmailTemplate";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 const resend = new Resend(process.env.RESEND_API_KEY);
+const unqiqueEvents = new Set();
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
@@ -25,6 +26,11 @@ export async function POST(request: NextRequest) {
 
   switch (event.type) {
     case "checkout.session.completed":
+      if (unqiqueEvents.has(event.id)) {
+        console.log(`Event ${event.id} already processed`);
+        return NextResponse.json({ status: 200 });
+      }
+      unqiqueEvents.add(event.id);
       const session = event.data.object;
       const email = session.customer_details?.email as string;
       const name = session.customer_details?.name as string;

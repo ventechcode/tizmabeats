@@ -137,7 +137,7 @@ export default function Success() {
                     </div>
                     <p className="text-subtext0">{item.price}€</p>
                     <button
-                      className="text-xs text-accentColor hover:underline ml-8"
+                      className="text-xs text-blue hover:underline ml-8"
                       onClick={async () => {
                         const res = await fetch(
                           `/api/download?id=${item.download.id}`
