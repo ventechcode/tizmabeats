@@ -6,6 +6,7 @@ export async function getProducts() {
     const products = await prisma.beat.findMany({
       select: {
         id: true,
+        createdAt: true,
         name: true,
         purchased: true,
         producer: {
@@ -24,6 +25,9 @@ export async function getProducts() {
             }
           },
         },
+      },
+      orderBy: {
+        createdAt: "desc",
       }
     });
     return products;

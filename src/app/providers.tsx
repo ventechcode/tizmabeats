@@ -1,7 +1,7 @@
 "use client";
 
 import { Beat } from "@/types";
-import { BeatLicense } from "@prisma/client";
+import { ThemeProvider } from "next-themes";
 import { createContext, useState, useEffect } from "react";
 
 interface ShoppingCartContextType {
@@ -67,8 +67,8 @@ export function ShoppingCartProvider({ children }: any) {
       return setCart((prev) => prev.filter((item) => item.id !== beat));
     }
     return setCart((prev) =>
-      prev.filter((item) =>
-      !beat.licenses.some((license: any) => license.id === item.id)
+      prev.filter(
+        (item) => !beat.licenses.some((license: any) => license.id === item.id)
       )
     );
   };
@@ -85,3 +85,19 @@ export function ShoppingCartProvider({ children }: any) {
 }
 
 export { ShoppingCartContext };
+
+function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem={true}
+      storageKey="theme"
+      themes={["latte", "mocha"]}
+    >
+      <ShoppingCartProvider>{children}</ShoppingCartProvider>
+    </ThemeProvider>
+  );
+}
+
+export { Providers };

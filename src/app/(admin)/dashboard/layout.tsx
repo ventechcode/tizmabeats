@@ -16,11 +16,6 @@ function AdminLayout({
 
   return (
     <main className="min-h-screen bg-base">
-      <Nav className="bg-crust top-0 sticky z-50 w-screen sm:px-8">
-        <NavLink href="/beats">Beats</NavLink>
-        <NavLink href="/beat-bundles">Beat-Bundles</NavLink>
-        <NavLink href="/contact">Contact</NavLink>
-      </Nav>
       <nav className="flex items-center py-4 pl-10 bg-mantle w-full">
         <div className="flex items-center space-x-4">
           <Link

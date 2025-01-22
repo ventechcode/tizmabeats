@@ -40,7 +40,11 @@ export default function AudioPlayer({
 
       // Destroy previous HLS instance if it exists
       if (hlsRef.current) {
-        hlsRef.current.destroy();
+        try {
+          hlsRef.current.destroy();
+        } catch (error) {
+          console.warn("Error while destroying HLS instance:", error);
+        }
       }
 
       const hls = new Hls();

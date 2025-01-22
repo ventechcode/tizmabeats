@@ -1,13 +1,14 @@
 import type { Config } from "tailwindcss";
 const svgToDataUri = require("mini-svg-data-uri");
 import daisyui from "daisyui";
-import { nextui } from "@nextui-org/theme";
 
 const {
   default: flattenColorPalette,
 } = require("tailwindcss/lib/util/flattenColorPalette");
 
 const config: Config = {
+  darkMode: "class",  
+  presets: [require("@catppuccin/tailwindcss")],
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -18,7 +19,7 @@ const config: Config = {
     extend: {
       colors: {
         'accentColor': '#89b4fa',
-        'primary': '#89b4fa',
+        'primary': '#89b4fa', 
         'mocha-red': '#f38ba8',
         'mocha-green': '#a6e3a1',
       },
@@ -45,7 +46,6 @@ const config: Config = {
   plugins: [
     require("@catppuccin/tailwindcss")({
       prefix: false,
-      defaultFlavour: "mocha",
     }),
     function ({ matchUtilities, theme }: any) {
       const flattenColorPalette = (colorPalette: any) => {

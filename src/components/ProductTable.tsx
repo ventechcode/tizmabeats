@@ -21,20 +21,26 @@ import {
 import { SearchIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react";
 
 type Product = {
-  id: number;
+  id: string;
+  createdAt: Date;
   name: string;
-  producer: string;
-  licenses: Array<{
-    id: number;
-    licenseOption: { name: string };
-    price: number;
-  }>;
   purchased: boolean;
+  producer: {
+    username: string;
+  };
+  licenses: {
+    id: string;
+    price: number;
+    licenseOption: {
+      name: string;
+    };
+  }[];
 };
 
 const columns: any[] = [
   { name: "ID", uid: "id", sortable: true },
   { name: "NAME", uid: "name", sortable: true },
+  { name: "CREATED AT", uid: "createdAt", sortable: true },
   { name: "PRODUCER", uid: "producer", sortable: true },
   { name: "LICENSES", uid: "licenses" },
   { name: "PURCHASED", uid: "purchased", sortable: true },
@@ -42,26 +48,26 @@ const columns: any[] = [
 ];
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "id",
   "name",
+  "createdAt",
   "producer",
   "licenses",
   "purchased",
   "actions",
 ];
 
-const dummyProducts: Product[] = Array.from({ length: 100 }, (_, index) => ({
-  id: index + 1,
-  name: `Product ${index + 1}`,
-  producer: `Producer ${index + 1}`,
-  licenses: [
-    { id: 1, licenseOption: { name: "Standard" }, price: 100 },
-    { id: 2, licenseOption: { name: "Premium" }, price: 200 },
-  ],
-  purchased: index % 2 === 0,
-}));
+// const dummyProducts: Product[] = Array.from({ length: 100 }, (_, index) => ({
+//   id: index + 1,
+//   name: `Product ${index + 1}`,
+//   producer: `Producer ${index + 1}`,
+//   licenses: [
+//     { id: 1, licenseOption: { name: "Standard" }, price: 100 },
+//     { id: 2, licenseOption: { name: "Premium" }, price: 200 },
+//   ],
+//   purchased: index % 2 === 0,
+// }));
 
-export default function ProductTable() {
+export default function ProductTable({ products }: { products: Product[] }) {
   const [filterValue, setFilterValue] = React.useState("");
   const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
     new Set([])
@@ -71,8 +77,8 @@ export default function ProductTable() {
   );
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
-    column: "id",
-    direction: "ascending",
+    column: "createdAt",
+    direction: "descending",
   });
   const [page, setPage] = React.useState(1);
   const [isOpen, setIsOpen] = React.useState(false);
@@ -88,7 +94,7 @@ export default function ProductTable() {
   }, [visibleColumns]);
 
   const filteredItems = React.useMemo(() => {
-    let filteredProducts = [...dummyProducts];
+    let filteredProducts = [...products];
 
     if (hasSearchFilter) {
       filteredProducts = filteredProducts.filter((product) =>
@@ -113,28 +119,43 @@ export default function ProductTable() {
       const first = a[sortDescriptor.column as keyof Product];
       const second = b[sortDescriptor.column as keyof Product];
       const cmp = first < second ? -1 : first > second ? 1 : 0;
-
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
+
   }, [sortDescriptor, items]);
+
+  const formatDate = (dateString: string, locale: string = "en-US") => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString(locale, {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
 
   const renderCell = React.useCallback(
     (product: Product, columnKey: React.Key): React.ReactNode => {
       switch (columnKey) {
         case "id":
           return product.id;
+        case "createdAt":
+          return formatDate(product.createdAt.toString(), "en-US");
         case "name":
           return product.name;
         case "producer":
-          return product.producer;
+          return product.producer.username;
         case "licenses":
           return (
             <div>
-              {product.licenses.map((license) => (
-                <div key={license.id}>
-                  {license.licenseOption.name} - ${license.price}
-                </div>
-              ))}
+              {product.licenses
+                .sort((a, b) => a.price - b.price)
+                .map((license) => (
+                  <div key={license.id}>
+                    {license.licenseOption.name} - {license.price}€
+                  </div>
+                ))}
             </div>
           );
         case "purchased":
@@ -289,6 +310,7 @@ export default function ProductTable() {
           disableCursorAnimation={false}
           classNames={{
             base: "bg-crust text-text rounded-lg",
+            wrapper: "rounded-lg bg-transparent",
             item: "hover:bg-text hover:text-crust rounded-lg duration-300 data-[active=true]:bg-text data-[active=true]:text-crust",
             chevronNext: "rotate-180",
           }}
@@ -298,7 +320,7 @@ export default function ProductTable() {
   }, [selectedKeys, filteredItems.length, page, pages]);
 
   const isRowSelected = React.useCallback(
-    (id: number) => {
+    (id: string) => {
       if (selectedKeys === "all") return true;
       if (selectedKeys instanceof Set) return selectedKeys.has(id.toString());
       return false;
@@ -315,7 +337,7 @@ export default function ProductTable() {
       classNames={{
         wrapper: "max-h-[382px]",
         th: "bg-crust text-text",
-        tr: "odd:bg-surface0 even:bg-surface1",
+        tr: "bg-surface0",
         table: "rounded-lg",
         base: "rounded-lg",
       }}

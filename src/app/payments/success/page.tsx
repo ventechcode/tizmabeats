@@ -38,62 +38,12 @@ export default function Success() {
       setOrder_id(data.order_id);
 
       if (data.session.payment_status == "paid") shoppingCart!.clear();
-
-      // set theme
-      if (typeof window !== "undefined") {
-        const prefersDarkMode = window.matchMedia(
-          "(prefers-color-scheme: dark)"
-        ).matches;
-        const initialFlavor = prefersDarkMode ? "mocha" : "latte";
-        updateTheme(initialFlavor, false);
-
-        const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-        const handleColorSchemeChange = (event: MediaQueryListEvent) => {
-          const newFlavor = event.matches ? "mocha" : "latte";
-          localStorage.setItem("theme", JSON.stringify({ flavor: newFlavor }));
-          updateTheme(newFlavor, true);
-        };
-
-        mediaQuery.addEventListener("change", handleColorSchemeChange);
-
-        // Cleanup event listener
-        return () => {
-          mediaQuery.removeEventListener("change", handleColorSchemeChange);
-        };
-      }
     };
 
     fetchData().then(() => {
       setLoading(false);
     });
   }, []);
-
-  const updateTheme = (newFlavor: string, manual_switch: boolean) => {
-    if (manual_switch) {
-      localStorage.setItem("theme", JSON.stringify({ flavor: newFlavor }));
-      console.log("Theme saved to local storage: ", newFlavor);
-    }
-
-    if (!manual_switch && localStorage.getItem("theme")) {
-      const theme = JSON.parse(localStorage.getItem("theme") || "");
-      newFlavor = theme.flavor;
-      console.log("Theme loaded from local storage: ", newFlavor);
-    }
-
-    if (document.body.className.includes("latte")) {
-      document.body.className = document.body.className.replace(
-        "latte",
-        newFlavor
-      );
-    } else if (document.body.className.includes("mocha")) {
-      document.body.className = document.body.className.replace(
-        "mocha",
-        newFlavor
-      );
-    } else {
-      document.body.className = newFlavor;
-    }
-  };
 
   return (
     <div className="flex flex-col items-center justify-center">
