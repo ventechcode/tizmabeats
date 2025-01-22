@@ -15,7 +15,7 @@ function AdminLayout({
   const pathname = usePathname();
 
   return (
-    <main className="max-h-screen">
+    <main className="min-h-screen bg-base">
       <Nav className="bg-crust top-0 sticky z-50 w-screen sm:px-8">
         <NavLink href="/beats">Beats</NavLink>
         <NavLink href="/beat-bundles">Beat-Bundles</NavLink>
