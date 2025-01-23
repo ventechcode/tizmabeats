@@ -9,13 +9,13 @@ import {
 } from "@headlessui/react";
 import { usePathname } from "next/navigation";
 import ShoppingCart from "./ShoppingCart";
+import { useSession } from "next-auth/react";
 
-export function Nav({ children, className }: { children: React.ReactNode, className?: string }) {
+export function Nav({ className }: { className?: string }) {
+  const session = useSession();
+
   return (
-    <Disclosure
-      as="nav"
-      className={className}
-    >
+    <Disclosure as="nav" className={className}>
       <div className="">
         <div className="flex flex-row h-20 items-center justify-between">
           <div className="absolute inset-y-0 flex items-center sm:hidden ml-2">
@@ -54,7 +54,12 @@ export function Nav({ children, className }: { children: React.ReactNode, classN
               <NavLogo imgSrc="/logo.svg" alt="TizmaBeats" />
             </div>
             <div className="hidden sm:mr-20 md:mr-32 sm:flex sm:flex-row sm:justify-center sm:items-center">
-              {children}
+              <NavLink href="/beats">Beats</NavLink>
+              <NavLink href="/beat-bundles">Beat-Bundles</NavLink>
+              <NavLink href="/contact">Contact</NavLink>
+              {session.data?.user && (
+                <NavLink href="/dashboard">Dashboard</NavLink>
+              )}
             </div>
             <ShoppingCart />
           </div>
@@ -62,7 +67,10 @@ export function Nav({ children, className }: { children: React.ReactNode, classN
       </div>
       <DisclosurePanel className="sm:hidden">
         <div className="flex flex-col space-y-1 px-2 pb-4 pt-3 w-max">
-          {children}
+          <NavLink href="/beats">Beats</NavLink>
+          <NavLink href="/beat-bundles">Beat-Bundles</NavLink>
+          <NavLink href="/contact">Contact</NavLink>
+          {session.data?.user && <NavLink href="/dashboard">Dashboard</NavLink>}
         </div>
       </DisclosurePanel>
     </Disclosure>
@@ -71,7 +79,8 @@ export function Nav({ children, className }: { children: React.ReactNode, classN
 
 export function NavLink(props: ComponentProps<typeof Link>) {
   const path = usePathname();
-  const isActive = path === props.href;
+  let isActive = path.startsWith(props.href as string);
+
   return (
     <Link
       {...props}

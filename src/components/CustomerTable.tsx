@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Table,
   TableHeader,
@@ -18,6 +17,7 @@ import {
   Pagination,
   type Selection,
   type SortDescriptor,
+  Chip,
 } from "@heroui/react";
 import {
   SearchIcon,
@@ -25,7 +25,6 @@ import {
   ChevronUpIcon,
   TrashIcon,
   EditIcon,
-  Plus,
 } from "lucide-react";
 import {
   Dialog,
@@ -37,43 +36,44 @@ import {
   DialogTitle,
 } from "./ui/dialog";
 
-type Product = {
+type Customer = {
   id: string;
   createdAt: Date;
+  email: string;
   name: string;
-  purchased: boolean;
-  producer: {
-    username: string;
-  };
-  licenses: {
+  address: string;
+  orders: {
     id: string;
+    createdAt: Date;
+    updatedAt: Date;
     price: number;
-    licenseOption: {
-      name: string;
-    };
+    userId: string;
   }[];
 };
 
 const columns: any[] = [
-  { name: "ID", uid: "id", sortable: true },
+  { name: "CUSTOMER ID", uid: "id", sortable: true },
   { name: "NAME", uid: "name", sortable: true },
   { name: "CREATED AT", uid: "createdAt", sortable: true },
-  { name: "PRODUCER", uid: "producer", sortable: true },
-  { name: "LICENSES", uid: "licenses" },
-  { name: "PURCHASED", uid: "purchased", sortable: true },
-  { name: "ACTIONS", uid: "actions" },
+  { name: "EMAIL", uid: "email", sortable: true },
+  { name: "COUNTRY", uid: "address", sortable: true },
+  { name: "ORDERS", uid: "orders" },
 ];
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "name",
+  "id",
   "createdAt",
-  "producer",
-  "licenses",
-  "purchased",
-  "actions",
+  "name",
+  "email",
+  "address",
+  "orders",
 ];
 
-export default function ProductTable({ products }: { products: Product[] }) {
+export default function CustomerTable({
+  customers,
+}: {
+  customers: Customer[];
+}) {
   const [filterValue, setFilterValue] = useState("");
   const [selectedKey, setSelectedKey] = useState<string>("");
   const [visibleColumns, setVisibleColumns] = useState<Selection>(
@@ -89,7 +89,6 @@ export default function ProductTable({ products }: { products: Product[] }) {
   const [isOpenRows, setIsOpenRows] = useState(false);
   const [hoveredColumn, setHoveredColumn] = useState<string | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const router = useRouter()
 
   const hasSearchFilter = Boolean(filterValue);
 
@@ -101,16 +100,16 @@ export default function ProductTable({ products }: { products: Product[] }) {
   }, [visibleColumns]);
 
   const filteredItems = React.useMemo(() => {
-    let filteredProducts = [...products];
+    let filteredCustomers = [...customers];
 
     if (hasSearchFilter) {
-      filteredProducts = filteredProducts.filter((product) =>
-        product.name.toLowerCase().includes(filterValue.toLowerCase())
+      filteredCustomers = filteredCustomers.filter((customer) =>
+        customer.name.toLowerCase().includes(filterValue.toLowerCase())
       );
     }
 
-    return filteredProducts;
-  }, [hasSearchFilter, filterValue, products]);
+    return filteredCustomers;
+  }, [hasSearchFilter, filterValue, customers]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -122,9 +121,9 @@ export default function ProductTable({ products }: { products: Product[] }) {
   }, [page, filteredItems, rowsPerPage]);
 
   const sortedItems = React.useMemo(() => {
-    return [...items].sort((a: Product, b: Product) => {
-      const first = a[sortDescriptor.column as keyof Product];
-      const second = b[sortDescriptor.column as keyof Product];
+    return [...items].sort((a: Customer, b: Customer) => {
+      const first = a[sortDescriptor.column as keyof Customer];
+      const second = b[sortDescriptor.column as keyof Customer];
       const cmp = first < second ? -1 : first > second ? 1 : 0;
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
@@ -142,30 +141,55 @@ export default function ProductTable({ products }: { products: Product[] }) {
   };
 
   const renderCell = React.useCallback(
-    (product: Product, columnKey: React.Key): React.ReactNode => {
+    (customer: Customer, columnKey: React.Key): React.ReactNode => {
       switch (columnKey) {
         case "id":
-          return product.id;
+          return customer.id;
         case "createdAt":
-          return formatDate(product.createdAt.toString(), "en-US");
+          return formatDate(customer.createdAt.toString(), "de-DE");
         case "name":
-          return product.name;
-        case "producer":
-          return product.producer.username;
-        case "licenses":
+          return customer.name;
+        case "email":
+          return customer.email;
+        case "address":
+          return JSON.parse(customer.address).country;
+        case "orders":
           return (
-            <div>
-              {product.licenses
-                .sort((a, b) => a.price - b.price)
-                .map((license) => (
-                  <div key={license.id}>
-                    {license.licenseOption.name} - {license.price}€
-                  </div>
-                ))}
+            <div className="flex flex-col gap-2">
+              {customer.orders.map((order) => (
+                <Dialog>
+                  <DialogTrigger>
+                    <div className="border-2 rounded-full bg-transparent border-subtext2 text-subtext2 hover:border-subtext0 hover:text-subtext0 duration-300">
+                      <p className="text-xs py-1">
+                        {formatDate(order.createdAt.toString()).split("at")[0]}
+                      </p>
+                    </div>
+                  </DialogTrigger>
+                  <DialogContent className="bg-base border-none">
+                    <DialogTitle className="flex items-center gap-x-2"><p className="font-semibold">Order:</p> <p className="text-subtext0">#{order.id}</p></DialogTitle>
+                    <DialogDescription>
+                      <div className="flex flex-row items-center justify-between">
+                        <div className="flex gap-x-2">
+                          <p className="font-semibold">Total:</p> {order.price}€
+                        </div>
+                        <div className="flex gap-x-2">
+                          <p className="font-semibold">Date:</p>{" "}
+                          {
+                            formatDate(order.createdAt.toString()).split(
+                              "at"
+                            )[0]
+                          }
+                        </div>
+                        <div className="flex gap-x-2">
+                          <p className="font-semibold">Customer:</p> {customer.name}
+                        </div>
+                      </div>
+                    </DialogDescription>
+                  </DialogContent>
+                </Dialog>
+              ))}
             </div>
           );
-        case "purchased":
-          return product.purchased ? "Yes" : "No";
         case "actions":
           return (
             <div className="flex justify-center items-center gap-2">
@@ -179,9 +203,9 @@ export default function ProductTable({ products }: { products: Product[] }) {
                 <DialogClose />
                 <DialogContent className="bg-crust rounded-lg border-none">
                   <DialogHeader>
-                    <DialogTitle>Delete Product</DialogTitle>
+                    <DialogTitle>Delete Customer</DialogTitle>
                     <DialogDescription>
-                      Are you sure you want to delete this product?
+                      Are you sure you want to delete this Customer?
                     </DialogDescription>
                   </DialogHeader>
                   <div className="flex justify-end items-center gap-x-8 mt-2">
@@ -312,16 +336,6 @@ export default function ProductTable({ products }: { products: Product[] }) {
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
-          <Button
-            className="bg-text text-crust rounded-lg hover:text-text hover:bg-crust duration-300"
-            variant="flat"
-            onPress={() => router.push("/dashboard/products/new")}
-          >
-            <div className="flex items-center gap-x-2 font-semibold">
-              <Plus />
-              <p className="font-semibold">New Product</p>
-            </div>
-          </Button>
         </div>
       </div>
     );
@@ -333,10 +347,10 @@ export default function ProductTable({ products }: { products: Product[] }) {
         <span className="w-[30%] text-small text-default-400">
           {selectedKey
             ? `${
-                filteredItems.find((item: Product) => item.id == selectedKey)
+                filteredItems.find((item: Customer) => item.id == selectedKey)
                   ?.name
               } selected`
-            : `${filteredItems.length} products`}
+            : `${filteredItems.length} customers`}
         </span>
         <Pagination
           unselectable="on"
@@ -356,10 +370,16 @@ export default function ProductTable({ products }: { products: Product[] }) {
     );
   }, [selectedKey, filteredItems.length, page, pages]);
 
+  const deleteDialog = React.useMemo(() => {}, [showDeleteDialog]);
+
+  const isRowSelected = (id: string) => {
+    return selectedKey === id;
+  };
+
   return (
     <Table
       removeWrapper
-      aria-label="Product table"
+      aria-label="Customer table"
       isHeaderSticky
       bottomContent={bottomContent}
       classNames={{
@@ -381,7 +401,7 @@ export default function ProductTable({ products }: { products: Product[] }) {
         {(column) => (
           <TableColumn
             key={column.uid}
-            align={column.uid === "actions" ? "center" : "start"}
+            align={column.uid === "actions" || column.uid === "orders" ? "center" : "start"}
             allowsSorting={column.sortable}
             onMouseEnter={() => column.sortable && setHoveredColumn(column.uid)}
             onMouseLeave={() => setHoveredColumn(null)}
@@ -405,7 +425,10 @@ export default function ProductTable({ products }: { products: Product[] }) {
             className="odd:bg-surface0 even:bg-surface1"
           >
             {(columnKey) => (
-              <TableCell className="truncate" key={columnKey}>
+              <TableCell
+                className="truncate max-w-12 sm:max-w-72"
+                key={columnKey}
+              >
                 {renderCell(item, columnKey)}
               </TableCell>
             )}

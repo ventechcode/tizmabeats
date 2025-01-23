@@ -1,6 +1,7 @@
 "use client";
 
 import { Beat } from "@/types";
+import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
 import { createContext, useState, useEffect } from "react";
 
@@ -88,15 +89,17 @@ export { ShoppingCartContext };
 
 function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem={true}
-      storageKey="theme"
-      themes={["latte", "mocha"]}
-    >
-      <ShoppingCartProvider>{children}</ShoppingCartProvider>
-    </ThemeProvider>
+    <SessionProvider>
+      <ThemeProvider
+        attribute="class"
+        defaultTheme="system"
+        enableSystem={true}
+        storageKey="theme"
+        themes={["latte", "mocha"]}
+      >
+        <ShoppingCartProvider>{children}</ShoppingCartProvider>
+      </ThemeProvider>
+    </SessionProvider>
   );
 }
 
