@@ -1,7 +1,5 @@
 "use client";
 
-import { Avatar } from "@heroui/react";
-import { AvatarIcon } from "@heroui/react";
 import { signOut, useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -12,7 +10,6 @@ import {
   PackageSearch,
   TableProperties,
   Settings,
-  CircleUserRound,
   CircleUser,
 } from "lucide-react";
 

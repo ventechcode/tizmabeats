@@ -1,8 +1,9 @@
+import DashboardHeader from "@/components/dashboard/dashboard-header";
+
 export default function SettingsPage() {
   return (
     <div className="flex flex-col items-center">
-      <h1 className="text-2xl font-bold my-6 uppercase z-50 relative -top-12">Your Settings</h1>
-      <div className="w-1/4 h-28 text-center bg-mantle rounded-b-full absolute top-28"></div>
+      <DashboardHeader text="Settings" subtext="Manage your settings" />
     </div>
   );
 }
