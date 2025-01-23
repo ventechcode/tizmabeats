@@ -157,7 +157,7 @@ export default function CustomerTable({
           return (
             <div className="flex flex-col gap-2">
               {customer.orders.map((order) => (
-                <Dialog>
+                <Dialog key={order.id}>
                   <DialogTrigger>
                     <div className="border-2 rounded-full bg-transparent border-subtext2 text-subtext2 hover:border-subtext0 hover:text-subtext0 duration-300">
                       <p className="text-xs py-1">
