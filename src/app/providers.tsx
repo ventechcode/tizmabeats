@@ -93,11 +93,15 @@ function Providers({ children }: { children: React.ReactNode }) {
       <ThemeProvider
         attribute="class"
         defaultTheme="system"
-        enableSystem={true}
+        enableSystem={false}
         storageKey="theme"
         themes={["latte", "mocha"]}
       >
-        <ShoppingCartProvider>{children}</ShoppingCartProvider>
+        <ShoppingCartProvider>
+          <main className="bg-base text-text">
+          {children}
+          </main>
+        </ShoppingCartProvider>
       </ThemeProvider>
     </SessionProvider>
   );

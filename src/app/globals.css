@@ -2,9 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-base text-text;
-}
+  /* body {
+    @apply bg-base text-text;
+  } */
 
 /* body {
   background-color: var(--bg-color);

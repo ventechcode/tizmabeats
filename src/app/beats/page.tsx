@@ -227,7 +227,7 @@ export default function Beats() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen w-screen overflow-hidden items-center">
+    <div className="flex flex-col overflow-y-scroll items-center">
       <SearchFilterSection
         genres={genres}
         onGenreChange={onGenreChange}

@@ -42,15 +42,15 @@ export default function ShoppingCart() {
 
   return (
     <Sheet>
-      <SheetTrigger>
-        <div className="absolute right-4 top-6 sm:top-5 hover:text-accentColor hover:duration-300 text-text">
+      <SheetTrigger >
+        <div className="relative hover:text-accentColor hover:duration-300 text-text">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="size-8 sm:size-10"
+            className="size-8 md:size-10"
           >
             <path
               strokeLinecap="round"

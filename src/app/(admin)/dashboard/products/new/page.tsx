@@ -17,11 +17,8 @@ const getLicenseOptions = async () => {
 export default async function NewProductPage() {
   const licenses = await getLicenseOptions();
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center justify-center max-w-[90%] md:max-w-[75%] lg:max-w-[70%] xl:max-w-[82%] mx-auto h-max">
       <DashboardHeader text="New Product" subtext="Add a new product" />
-      <Link prefetch href="/dashboard/products" className="self-start lg:ml-80 mb-4">
-        <ArrowLeft className="w-8 h-8 cursor-pointer" />
-      </Link>
       <NewProductForm licenseOptions={licenses} />
     </div>
   );

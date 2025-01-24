@@ -1,7 +1,6 @@
-"use client"
+"use client";
 
-import React, { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import React, { useEffect, useState } from "react";
 import {
   Table,
   TableHeader,
@@ -18,8 +17,14 @@ import {
   Pagination,
   type Selection,
   type SortDescriptor,
-} from "@heroui/react"
-import { SearchIcon, ChevronDownIcon, ChevronUpIcon, TrashIcon, EditIcon, Plus } from "lucide-react"
+} from "@heroui/react";
+import {
+  SearchIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  TrashIcon,
+  EditIcon,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -28,126 +33,155 @@ import {
   DialogTrigger,
   DialogClose,
   DialogTitle,
-} from "./ui/dialog"
+} from "./ui/dialog";
 
-type Product = {
-  id: string
-  createdAt: Date
-  name: string
-  purchased: boolean
-  producer: {
-    username: string
-  }
-  licenses: {
-    id: string
-    price: number
-    licenseOption: {
-      name: string
-    }
-  }[]
-}
+type Order = {
+  id: string;
+  createdAt: Date;
+  price: number;
+  user: {
+    name: string;
+    email: string;
+  };
+  beat: {
+    name: string;
+    producer: {
+      id: string;
+      username: string;
+    };
+  }[];
+};
 
 const columns: any[] = [
-  { name: "ID", uid: "id", sortable: true },
-  { name: "NAME", uid: "name", sortable: true },
+  { name: "ORDER ID", uid: "id", sortable: true },
   { name: "CREATED AT", uid: "createdAt", sortable: true },
-  { name: "PRODUCER", uid: "producer", sortable: true },
-  { name: "LICENSES", uid: "licenses" },
-  { name: "PURCHASED", uid: "purchased", sortable: true },
+  { name: "CUSTOMER", uid: "customer" },
+  { name: "TOTAL", uid: "total", sortable: true },
+  { name: "PRODUCTS", uid: "products" },
+  { name: "SELLERS", uid: "sellers" },
   { name: "ACTIONS", uid: "actions" },
-]
+];
 
-const INITIAL_VISIBLE_COLUMNS = ["name", "createdAt", "producer", "licenses", "purchased", "actions"]
+const INITIAL_VISIBLE_COLUMNS = [
+  "id",
+  "createdAt",
+  "total",
+  "customer",
+  "products",
+  "sellers",
+];
 
-export default function ProductTable({ products }: { products: Product[] }) {
-  const [filterValue, setFilterValue] = useState("")
-  const [selectedKey, setSelectedKey] = useState<string>("")
-  const [visibleColumns, setVisibleColumns] = useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS))
-  const [rowsPerPage, setRowsPerPage] = useState(5)
+export default function CustomerTable({ orders }: { orders: Order[] }) {
+  const [filterValue, setFilterValue] = useState("");
+  const [selectedKey, setSelectedKey] = useState<string>("");
+  const [visibleColumns, setVisibleColumns] = useState<Selection>(
+    new Set(INITIAL_VISIBLE_COLUMNS)
+  );
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: "createdAt",
     direction: "descending",
-  })
-  const [page, setPage] = useState(1)
-  const [isOpen, setIsOpen] = useState(false)
-  const [isOpenRows, setIsOpenRows] = useState(false)
-  const [hoveredColumn, setHoveredColumn] = useState<string | null>(null)
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const router = useRouter()
+  });
+  const [page, setPage] = useState(1);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenRows, setIsOpenRows] = useState(false);
+  const [hoveredColumn, setHoveredColumn] = useState<string | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  const hasSearchFilter = Boolean(filterValue)
+  const hasSearchFilter = Boolean(filterValue);
 
   const headerColumns = React.useMemo(() => {
-    if (visibleColumns === "all") return columns
-    return columns.filter((column) => Array.from(visibleColumns).includes(column.uid))
-  }, [visibleColumns])
+    if (visibleColumns === "all") return columns;
+    return columns.filter((column) =>
+      Array.from(visibleColumns).includes(column.uid)
+    );
+  }, [visibleColumns]);
 
   const filteredItems = React.useMemo(() => {
-    let filteredProducts = [...products]
+    let filteredOrders = [...orders];
 
     if (hasSearchFilter) {
-      filteredProducts = filteredProducts.filter((product) =>
-        product.name.toLowerCase().includes(filterValue.toLowerCase()),
-      )
+      filteredOrders = filteredOrders.filter((order) =>
+        order.id.toLowerCase().includes(filterValue.toLowerCase())
+      );
     }
 
-    return filteredProducts
-  }, [hasSearchFilter, filterValue, products])
+    return filteredOrders;
+  }, [hasSearchFilter, filterValue, orders]);
 
-  const pages = Math.ceil(filteredItems.length / rowsPerPage)
+  const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
   const items = React.useMemo(() => {
-    const start = (page - 1) * rowsPerPage
-    const end = start + rowsPerPage
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
 
-    return filteredItems.slice(start, end)
-  }, [page, filteredItems, rowsPerPage])
+    return filteredItems.slice(start, end);
+  }, [page, filteredItems, rowsPerPage]);
 
   const sortedItems = React.useMemo(() => {
-    return [...items].sort((a: Product, b: Product) => {
-      const first = a[sortDescriptor.column as keyof Product]
-      const second = b[sortDescriptor.column as keyof Product]
-      const cmp = first < second ? -1 : first > second ? 1 : 0
-      return sortDescriptor.direction === "descending" ? -cmp : cmp
-    })
-  }, [sortDescriptor, items])
+    return [...items].sort((a: Order, b: Order) => {
+      const first = a[sortDescriptor.column as keyof Order];
+      const second = b[sortDescriptor.column as keyof Order];
+      const cmp = first < second ? -1 : first > second ? 1 : 0;
+      return sortDescriptor.direction === "descending" ? -cmp : cmp;
+    });
+  }, [sortDescriptor, items]);
 
-  const formatDate = (dateString: string, locale = "en-US") => {
-    const date = new Date(dateString)
+  const formatDate = (dateString: string, locale: string = "en-US") => {
+    const date = new Date(dateString);
     return date.toLocaleDateString(locale, {
       year: "numeric",
       month: "long",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-    })
-  }
+    });
+  };
 
   const renderCell = React.useCallback(
-    (product: Product, columnKey: React.Key): React.ReactNode => {
+    (order: Order, columnKey: React.Key): React.ReactNode => {
       switch (columnKey) {
         case "id":
-          return product.id
+          return order.id;
         case "createdAt":
-          return formatDate(product.createdAt.toString(), "en-US")
-        case "name":
-          return product.name
-        case "producer":
-          return product.producer.username
-        case "licenses":
+          return formatDate(order.createdAt.toString());
+        case "total":
+          return order.price.toString() + " EUR";
+        case "customer":
+          return (
+            <div className="flex flex-col">
+              <p className="text-md">{order.user.name}</p>
+              <p className="text-sm text-subtext0">{order.user.email}</p>
+            </div>
+          );
+        case "products":
           return (
             <div>
-              {product.licenses
-                .sort((a, b) => a.price - b.price)
-                .map((license) => (
-                  <div key={license.id}>
-                    {license.licenseOption.name} - {license.price}€
+              <div className="flex flex-col space-y-2">
+                {order.beat.map((beat) => (
+                  <div className="border hover:cursor-pointer w-full rounded-md bg-transparent text-subtext0 border-subtext0 hover:border-text hover:text-text duration-300">
+                    <p className="text-[10px] px-2 py-1 sm:text-[11px] md:text-xs text-center truncate">
+                      {beat.name}
+                    </p>
                   </div>
                 ))}
+              </div>
             </div>
-          )
-        case "purchased":
-          return product.purchased ? "Yes" : "No"
+          );
+        case "sellers":
+          return (
+            <div>
+              <div className="flex flex-col space-y-2">
+                {order.beat.map((beat) => (
+                  <div className="border hover:cursor-pointer w-full rounded-md bg-transparent text-subtext0 border-subtext0 hover:border-text hover:text-text duration-300">
+                    <p className="text-[10px] px-2 py-1 sm:text-[11px] md:text-xs text-center truncate">
+                      {beat.producer.username}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
         case "actions":
           return (
             <div className="flex justify-center items-center gap-2">
@@ -161,8 +195,10 @@ export default function ProductTable({ products }: { products: Product[] }) {
                 <DialogClose />
                 <DialogContent className="bg-crust rounded-lg border-none">
                   <DialogHeader>
-                    <DialogTitle>Delete Product</DialogTitle>
-                    <DialogDescription>Are you sure you want to delete this product?</DialogDescription>
+                    <DialogTitle>Delete Order</DialogTitle>
+                    <DialogDescription>
+                      Are you sure you want to delete this Order?
+                    </DialogDescription>
                   </DialogHeader>
                   <div className="flex justify-end items-center gap-x-8 mt-2">
                     <DialogTrigger>
@@ -180,17 +216,13 @@ export default function ProductTable({ products }: { products: Product[] }) {
                 </DialogContent>
               </Dialog>
             </div>
-          )
+          );
         default:
-          return null
+          return null;
       }
     },
-    [showDeleteDialog],
-  )
-
-  const onSelectionChange = (keys: Selection) => {
-    setSelectedKey(keys.toString())
-  }
+    [showDeleteDialog]
+  );
 
   const topContent = React.useMemo(() => {
     return (
@@ -198,7 +230,7 @@ export default function ProductTable({ products }: { products: Product[] }) {
         <Input
           isClearable
           className="w-full mt-2 sm:max-w-[44%] bg-crust rounded-lg"
-          placeholder="Search by name..."
+          placeholder="Search by id..."
           startContent={<SearchIcon />}
           value={filterValue}
           onValueChange={setFilterValue}
@@ -243,7 +275,9 @@ export default function ProductTable({ products }: { products: Product[] }) {
             <DropdownTrigger className="flex w-full ml-2 sm:ml-0 sm:w-max mt-2">
               <Button
                 className="bg-crust text-text rounded-lg"
-                endContent={isOpenRows ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                endContent={
+                  isOpenRows ? <ChevronUpIcon /> : <ChevronDownIcon />
+                }
                 variant="flat"
               >
                 {rowsPerPage} Rows
@@ -255,8 +289,8 @@ export default function ProductTable({ products }: { products: Product[] }) {
               selectionMode="single"
               selectedKeys={[rowsPerPage.toString()]}
               onSelectionChange={(keys) => {
-                const selectedValue = Array.from(keys).map(Number)[0]
-                setRowsPerPage(selectedValue)
+                const selectedValue = Array.from(keys).map(Number)[0];
+                setRowsPerPage(selectedValue);
               }}
               className="bg-crust rounded-lg"
               classNames={{
@@ -290,29 +324,20 @@ export default function ProductTable({ products }: { products: Product[] }) {
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
-          <Button
-            className="bg-text text-crust rounded-lg hover:text-text hover:bg-crust duration-300 w-full ml-2 sm:w-auto mt-2"
-            variant="flat"
-            onPress={() => router.push("/dashboard/products/new")}
-          >
-            <div className="flex items-center justify-center gap-x-2 font-semibold">
-              <Plus className="" />
-              <p className="hidden lg:block font-semibold">New Product</p>
-            </div>
-          </Button>
         </div>
       </div>
-    )
-  }, [filterValue, visibleColumns, isOpen, isOpenRows, rowsPerPage])
+    );
+  }, [filterValue, visibleColumns, isOpen, isOpenRows, rowsPerPage]);
 
   const bottomContent = React.useMemo(() => {
     return (
       <div className="py-2 px-2 flex flex-row sm:flex-row justify-between items-center gap-4">
         <span className="w-[30%] text-small text-default-400">
-          {/* {selectedKey
-            ? `${filteredItems.find((item: Product) => item.id == selectedKey)?.name} selected`
-            : `${filteredItems.length} products`} */}
-            {`${filteredItems.length} products`}
+          {selectedKey
+            ? `${
+                filteredItems.find((item: Order) => item.id == selectedKey)?.id
+              } selected`
+            : `${filteredItems.length} orders`}
         </span>
         <Pagination
           unselectable="on"
@@ -329,12 +354,12 @@ export default function ProductTable({ products }: { products: Product[] }) {
           }}
         />
       </div>
-    )
-  }, [selectedKey, filteredItems.length, page, pages])
+    );
+  }, [selectedKey, filteredItems.length, page, pages]);
 
   return (
     <Table
-      aria-label="Product table"
+      aria-label="Customer table"
       isHeaderSticky
       bottomContent={bottomContent}
       classNames={{
@@ -343,7 +368,6 @@ export default function ProductTable({ products }: { products: Product[] }) {
         table: "rounded-lg overflow-x-auto",
         base: "rounded-lg sm:mt-8",
         wrapper: "rounded-lg",
-        td: "w-[20%] ",
       }}
       selectedKeys={selectedKey}
       selectionMode="single"
@@ -351,18 +375,24 @@ export default function ProductTable({ products }: { products: Product[] }) {
       topContent={topContent}
       topContentPlacement="outside"
       bottomContentPlacement="outside"
+      //onSelectionChange={onSelectionChange}
       onSortChange={setSortDescriptor}
     >
       <TableHeader columns={headerColumns}>
         {(column) => (
           <TableColumn
             key={column.uid}
-            align={column.uid === "actions" ? "center" : "start"}
+            align={
+              column.uid === "actions"
+                ? "center"
+                : "start"
+            }
             allowsSorting={column.sortable}
             onMouseEnter={() => column.sortable && setHoveredColumn(column.uid)}
             onMouseLeave={() => setHoveredColumn(null)}
-            
-            className={column.sortable ? "hover:cursor-pointer hover:text-subtext0 w-12" : ""}
+            className={
+              column.sortable ? "hover:cursor-pointer hover:text-subtext0" : ""
+            }
           >
             {column.name}
           </TableColumn>
@@ -388,6 +418,5 @@ export default function ProductTable({ products }: { products: Product[] }) {
         )}
       </TableBody>
     </Table>
-  )
+  );
 }
-

@@ -171,7 +171,7 @@ export default function BeatCard({
                 </CardItem>
               </DialogTrigger>
             )}
-            <DialogContent className="bg-base border-none">
+            <DialogContent className="bg-base border-none text-text">
               <DialogHeader>
                 <DialogTitle>Choose License</DialogTitle>
                 <DialogDescription className="text-subtext0">
@@ -190,10 +190,10 @@ export default function BeatCard({
                     className={`h-20 ${
                       selectedLicense?.id == license.id
                         ? "bg-mantle border-accentColor"
-                        : ""
+                        : "border-text"
                     } hover:bg-mantle hover:cursor-pointer border-2 rounded-md flex flex-col justify-around pl-2 py-1`}
                   >
-                    <p className="text-md">{license.licenseOption.name}</p>
+                    <p className="text-md text-text">{license.licenseOption.name}</p>
                     <p className="text-subtext1 text-sm">{license.price}€</p>
                     <p className="text-subtext0 text-[10px]">
                       {license.licenseOption.contents.map((s) => s).join(", ")}

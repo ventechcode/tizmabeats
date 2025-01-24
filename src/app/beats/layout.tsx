@@ -4,7 +4,7 @@ export default function BeatsLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <main>
+    <main className="h-screen">
       {children}
     </main>
   );

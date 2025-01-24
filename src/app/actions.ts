@@ -50,6 +50,37 @@ export const getCustomers = async () => {
   return customers;
 };
 
+export const getOrders = async () => {
+  const orders = await prisma.order.findMany({
+    select: {
+      id: true,
+      createdAt: true,
+      price: true,
+      user: {
+        select: {
+          email: true,
+          name: true,
+        },
+      },
+      beat: {
+        select: {
+          name: true,
+          producer: {
+            select: {
+              id: true,
+              username: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+  return orders;
+};
+
 export const getDashboardStats = async () => {
   const totalBeats = await prisma.beat.count();
   const totalOrders = await prisma.order.count();
@@ -60,4 +91,4 @@ export const getDashboardStats = async () => {
     },
   });
   return { totalBeats, totalOrders, totalUsers, totalRevenue };
-}
+};

@@ -54,14 +54,13 @@ type Customer = {
 const columns: any[] = [
   { name: "CUSTOMER ID", uid: "id", sortable: true },
   { name: "NAME", uid: "name", sortable: true },
-  { name: "CREATED AT", uid: "createdAt", sortable: true },
   { name: "EMAIL", uid: "email", sortable: true },
+  { name: "CREATED AT", uid: "createdAt", sortable: true },
   { name: "COUNTRY", uid: "address", sortable: true },
   { name: "ORDERS", uid: "orders" },
 ];
 
 const INITIAL_VISIBLE_COLUMNS = [
-  "id",
   "createdAt",
   "name",
   "email",
@@ -146,7 +145,7 @@ export default function CustomerTable({
         case "id":
           return customer.id;
         case "createdAt":
-          return formatDate(customer.createdAt.toString(), "de-DE");
+          return formatDate(customer.createdAt.toString());
         case "name":
           return customer.name;
         case "email":
@@ -159,14 +158,17 @@ export default function CustomerTable({
               {customer.orders.map((order) => (
                 <Dialog key={order.id}>
                   <DialogTrigger>
-                    <div className="border-2 rounded-full bg-transparent border-subtext2 text-subtext2 hover:border-subtext0 hover:text-subtext0 duration-300">
-                      <p className="text-xs py-1">
+                    <div className="border hover:cursor-pointer w-full rounded-md bg-transparent text-subtext0 border-subtext0 hover:border-text hover:text-text duration-300">
+                      <p className="text-[10px] px-2 py-1 sm:text-[11px] md:text-xs text-center truncate">
                         {formatDate(order.createdAt.toString()).split("at")[0]}
                       </p>
                     </div>
                   </DialogTrigger>
                   <DialogContent className="bg-base border-none">
-                    <DialogTitle className="flex items-center gap-x-2"><p className="font-semibold">Order:</p> <p className="text-subtext0">#{order.id}</p></DialogTitle>
+                    <DialogTitle className="flex items-center gap-x-2">
+                      <p className="font-semibold">Order:</p>{" "}
+                      <p className="text-subtext0">#{order.id}</p>
+                    </DialogTitle>
                     <DialogDescription>
                       <div className="flex flex-row items-center justify-between">
                         <div className="flex gap-x-2">
@@ -181,7 +183,8 @@ export default function CustomerTable({
                           }
                         </div>
                         <div className="flex gap-x-2">
-                          <p className="font-semibold">Customer:</p> {customer.name}
+                          <p className="font-semibold">Customer:</p>{" "}
+                          {customer.name}
                         </div>
                       </div>
                     </DialogDescription>
@@ -238,18 +241,18 @@ export default function CustomerTable({
 
   const topContent = React.useMemo(() => {
     return (
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col sm:flex-row sm:justify-end items-start sm:items-center gap-4 mt-4 md:mt-0 w-full">
         <Input
           isClearable
-          className="w-full sm:max-w-[44%] bg-crust rounded-lg"
-          placeholder="Search by name..."
+          className="w-full mt-2 sm:max-w-[44%] bg-crust rounded-lg"
+          placeholder="Search by email..."
           startContent={<SearchIcon />}
           value={filterValue}
           onValueChange={setFilterValue}
         />
-        <div className="flex flex-row gap-2">
+        <div className="flex items-center justify-end gap-2 md:gap-2 w-full">
           <Dropdown onOpenChange={setIsOpen}>
-            <DropdownTrigger className="hidden sm:flex">
+            <DropdownTrigger className="flex w-full sm:ml-0 sm:w-max mt-2">
               <Button
                 className="bg-crust text-text rounded-lg"
                 endContent={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
@@ -284,7 +287,7 @@ export default function CustomerTable({
             </DropdownMenu>
           </Dropdown>
           <Dropdown onOpenChange={setIsOpenRows}>
-            <DropdownTrigger className="hidden sm:flex">
+            <DropdownTrigger className="flex w-full ml-2 sm:ml-0 sm:w-max mt-2">
               <Button
                 className="bg-crust text-text rounded-lg"
                 endContent={
@@ -292,7 +295,7 @@ export default function CustomerTable({
                 }
                 variant="flat"
               >
-                # Rows
+                {rowsPerPage} Rows
               </Button>
             </DropdownTrigger>
             <DropdownMenu
@@ -343,7 +346,7 @@ export default function CustomerTable({
 
   const bottomContent = React.useMemo(() => {
     return (
-      <div className="py-2 px-2 flex justify-between items-center">
+      <div className="py-2 px-2 flex flex-row sm:flex-row justify-between items-center gap-4">
         <span className="w-[30%] text-small text-default-400">
           {selectedKey
             ? `${
@@ -370,38 +373,36 @@ export default function CustomerTable({
     );
   }, [selectedKey, filteredItems.length, page, pages]);
 
-  const deleteDialog = React.useMemo(() => {}, [showDeleteDialog]);
-
-  const isRowSelected = (id: string) => {
-    return selectedKey === id;
-  };
-
   return (
     <Table
-      removeWrapper
       aria-label="Customer table"
       isHeaderSticky
       bottomContent={bottomContent}
       classNames={{
-        wrapper: "max-h-[382px]",
         th: "bg-crust text-text",
         tr: "bg-surface0",
-        table: "rounded-lg",
-        base: "rounded-lg",
+        table: "rounded-lg overflow-x-auto",
+        base: "rounded-lg sm:mt-8",
+        wrapper: "rounded-lg",
       }}
       selectedKeys={selectedKey}
       selectionMode="single"
       sortDescriptor={sortDescriptor}
       topContent={topContent}
       topContentPlacement="outside"
-      onSelectionChange={onSelectionChange}
+      bottomContentPlacement="outside"
+      //onSelectionChange={onSelectionChange}
       onSortChange={setSortDescriptor}
     >
       <TableHeader columns={headerColumns}>
         {(column) => (
           <TableColumn
             key={column.uid}
-            align={column.uid === "actions" || column.uid === "orders" ? "center" : "start"}
+            align={
+              column.uid === "actions" || column.uid === "orders"
+                ? "center"
+                : "start"
+            }
             allowsSorting={column.sortable}
             onMouseEnter={() => column.sortable && setHoveredColumn(column.uid)}
             onMouseLeave={() => setHoveredColumn(null)}
@@ -425,10 +426,7 @@ export default function CustomerTable({
             className="odd:bg-surface0 even:bg-surface1"
           >
             {(columnKey) => (
-              <TableCell
-                className="truncate max-w-12 sm:max-w-72"
-                key={columnKey}
-              >
+              <TableCell className="truncate" key={columnKey}>
                 {renderCell(item, columnKey)}
               </TableCell>
             )}

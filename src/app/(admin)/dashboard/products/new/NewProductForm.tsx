@@ -4,7 +4,7 @@ import { useRef, useState, useEffect } from "react";
 import { upload } from "@vercel/blob/client";
 import { v4 as uuid } from "uuid";
 import WaveSurfer from "wavesurfer.js";
-import { set, z } from "zod";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import {
@@ -17,8 +17,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { ArrowLeft } from "lucide-react";
 
-// Define the license schema
 const licenseSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -213,7 +214,7 @@ export default function NewProductForm({
         return;
       }
 
-      let fileName = file.name.replace("#", "");
+      const fileName = file.name.replace("#", "");
 
       const src = await fetchFile(file);
       await ffmpeg.writeFile("input.mp3", src);
@@ -362,7 +363,7 @@ export default function NewProductForm({
         messageRef.current.innerHTML = "Uploading product files...";
       }
 
-      let productSrcs = [];
+      const productSrcs: string[] = [];
 
       for (const license of selectedLicenses) {
         const file = productFiles.current[license.name];
@@ -432,195 +433,110 @@ export default function NewProductForm({
   };
 
   return (
-    <div className="bg-mantle py-4 px-6 rounded-md w-2/3">
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="grid grid-cols-2 gap-x-8"
-        >
-          <div className="space-y-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="e.g. Trap Beat"
-                      className="text-text"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="genre"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Genre</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="e.g. Techno"
-                      className="text-text"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="bpm"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Bpm</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="e.g. 90"
-                      type="number"
-                      className="text-text"
-                      {...field}
-                      onChange={(e) => field.onChange(Number(e.target.value))}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="songKey"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Song key</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="e.g. F#M"
-                      className="text-text"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="audioSrc"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Audio for streaming (mp3)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="file"
-                      accept="audio/mp3"
-                      className="text-text"
-                      ref={inputFileRef}
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          field.onChange(file.name);
-                        }
-                      }}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-          <div className="space-y-4">
-            <p className="text-sm mt-0.5">Select or add licensing options</p>
-            <div className="grid grid-cols-3 gap-2 w-full">
-              {licenseOptions.map((option: any) => {
-                const isSelected = selectedLicenses.some(
-                  (license) => license.id === option.id
-                );
-                return (
-                  <div
-                    key={option.id}
-                    onClick={() => handleLicenseSelect(option)}
-                    className={`h-20 hover:bg-crust hover:cursor-pointer border-2 rounded-md flex flex-col items-start justify-around pl-2 py-1 ${
-                      isSelected ? "border-accentColor bg-crust" : ""
-                    }`}
-                  >
-                    <p className="text-md">{option.name}</p>
-                    <input
-                      type="text"
-                      placeholder={option.basePrice + " €"}
-                      value={
-                        selectedLicenses.find((l) => l.id === option.id)?.price
-                          ? `${
-                              selectedLicenses.find((l) => l.id === option.id)
-                                ?.price
-                            } €`
-                          : ""
-                      }
-                      onChange={(e) => {
-                        e.stopPropagation();
-                        const value = e.target.value.replace(/[^0-9]/g, "");
-                        const numericValue = parseInt(value, 10);
-                        if (!isNaN(numericValue)) {
-                          handleLicensePriceChange(
-                            option.id,
-                            isNaN(numericValue) ? 0 : numericValue
-                          );
-                        }
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Backspace") {
-                          e.stopPropagation();
-                          const currentValue =
-                            selectedLicenses
-                              .find((l) => l.id === option.id)
-                              ?.price?.toString() || "";
-                          const newValue = currentValue.slice(0, -1);
-                          handleLicensePriceChange(
-                            option.id,
-                            newValue === "" ? 0 : parseInt(newValue, 10)
-                          );
-                        }
-                      }}
-                      onClick={(e) => e.stopPropagation()}
-                      onFocus={(e) => e.stopPropagation()}
-                      className="border-none w-16 bg-transparent pl-0 text-text focus:outline-none focus:ring-0 focus:border-transparent cursor-text"
-                    />
-                    <p className="text-subtext0 text-[10px]">
-                      {option.contents.join(", ")}
-                    </p>
-                  </div>
-                );
-              })}
-            </div>
+    <div className="w-full flex flex-col items-center">
+      <div className="w-full max-w-[95%] sm:max-w-[90%] md:max-w-[90%] xl:max-w-[75%] mx-auto mb-4 flex flex-row items-center justify-start">
+        <Link prefetch href="/dashboard/products">
+          <ArrowLeft className="w-8 h-8 cursor-pointer mt-4 xl:mt-0 lg:ml-0 ml-4 hover:text-accentColor duration-300" />
+        </Link>
+        <div></div>
+      </div>
 
-            {selectedLicenses.map((license) => (
+      <div className="bg-crust py-4 px-6 rounded-md w-full max-w-[95%] sm:max-w-[90%] md:max-w-[90%] xl:max-w-[75%] mx-auto mb-12">
+        <Form {...form}>
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex flex-col lg:grid lg:grid-cols-2 lg:gap-x-8"
+          >
+            <div className="space-y-4">
               <FormField
-                key={license.name}
                 control={form.control}
-                name={`licenses.${form
-                  .getValues("licenses")
-                  .findIndex((l) => l.name === license.name)}.productSrc`}
+                name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
-                      Add product for license: {license.name}
+                    <FormLabel className="uppercase">Title</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g. Trap Beat"
+                        className="text-text border-text"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="genre"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="uppercase">Genre</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g. Techno"
+                        className="text-text border-text"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="bpm"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="uppercase">Bpm</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g. 90"
+                        type="number"
+                        className="text-text border-text"
+                        {...field}
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="songKey"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="uppercase">Song key</FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="e.g. F#M"
+                        className="text-text border-text"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="audioSrc"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="uppercase">
+                      Audio for streaming (mp3)
                     </FormLabel>
                     <FormControl>
                       <Input
                         type="file"
-                        accept="audio/*"
-                        className="text-text"
+                        accept="audio/mp3"
+                        className="text-text border-text"
+                        placeholder="Select audio file"
+                        ref={inputFileRef}
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (file) {
                             field.onChange(file.name);
-                            handleProductFileChange(license.name, file.name);
-                            productFiles.current[license.name] = file;
                           }
                         }}
                       />
@@ -629,44 +545,153 @@ export default function NewProductForm({
                   </FormItem>
                 )}
               />
-            ))}
-
-            {form.formState.errors.licenses && (
-              <p className="text-red-500 text-sm">
-                {form.formState.errors.licenses.message}
-              </p>
-            )}
-
-            <div className="col-span-2 flex flex-row">
-              <Button
-                type="submit"
-                disabled={uploading}
-                className="bg-accentColor mb-2"
-              >
-                {uploading ? (
-                  <div className="loading loading-spinner"></div>
-                ) : (
-                  "Create Beat"
-                )}
-              </Button>
-              {uploading && (
-                <div className="flex flex-col justify-around ml-2 w-full mb-2">
-                  <div ref={messageRef} className="text-subtext0 text-sm">
-                    Initializing ffmpeg...
-                  </div>
-                  <progress
-                    ref={progressRef}
-                    className="progress"
-                    value={0}
-                    max={100}
-                  />
-                </div>
-              )}
             </div>
-          </div>
-        </form>
-      </Form>
-      <div id="waveform" className="hidden col-span-2"></div>
+            <div className="space-y-3 mt-4 lg:mt-0">
+              <FormLabel className="uppercase">
+                Select licenses & products
+              </FormLabel>
+              <div className="grid grid-cols-3 gap-2 w-full">
+                {licenseOptions.map((option: any) => {
+                  const isSelected = selectedLicenses.some(
+                    (license) => license.id === option.id
+                  );
+                  return (
+                    <div
+                      key={option.id}
+                      onClick={() => handleLicenseSelect(option)}
+                      className={`h-20 hover:bg-mantle hover:cursor-pointer border-2 rounded-md flex flex-col items-start justify-around pl-2 py-1 duration-300 ${
+                        isSelected ? "border-accentColor bg-mantle" : "border-text"
+                      }`}
+                    >
+                      <p className="text-md">{option.name}</p>
+                      <input
+                        type="text"
+                        placeholder={option.basePrice + " €"}
+                        value={
+                          selectedLicenses.find((l) => l.id === option.id)
+                            ?.price
+                            ? `${
+                                selectedLicenses.find((l) => l.id === option.id)
+                                  ?.price
+                              } €`
+                            : ""
+                        }
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          const value = e.target.value.replace(/[^0-9]/g, "");
+                          const numericValue = Number.parseInt(value, 10);
+                          if (!isNaN(numericValue)) {
+                            handleLicensePriceChange(
+                              option.id,
+                              isNaN(numericValue) ? 0 : numericValue
+                            );
+                          }
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Backspace") {
+                            e.stopPropagation();
+                            const currentValue =
+                              selectedLicenses
+                                .find((l) => l.id === option.id)
+                                ?.price?.toString() || "";
+                            const newValue = currentValue.slice(0, -1);
+                            handleLicensePriceChange(
+                              option.id,
+                              newValue === ""
+                                ? 0
+                                : Number.parseInt(newValue, 10)
+                            );
+                          }
+                        }}
+                        onClick={(e) => e.stopPropagation()}
+                        onFocus={(e) => e.stopPropagation()}
+                        className="border-none w-16 bg-transparent pl-0 text-text focus:outline-none focus:ring-0 focus:border-transparent cursor-text"
+                      />
+                      <p className="text-subtext0 text-[10px]">
+                        {option.contents.join(", ")}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {selectedLicenses.map((license) => (
+                <FormField
+                  key={license.name}
+                  control={form.control}
+                  name={`licenses.${form
+                    .getValues("licenses")
+                    .findIndex((l) => l.name === license.name)}.productSrc`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center space-x-2">
+                        <p className="font-semibold text-sm">{license.name}:</p>{" "}
+                        <p className="text-xs text-subtext0 mt-0.5">
+                          Add file(s) to sell under this license
+                        </p>
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          accept="audio/*"
+                          className="text-text"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              field.onChange(file.name);
+                              handleProductFileChange(license.name, file.name);
+                              productFiles.current[license.name] = file;
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      {/* <FormMessage /> */}
+                    </FormItem>
+                  )}
+                />
+              ))}
+
+              {form.formState.errors.licenses && (
+                <p className="text-red-500 text-sm">
+                  {form.formState.errors.licenses.message}
+                </p>
+              )}
+
+              <div className="col-span-2 flex flex-col">
+                <Button
+                  type="submit"
+                  disabled={uploading}
+                  className={`shadow-xl w-full bg-text text-crust hover:bg-crust hover:text-accentColor hover:border-2 hover:border-accentColor duration-300 hover:animate-pulse ${
+                    uploading
+                      ? "border-2 border-accentColor animate-pulse bg-transparent"
+                      : ""
+                  }`}
+                >
+                  {uploading ? (
+                    <div className="loading loading-dots text-accentColor animate-puls"></div>
+                  ) : (
+                    <p className="uppercase font-semibold">Create</p>
+                  )}
+                </Button>
+                {uploading && (
+                  <div className="flex flex-col justify-around w-full mt-2 space-y-2">
+                    <div ref={messageRef} className="text-subtext0 text-sm">
+                      Initializing ffmpeg...
+                    </div>
+                    <progress
+                      ref={progressRef}
+                      className="progress animate-pulse text-accentColor bg-surface1"
+                      value={0}
+                      max={100}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+          </form>
+        </Form>
+        <div id="waveform" className="hidden col-span-2"></div>
+      </div>
     </div>
   );
 }

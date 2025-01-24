@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
-import Footer from "@/components/Footer";
+import Footer from "@/components/MyFooter";
 import { Nav } from "@/components/Nav";
-
-import { SpeedInsights } from "@vercel/speed-insights/next"
+import { SpeedInsights } from "@vercel/speed-insights/next";
+import MyFooter from "@/components/MyFooter";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,14 +21,15 @@ export default function RootLayout({
 }>) {
   return (
     <html>
-      {/* color schemes: latte frappé macchiatio mocha */}
-      <body className={`${inter.className}`}>
-        <main className="flex flex-col justify-between h-screen w-screen">
+      <body className={`${inter.className} bg-base text-text`}>
+        <main className="flex flex-col justify-between">
           <SpeedInsights />
           <Providers>
-            <Nav className="bg-crust top-0 sticky z-50 w-screen sm:px-8" />
-            {children}
-            <Footer />
+            <Nav className="z-50 bg-crust relative w-full" />
+            <div className="flex-grow"> 
+              {children}
+            </div>
+            <MyFooter />
           </Providers>
         </main>
       </body>
