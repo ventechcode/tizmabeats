@@ -1,9 +1,8 @@
-"use client";
-
 import React, { useContext, useEffect, useState } from "react";
 import { CardBody, CardContainer, CardItem } from "./ui/3d-card";
 import { Beat, BeatLicense } from "@/types";
 import { ShoppingCartContext } from "@/app/providers";
+import { AudioPlayerContext, useGlobalAudioPlayer } from "@/hooks/useAudioPlayer";
 
 import {
   Dialog,
@@ -17,28 +16,16 @@ import {
 
 import { TbShoppingBagPlus } from "react-icons/tb";
 
-export default function BeatCard({
-  beat,
-  play,
-  isPlaying,
-}: {
-  beat: Beat;
-  play: (beat: Beat, pause: boolean, next: boolean) => void;
-  isPlaying: boolean;
-}) {
-  const [toggle, setToggle] = useState(isPlaying);
+export default function BeatCard({ beat }: { beat: Beat }) {
+  const [toggle, setToggle] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false); // Track dialog open state
   const shoppingCart = useContext(ShoppingCartContext);
-  const [selectedLicense, setSelectedLicense] = useState<BeatLicense>();
+  const [selectedLicense, setSelectedLicense] = useState<BeatLicense>(
+    beat.licenses[0]
+  );
 
-  useEffect(() => {
-    setSelectedLicense(beat.licenses[0]);
-  }, []);
-
-  useEffect(() => {
-    setToggle(isPlaying);
-  }, [isPlaying]);
+  const audioPlayer = useGlobalAudioPlayer();
 
   return (
     <CardContainer className="inter-var" isDialogOpen={isDialogOpen}>
@@ -84,11 +71,14 @@ export default function BeatCard({
             as="button"
             translateZ="61"
             onClick={() => {
-              play(beat, true, false);
-              setToggle(!toggle);
+              if (audioPlayer?.isPlaying(beat)) {
+                audioPlayer?.pause(beat);
+              } else {
+                audioPlayer?.play(beat);
+              }
             }}
           >
-            {!toggle ? (
+            {audioPlayer?.isPlaying(beat) ? (
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
@@ -97,7 +87,7 @@ export default function BeatCard({
               >
                 <path
                   fillRule="evenodd"
-                  d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z"
+                  d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12ZM9 8.25a.75.75 0 0 0-.75.75v6c0 .414.336.75.75.75h.75a.75.75 0 0 0 .75-.75V9a.75.75 0 0 0-.75-.75H9Zm5.25 0a.75.75 0 0 0-.75.75v6c0 .414.336.75.75.75H15a.75.75 0 0 0 .75-.75V9a.75.75 0 0 0-.75-.75h-.75Z"
                   clipRule="evenodd"
                 />
               </svg>
@@ -110,7 +100,7 @@ export default function BeatCard({
               >
                 <path
                   fillRule="evenodd"
-                  d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12ZM9 8.25a.75.75 0 0 0-.75.75v6c0 .414.336.75.75.75h.75a.75.75 0 0 0 .75-.75V9a.75.75 0 0 0-.75-.75H9Zm5.25 0a.75.75 0 0 0-.75.75v6c0 .414.336.75.75.75H15a.75.75 0 0 0 .75-.75V9a.75.75 0 0 0-.75-.75h-.75Z"
+                  d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z"
                   clipRule="evenodd"
                 />
               </svg>
@@ -124,8 +114,7 @@ export default function BeatCard({
             {shoppingCart!.contains(beat) ? (
               <CardItem
                 translateZ={36}
-                as="button"
-                className={`px-4 py-2 rounded-xl bg-text text-crust hover:bg-[#f38ba8] text-xs font-bold w-24 h-8 duration-300`}
+                className={`px-4 py-2 rounded-xl bg-text text-crust hover:cursor-pointer hover:bg-[#f38ba8] text-xs font-bold w-24 h-8 duration-300`}
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
                 onClick={() => shoppingCart?.removeFromCart(beat)}
@@ -158,7 +147,6 @@ export default function BeatCard({
               <DialogTrigger>
                 <CardItem
                   translateZ={36}
-                  as="button"
                   className={`px-4 py-2 rounded-xl bg-text text-crust text-xs font-bold w-24 h-8 duration-300`}
                   onMouseEnter={() => setIsHovered(true)}
                   onMouseLeave={() => setIsHovered(false)}
@@ -193,7 +181,9 @@ export default function BeatCard({
                         : "border-text"
                     } hover:bg-mantle hover:cursor-pointer border-2 rounded-md flex flex-col justify-around pl-2 py-1`}
                   >
-                    <p className="text-md text-text">{license.licenseOption.name}</p>
+                    <p className="text-md text-text">
+                      {license.licenseOption.name}
+                    </p>
                     <p className="text-subtext1 text-sm">{license.price}€</p>
                     <p className="text-subtext0 text-[10px]">
                       {license.licenseOption.contents.map((s) => s).join(", ")}

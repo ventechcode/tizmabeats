@@ -12,15 +12,12 @@ import {
   IoVolumeMuteOutline,
 } from "react-icons/io5";
 import { HiMiniXMark } from "react-icons/hi2";
+import { useGlobalAudioPlayer } from "@/hooks/useAudioPlayer";
 
-export default function AudioPlayer({
-  beat,
-  toggle,
-}: {
-  beat: Beat;
-  toggle: (beat: Beat, pause: boolean, next: boolean) => void;
-}) {
-  beat.wavesurferRef = useRef<WaveSurfer | null>(null);
+export default function AudioPlayer() {
+  const audioPlayer = useGlobalAudioPlayer();
+
+  audioPlayer.beat!.wavesurferRef = useRef<WaveSurfer | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const hlsRef = useRef<Hls | null>(null);
   const [elapsedTime, setElapsedTime] = useState(0);
@@ -33,7 +30,7 @@ export default function AudioPlayer({
       if (!audioRef.current) return;
 
       const audio_info = await fetch(
-        `https://blhf5x3zv0lnny2n.public.blob.vercel-storage.com/beats/${beat.id}/stream/audio-info.json`
+        `https://blhf5x3zv0lnny2n.public.blob.vercel-storage.com/beats/${audioPlayer.beat?.id}/stream/audio-info.json`
       );
       const metadata = await audio_info.json();
       setMetadata(metadata);
@@ -61,7 +58,7 @@ export default function AudioPlayer({
           .catch((error) => console.error("Autoplay failed:", error));
       });
 
-      hls.loadSource(beat.audioSrc);
+      hls.loadSource(audioPlayer.beat?.audioSrc!);
       hls.attachMedia(audioRef.current);
 
       // Create a blob URL for the audio element
@@ -83,17 +80,17 @@ export default function AudioPlayer({
         hlsRef.current = null;
       }
     };
-  }, [beat.id, beat.audioSrc]);
+  }, [audioPlayer.beat]);
 
   useEffect(() => {
     if (!playlistUrl || !audioRef.current) return;
 
-    if (beat.wavesurferRef.current) {
-      beat.wavesurferRef.current.destroy();
+    if (audioPlayer.beat?.wavesurferRef.current) {
+      audioPlayer.beat?.wavesurferRef.current.destroy();
     }
 
-    if (!beat.wavesurferRef.current) {
-      beat.wavesurferRef.current = WaveSurfer.create({
+    if (!audioPlayer.beat?.wavesurferRef.current) {
+      audioPlayer.beat!.wavesurferRef.current = WaveSurfer.create({
         container: "#waveform",
         waveColor: "#4c4f69",
         progressColor: "#89b4fa",
@@ -113,38 +110,38 @@ export default function AudioPlayer({
         dragToSeek: true,
       });
 
-      beat.wavesurferRef.current.on("interaction", () => {
-        setElapsedTime(beat.wavesurferRef.current?.getCurrentTime() || 0);
+      audioPlayer.beat?.wavesurferRef.current.on("interaction", () => {
+        setElapsedTime(audioPlayer.beat?.wavesurferRef.current.getCurrentTime() || 0);
       });
 
-      beat.wavesurferRef.current.on("audioprocess", () => {
-        setElapsedTime(beat.wavesurferRef.current?.getCurrentTime() || 0);
+      audioPlayer.beat?.wavesurferRef.current.on("audioprocess", () => {
+        setElapsedTime(audioPlayer.beat?.wavesurferRef.current.getCurrentTime() || 0);
       });
 
       // Start playback as soon as WaveSurfer is ready
-      beat.wavesurferRef.current.on("ready", () => {
-        beat.wavesurferRef.current?.play();
+      audioPlayer.beat?.wavesurferRef.current.on("ready", () => {
+        audioPlayer.beat?.wavesurferRef.current.play();
       });
 
-      beat.wavesurferRef.current.on("finish", () => {
+      audioPlayer.beat?.wavesurferRef.current.on("finish", () => {
         setElapsedTime(0);
-        toggle(beat, false, true);
+        audioPlayer.stop();
       });
     }
 
-    beat.wavesurferRef.current.setVolume(volume / 100);
+    audioPlayer.beat?.wavesurferRef.current.setVolume(volume / 100);
 
     return () => {
-      if (beat.wavesurferRef.current) {
+      if (audioPlayer.beat?.wavesurferRef.current) {
         try {
-          beat.wavesurferRef.current.destroy();
+          audioPlayer.beat?.wavesurferRef.current.destroy();
         } catch (error) {
           console.warn("Error while destroying WaveSurfer instance:", error);
         }
-        beat.wavesurferRef.current = null;
+        audioPlayer.beat!.wavesurferRef.current = null;
       }
     };
-  }, [beat, playlistUrl, metadata]);
+  }, [audioPlayer.beat, audioRef, playlistUrl, metadata]);
 
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
@@ -152,10 +149,10 @@ export default function AudioPlayer({
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
-  const handleVolumeChange = (e: any)  => {
+  const handleVolumeChange = (e: any) => {
     const newVolume = parseInt(e.target.value, 10);
     setVolume(newVolume);
-    beat.wavesurferRef.current?.setVolume(newVolume / 100);
+    audioPlayer.beat?.wavesurferRef.current.setVolume(newVolume / 100);
     localStorage.setItem("volume", newVolume.toString());
   };
 
@@ -167,7 +164,9 @@ export default function AudioPlayer({
           onClick={() => {
             const storedVolume = localStorage.getItem("volume");
             setVolume(storedVolume ? parseInt(storedVolume) : 100);
-            beat.wavesurferRef.current?.setVolume(storedVolume ? parseInt(storedVolume) / 100 : 1);
+            audioPlayer.beat?.wavesurferRef.current.setVolume(
+              storedVolume ? parseInt(storedVolume) / 100 : 1
+            );
           }}
         />
       );
@@ -177,7 +176,7 @@ export default function AudioPlayer({
           className="text-text text-3xl"
           onClick={() => {
             setVolume(0);
-            beat.wavesurferRef.current?.setVolume(0);
+            audioPlayer.beat?.wavesurferRef.current.setVolume(0);
           }}
         />
       );
@@ -187,7 +186,7 @@ export default function AudioPlayer({
           className="text-text text-3xl"
           onClick={() => {
             setVolume(0);
-            beat.wavesurferRef.current?.setVolume(0);
+            audioPlayer.beat?.wavesurferRef.current.setVolume(0);
           }}
         />
       );
@@ -198,10 +197,8 @@ export default function AudioPlayer({
       <audio ref={audioRef} className="hidden"></audio>
       <div className="flex flex-row flex-wrap items-center w-1/5">
         <div className="ml-3">
-          <p className="font-semibold truncate overflow-hidden">
-            {beat.name}
-          </p>
-          <div className="text-[12px] sm:text-sm">{beat.genre}</div>
+          <p className="font-semibold truncate overflow-hidden">{audioPlayer.beat?.name}</p>
+          <div className="text-[12px] sm:text-sm">{audioPlayer.beat?.genre}</div>
         </div>
       </div>
 
@@ -230,7 +227,7 @@ export default function AudioPlayer({
 
       <HiMiniXMark
         className="text-text cursor-pointer ml-8 sm:ml-24 hover:text-accentColor duration-300"
-        onClick={() => toggle(beat, false, false)}
+        onClick={() => audioPlayer.stop()}
       />
     </div>
   );

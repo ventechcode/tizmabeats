@@ -6,6 +6,8 @@ import Footer from "@/components/MyFooter";
 import { Nav } from "@/components/Nav";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import MyFooter from "@/components/MyFooter";
+import AudioPlayer from "@/components/AudioPlayer";
+import AudioPlayerWrapper from "@/components/AudioPlayerWrapper";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -26,9 +28,8 @@ export default function RootLayout({
           <SpeedInsights />
           <Providers>
             <Nav className="z-50 bg-crust relative w-full" />
-            <div className="flex-grow"> 
-              {children}
-            </div>
+            <div className="flex-grow">{children}</div>
+            <AudioPlayerWrapper />
             <MyFooter />
           </Providers>
         </main>

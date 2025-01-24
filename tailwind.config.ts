@@ -46,6 +46,7 @@ const config: Config = {
   plugins: [
     require("@catppuccin/tailwindcss")({
       prefix: false,
+      defaultTheme: "mocha"
     }),
     function ({ matchUtilities, theme }: any) {
       const flattenColorPalette = (colorPalette: any) => {

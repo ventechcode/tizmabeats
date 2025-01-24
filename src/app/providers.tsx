@@ -4,6 +4,7 @@ import { Beat } from "@/types";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "next-themes";
 import { createContext, useState, useEffect } from "react";
+import { AudioPlayerProvider } from "@/hooks/useAudioPlayer";
 
 interface ShoppingCartContextType {
   cart: any[];
@@ -92,15 +93,13 @@ function Providers({ children }: { children: React.ReactNode }) {
     <SessionProvider>
       <ThemeProvider
         attribute="class"
-        defaultTheme="system"
-        enableSystem={false}
+        defaultTheme="mocha"
+        enableSystem={true}
         storageKey="theme"
         themes={["latte", "mocha"]}
       >
         <ShoppingCartProvider>
-          <main className="bg-base text-text">
-          {children}
-          </main>
+          <AudioPlayerProvider>{children}</AudioPlayerProvider>
         </ShoppingCartProvider>
       </ThemeProvider>
     </SessionProvider>
