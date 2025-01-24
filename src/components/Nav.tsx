@@ -1,14 +1,18 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import React, { type ComponentProps } from "react"
-import { Disclosure, DisclosureButton, DisclosurePanel } from "@headlessui/react"
-import { usePathname } from "next/navigation"
-import ShoppingCart from "./ShoppingCart"
-import { useSession } from "next-auth/react"
+import Link from "next/link";
+import React, { type ComponentProps } from "react";
+import {
+  Disclosure,
+  DisclosureButton,
+  DisclosurePanel,
+} from "@headlessui/react";
+import { usePathname } from "next/navigation";
+import ShoppingCart from "./ShoppingCart";
+import { useSession } from "next-auth/react";
 
 export function Nav({ className }: { className?: string }) {
-  const session = useSession()
+  const session = useSession();
 
   return (
     <Disclosure as="nav" className={className}>
@@ -28,7 +32,12 @@ export function Nav({ className }: { className?: string }) {
                       stroke="currentColor"
                       className="h-6 w-6"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   ) : (
                     <svg
@@ -38,7 +47,12 @@ export function Nav({ className }: { className?: string }) {
                       stroke="currentColor"
                       className="h-6 w-6"
                     >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M4 6h16M4 12h16M4 18h16"
+                      />
                     </svg>
                   )}
                 </DisclosureButton>
@@ -55,7 +69,9 @@ export function Nav({ className }: { className?: string }) {
                 <NavLink href="/beats">Beats</NavLink>
                 <NavLink href="/beat-bundles">Beat-Bundles</NavLink>
                 <NavLink href="/contact">Contact</NavLink>
-                {session.data?.user && <NavLink href="/dashboard">Dashboard</NavLink>}
+                {session.data?.user && (
+                  <NavLink href="/dashboard">Dashboard</NavLink>
+                )}
               </div>
             </div>
             <div className="flex items-center justify-end">
@@ -68,18 +84,20 @@ export function Nav({ className }: { className?: string }) {
               <NavLink href="/beats">Beats</NavLink>
               <NavLink href="/beat-bundles">Beat-Bundles</NavLink>
               <NavLink href="/contact">Contact</NavLink>
-              {session.data?.user && <NavLink href="/dashboard">Dashboard</NavLink>}
+              {session.data?.user && (
+                <NavLink href="/dashboard">Dashboard</NavLink>
+              )}
             </div>
           </DisclosurePanel>
         </>
       )}
     </Disclosure>
-  )
+  );
 }
 
 export function NavLink(props: ComponentProps<typeof Link>) {
-  const path = usePathname()
-  const isActive = path.startsWith(props.href as string)
+  const path = usePathname();
+  const isActive = path.startsWith(props.href as string);
 
   return (
     <Link
@@ -88,21 +106,23 @@ export function NavLink(props: ComponentProps<typeof Link>) {
         isActive ? "bg-text text-mantle" : "text-text bg-crust"
       } text-md lg:text-lg hover:text-mantle hover:bg-text rounded-lg hover:rounded-lg hover:duration-500 uppercase font-bold whitespace-nowrap`}
     />
-  )
+  );
 }
 
 export function NavLogo({
   imgSrc,
   alt,
 }: {
-  href?: string
-  imgSrc: string
-  alt: string
+  href?: string;
+  imgSrc: string;
+  alt: string;
 }) {
   return (
-    <Link href="/" className="text-xl sm:text-lg p-2 md:text-xl lg:text-2xl text-text hover:text-accentColor hover:duration-300 uppercase">
+    <Link
+      href="/"
+      className="text-xl sm:text-lg p-2 md:text-xl lg:text-2xl text-text hover:text-accentColor hover:duration-300 uppercase"
+    >
       TizmaBeats
     </Link>
-  )
+  );
 }
-

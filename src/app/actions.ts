@@ -64,6 +64,7 @@ export const getOrders = async () => {
       },
       beat: {
         select: {
+          id: true,
           name: true,
           producer: {
             select: {

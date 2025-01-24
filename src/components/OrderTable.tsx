@@ -44,6 +44,7 @@ type Order = {
     email: string;
   };
   beat: {
+    id: string;
     name: string;
     producer: {
       id: string;
@@ -159,7 +160,7 @@ export default function CustomerTable({ orders }: { orders: Order[] }) {
             <div>
               <div className="flex flex-col space-y-2">
                 {order.beat.map((beat) => (
-                  <div className="border hover:cursor-pointer w-full rounded-md bg-transparent text-subtext0 border-subtext0 hover:border-text hover:text-text duration-300">
+                  <div key={beat.id} className="border hover:cursor-pointer w-full rounded-md bg-transparent text-subtext0 border-subtext0 hover:border-text hover:text-text duration-300">
                     <p className="text-[10px] px-2 py-1 sm:text-[11px] md:text-xs text-center truncate">
                       {beat.name}
                     </p>
@@ -173,7 +174,7 @@ export default function CustomerTable({ orders }: { orders: Order[] }) {
             <div>
               <div className="flex flex-col space-y-2">
                 {order.beat.map((beat) => (
-                  <div className="border hover:cursor-pointer w-full rounded-md bg-transparent text-subtext0 border-subtext0 hover:border-text hover:text-text duration-300">
+                  <div key={beat.id} className="border hover:cursor-pointer w-full rounded-md bg-transparent text-subtext0 border-subtext0 hover:border-text hover:text-text duration-300">
                     <p className="text-[10px] px-2 py-1 sm:text-[11px] md:text-xs text-center truncate">
                       {beat.producer.username}
                     </p>
