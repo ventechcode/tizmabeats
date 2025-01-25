@@ -19,6 +19,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
+import { revalidatePath } from "next/cache";
 
 const licenseSchema = z.object({
   id: z.string(),

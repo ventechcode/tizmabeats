@@ -38,3 +38,6 @@ next-env.d.ts
 
 # binaries
 /bin
+
+# database seed 
+/prisma/seed.ts

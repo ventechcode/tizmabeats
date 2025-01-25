@@ -1,6 +1,4 @@
-import { Nav, NavLink } from "@/components/Nav";
-
-export default function BeatsLayout({
+export default async function BeatsLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (

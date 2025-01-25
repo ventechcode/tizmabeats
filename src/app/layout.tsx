@@ -23,12 +23,15 @@ export default function RootLayout({
 }>) {
   return (
     <html>
+      <head>
+      <link rel="preload" href="/api/data" as="fetch"></link>
+      </head>
       <body className={`${inter.className} bg-base text-text`}>
         <main className="flex flex-col justify-between">
           <SpeedInsights />
           <Providers>
             <Nav className="z-50 bg-crust relative w-full" />
-            <div className="flex-grow">{children}</div>
+            <div className="flex-grow h-screen">{children}</div>
             <AudioPlayerWrapper />
             <MyFooter />
           </Providers>

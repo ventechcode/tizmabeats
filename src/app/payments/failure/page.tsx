@@ -6,7 +6,7 @@ export default function Failure() {
   const router = useRouter();
 
   return (
-    <div className="flex flex-col items-center justify-center p-4">
+    <div className="flex items-center justify-center h-screen">
       <div>
         <div className="bg-mantle shadow-md rounded-lg p-6 max-w-lg w-full text-center">
           <h1 className="text-3xl font-bold text-red">Payment Failed!</h1>

@@ -6,7 +6,7 @@ import Searchbar from "@/components/Searchbar";
 import { Separator } from "@/components/ui/separator";
 import BpmFilter from "@/components/BpmFilter";
 
-const SearchFilterSection = ({ genres, onGenreChange, bpms, onBpmChange, onSearch, initialSearch }: { genres: Set<string>, onGenreChange: (selections: any) => void, bpms: Set<number>, onBpmChange: (selections: any) => void, onSearch: (value: string) => void, initialSearch: string}) => {
+const SearchFilterSection = ({ onGenreChange, onBpmChange, onSearch, initialSearch }: { onGenreChange: (selections: any) => void, onBpmChange: (selections: any) => void, onSearch: (value: string) => void, initialSearch: string}) => {
   return (
     <div className="z-40 w-screen sm:w-3/4 bg-crust rounded-b-3xl sm:rounded-b-3xl md:rounded-b-full flex flex-col sm:items-center justify-between mb-2" >
       <h1 className="text-xs sm:text-lg text-center md:text-2xl p-4 uppercase font-bold text-text">
@@ -15,8 +15,8 @@ const SearchFilterSection = ({ genres, onGenreChange, bpms, onBpmChange, onSearc
       <Separator className='hidden sm:block'/>
       <Searchbar onSearch={onSearch} initialValue={initialSearch}/>
       <div className="hidden sm:flex sm:flex-row justify-center gap-4 w-full p-5">
-        <GenreFilter genres={genres} onGenreChange={onGenreChange} />
-        <BpmFilter bpms={bpms} onBpmChange={onBpmChange} />
+        <GenreFilter  onGenreChange={onGenreChange} />
+        <BpmFilter onBpmChange={onBpmChange} />
       </div>
     </div>
   );

@@ -7,85 +7,48 @@ import { useSearchParams, useRouter } from "next/navigation";
 import BeatList from "@/components/BeatList";
 import { useGlobalAudioPlayer } from "@/hooks/useAudioPlayer";
 import Background from "@/components/Background";
+import useSWR from "swr";
+import SkeletonBeatList from "@/components/SkeletonBeatList";
+import Loading from "../loading";
+import { set } from "zod";
 
-export default function Beats() {
+export default function BeatsPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const audioPlayer = useGlobalAudioPlayer();
 
-  const [beats, setBeats] = useState<Beat[]>([]);
-  const [genres, setGenres] = useState<Set<string>>(new Set([]));
-  const [bpms, setBpms] = useState<Set<number>>(new Set([]));
-  const [beatsLoading, setBeatsLoading] = useState(false);
-  const [initialSearch, setInitialSearch] = useState("");
-
   const baseQuery = "/api/beats";
+  const [query, setQuery] = useState(baseQuery);
+  const [beats, setBeats] = useState<Beat[]>([]);
+  const [search, setSearch] = useState(searchParams.get("search") || null);
+  const [genres, setGenres] = useState([searchParams.get("genre") || null]);
+  const [bpms, setBpms] = useState([searchParams.get("bpm") || null]);
+
+  const [initialLoading, setInitialLoading] = useState(true);
+  
+  const { data, isLoading } = useSWR(query, async (query) => {
+    const res = await fetch(query);
+    const data = await res.json();
+    for (const beat of data) {
+      setWavesurferRef(beat);
+    }
+    setBeats(data);
+    return data;
+  });
 
   useEffect(() => {
-    const params = new URLSearchParams(searchParams.toString());
-
-    if (params.has("search")) {
-      setInitialSearch(params.get("search") || "");
-    }
-
-    // Fetch data based on initial query params
-    const queryArray: string[] = [];
-    params.forEach((value, key) => {
-      queryArray.push(`${key}=${value}`);
-    });
-    const queryString = queryArray.join("&");
-    const query = queryString ? `${baseQuery}?${queryString}` : baseQuery;
-
-    router.push(`?${queryString}`);
-
-    fetch(baseQuery)
-      .then((res) => res.json())
-      .then((data) => {
-        const genres: string[] = data
-          .map((beat: any) => beat.genre)
-          .sort((a: string, b: string) => a.localeCompare(b));
-        const bpms: number[] = data
-          .map((beat: any) => parseInt(beat.bpm))
-          .sort((a: number, b: number) => a - b);
-        const unqiueBpms = new Set(bpms);
-        const uniqueGenres = new Set(genres);
-        setGenres(uniqueGenres);
-        setBpms(unqiueBpms);
-      });
-
-    fetch(query)
-      .then((res) => res.json())
-      .then((data) => {
-        setBeats(data);
-        for (const beat of data) {
-          setWavesurferRef(beat);
-        }
-      });
+    setInitialLoading(false);
   }, []);
 
   // Fetch data whenever queryParams changes
   useEffect(() => {
-    setBeatsLoading(true);
-    const params = new URLSearchParams(searchParams.toString());
+    if (isLoading) console.log("Loading...");
+    const queryString = searchParams.toString();
+    const fullQuery = queryString ? `${baseQuery}?${queryString}` : baseQuery;
 
-    const queryArray: string[] = [];
-    params.forEach((value, key) => {
-      queryArray.push(`${key}=${value}`);
-    });
-    const queryString = queryArray.join("&");
-    const query = queryString ? `${baseQuery}?${queryString}` : baseQuery;
+    setQuery(fullQuery);
 
-    router.push(`?${queryString}`);
-
-    fetch(query)
-      .then((res) => res.json())
-      .then((data) => {
-        setBeats(data);
-        for (const beat of data) {
-          setWavesurferRef(beat);
-        }
-        setBeatsLoading(false);
-      });
+    router.replace(`?${queryString}`);
   }, [searchParams]);
 
   const createQueryString = (name: string, value: string) => {
@@ -99,16 +62,19 @@ export default function Beats() {
   };
 
   const onSearch = (value: string) => {
+    setSearch(value);
     router.push(`?${createQueryString("search", value)}`);
   };
 
   const onGenreChange = (selections: Set<string>) => {
     let selectedGenres = Array.from(selections).join(",");
+    setGenres(Array.from(selections));
     router.push(`?${createQueryString("genre", selectedGenres)}`);
   };
 
   const onBpmChange = (selections: Set<string>) => {
     let selectedBpms = Array.from(selections).join(",");
+    setBpms(Array.from(selections));
     router.push(`?${createQueryString("bpm", selectedBpms)}`);
   };
 
@@ -118,20 +84,21 @@ export default function Beats() {
     }
   };
 
-  
-
   return (
+
     <div className="flex flex-col items-center">
       <SearchFilterSection
-        genres={genres}
         onGenreChange={onGenreChange}
-        bpms={bpms}
         onBpmChange={onBpmChange}
         onSearch={onSearch}
-        initialSearch={initialSearch}
+        initialSearch={search!}
       />
 
-      <BeatList beats={beats} loading={beatsLoading} />
+      {(isLoading && !data && beats.length === 0 && search === "") && (
+        <Loading />
+      )}
+
+      {isLoading && !data ? <SkeletonBeatList beats={beats || [1,2,3,4,5,6,7,8]} /> : <BeatList beats={data || []} />}
 
       <Background />
     </div>

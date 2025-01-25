@@ -93,3 +93,35 @@ export const getDashboardStats = async () => {
   });
   return { totalBeats, totalOrders, totalUsers, totalRevenue };
 };
+
+export const getUniqueGenres = async () => {
+  const genres = await prisma.beat.findMany({
+    select: {
+      genre: true,
+    },
+    where: {
+      purchased: false,
+    },
+    orderBy: {
+      genre: "asc",
+    },
+    distinct: ["genre"],
+  });
+  return genres.map((beat) => beat.genre);
+};
+
+export const getUniqueBpms = async () => {
+  const bpms = await prisma.beat.findMany({
+    select: {
+      bpm: true,
+    },
+    where: {
+      purchased: false,
+    },
+    orderBy: {
+      bpm: "asc",
+    },
+    distinct: ["bpm"],
+  });
+  return bpms.map((beat) => beat.bpm);
+};

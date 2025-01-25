@@ -35,6 +35,7 @@ export default async function AdminNav() {
         </Link>
         <Link
           href="/dashboard/products"
+          prefetch={true}
           className={`${
             pathname == "/dashboard/products" || pathname == "/dashboard/products/new"
               ? "border-b-[3px] border-accentColor"

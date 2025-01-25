@@ -5,7 +5,6 @@ import { TypewriterEffectSmooth } from "@/components/ui/typewriter-effect";
 import Link from "next/link";
 import { flavorEntries } from "@catppuccin/palette";
 import { useTheme } from "next-themes";
-import Footer from "@/components/Footer";
 
 export default function Home() {
   const { theme, setTheme } = useTheme();
@@ -46,7 +45,7 @@ export default function Home() {
     <main className="flex flex-col items-center justify-start mx-auto h-screen">
       <TypewriterEffectSmooth
         words={words}
-        className="relative z-10 sm:mt-16 text-3xl"
+        className="relative z-10 mt-44 sm:mt-24 text-3xl"
       />
       <h1 className="relative z-10 text-sm sm:text-md md:text-lg text-text">
         Hip-Hop, Techno, House and more!
