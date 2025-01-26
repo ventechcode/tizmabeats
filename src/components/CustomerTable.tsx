@@ -38,16 +38,18 @@ import {
 
 type Customer = {
   id: string;
-  createdAt: Date;
-  email: string;
   name: string;
+  email: string;
+  createdAt: Date;
   address: string;
   orders: {
     id: string;
+    custom_id: string | null;
     createdAt: Date;
     updatedAt: Date;
-    price: number;
-    userId: string;
+    total: number;
+    status: string;
+    userId: string | null;
   }[];
 };
 
@@ -172,7 +174,7 @@ export default function CustomerTable({
                     <DialogDescription>
                       <div className="flex flex-row items-center justify-between">
                         <div className="flex gap-x-2">
-                          <p className="font-semibold">Total:</p> {order.price}€
+                          <p className="font-semibold">Total:</p> {order.total}€
                         </div>
                         <div className="flex gap-x-2">
                           <p className="font-semibold">Date:</p>{" "}
@@ -305,7 +307,8 @@ export default function CustomerTable({
               selectedKeys={[rowsPerPage.toString()]}
               onSelectionChange={(keys) => {
                 const selectedValue = Array.from(keys).map(Number)[0];
-                setRowsPerPage(selectedValue);
+                if (selectedValue) setRowsPerPage(selectedValue);
+                else setRowsPerPage(5);
               }}
               className="bg-crust rounded-lg"
               classNames={{

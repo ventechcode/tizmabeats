@@ -14,8 +14,21 @@ export async function POST(request: Request): Promise<NextResponse> {
     select: {
       id: true,
       stripePriceId: true,
-    }
+      price: true,
+      beatId: true,
+    },
   });
+
+  // Create order intent
+  const order = await prisma.order.create({
+    data: {
+      total: beatLicenses.reduce((acc, item) => acc + item.price, 0),
+      beats: {connect: beatLicenses.map((item: any) => ({id: item.beatId}))},
+      beatLicenses: {connect: beatLicenses.map((item: any) => ({id: item.id}))},
+    },
+  });
+
+  console.log("Order intent created", order);
 
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ["card", "klarna", "paypal"],
@@ -28,10 +41,10 @@ export async function POST(request: Request): Promise<NextResponse> {
     mode: "payment",
     success_url: `${request.headers.get(
       "origin"
-    )}/payments/success?session_id={CHECKOUT_SESSION_ID}`,
+    )}/payments/success?order_id=${order.id}`,
     cancel_url: `${request.headers.get("origin")}/payments/failure`,
     metadata: {
-      items: JSON.stringify(beatLicenses),
+      order_id: order.id,
     },
   });
 
@@ -42,7 +55,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
   const params = request.nextUrl.searchParams;
   const session_id = params.get("session_id");
   const session = await stripe.checkout.sessions.retrieve(session_id!);
-  const items = await JSON.parse(session.metadata!.items)
+  const items = await JSON.parse(session.metadata!.items);
 
   let products = [];
 
@@ -52,7 +65,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
       select: {
         id: true,
         price: true,
-        download: { select: { DownloadLink: true, url: true, id: true} },
+        download: { select: { DownloadLink: true, url: true, id: true } },
         beat: { select: { name: true } },
         licenseOption: { select: { name: true, contents: true } },
       },

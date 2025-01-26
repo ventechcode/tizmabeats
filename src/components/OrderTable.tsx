@@ -34,16 +34,17 @@ import {
   DialogClose,
   DialogTitle,
 } from "./ui/dialog";
+import { Beat } from "@/types";
 
 type Order = {
-  id: string;
   createdAt: Date;
-  price: number;
+  id: string;
+  total: number;
   user: {
     name: string;
     email: string;
-  };
-  beat: {
+  } | null;
+  beats: {
     id: string;
     name: string;
     producer: {
@@ -123,7 +124,7 @@ export default function CustomerTable({ orders }: { orders: Order[] }) {
     return [...items].sort((a: Order, b: Order) => {
       const first = a[sortDescriptor.column as keyof Order];
       const second = b[sortDescriptor.column as keyof Order];
-      const cmp = first < second ? -1 : first > second ? 1 : 0;
+      const cmp = first! < second! ? -1 : first! > second! ? 1 : 0;
       return sortDescriptor.direction === "descending" ? -cmp : cmp;
     });
   }, [sortDescriptor, items]);
@@ -147,20 +148,23 @@ export default function CustomerTable({ orders }: { orders: Order[] }) {
         case "createdAt":
           return formatDate(order.createdAt.toString());
         case "total":
-          return order.price.toString() + " EUR";
+          return order.total.toString() + " EUR";
         case "customer":
           return (
             <div className="flex flex-col">
-              <p className="text-md">{order.user.name}</p>
-              <p className="text-sm text-subtext0">{order.user.email}</p>
+              <p className="text-md">{order.user?.name}</p>
+              <p className="text-sm text-subtext0">{order.user?.email}</p>
             </div>
           );
         case "products":
           return (
             <div>
               <div className="flex flex-col space-y-2">
-                {order.beat.map((beat) => (
-                  <div key={beat.id} className="border hover:cursor-pointer w-full rounded-md bg-transparent text-subtext0 border-subtext0 hover:border-text hover:text-text duration-300">
+                {order.beats.map((beat) => (
+                  <div
+                    key={beat.id}
+                    className="border hover:cursor-pointer w-full rounded-md bg-transparent text-subtext0 border-subtext0 hover:border-text hover:text-text duration-300"
+                  >
                     <p className="text-[10px] px-2 py-1 sm:text-[11px] md:text-xs text-center truncate">
                       {beat.name}
                     </p>
@@ -173,8 +177,11 @@ export default function CustomerTable({ orders }: { orders: Order[] }) {
           return (
             <div>
               <div className="flex flex-col space-y-2">
-                {order.beat.map((beat) => (
-                  <div key={beat.id} className="border hover:cursor-pointer w-full rounded-md bg-transparent text-subtext0 border-subtext0 hover:border-text hover:text-text duration-300">
+                {order.beats.map((beat) => (
+                  <div
+                    key={beat.id}
+                    className="border hover:cursor-pointer w-full rounded-md bg-transparent text-subtext0 border-subtext0 hover:border-text hover:text-text duration-300"
+                  >
                     <p className="text-[10px] px-2 py-1 sm:text-[11px] md:text-xs text-center truncate">
                       {beat.producer.username}
                     </p>
@@ -291,7 +298,8 @@ export default function CustomerTable({ orders }: { orders: Order[] }) {
               selectedKeys={[rowsPerPage.toString()]}
               onSelectionChange={(keys) => {
                 const selectedValue = Array.from(keys).map(Number)[0];
-                setRowsPerPage(selectedValue);
+                if (selectedValue) setRowsPerPage(selectedValue);
+                else setRowsPerPage(5);
               }}
               className="bg-crust rounded-lg"
               classNames={{
@@ -383,11 +391,7 @@ export default function CustomerTable({ orders }: { orders: Order[] }) {
         {(column) => (
           <TableColumn
             key={column.uid}
-            align={
-              column.uid === "actions"
-                ? "center"
-                : "start"
-            }
+            align={column.uid === "actions" ? "center" : "start"}
             allowsSorting={column.sortable}
             onMouseEnter={() => column.sortable && setHoveredColumn(column.uid)}
             onMouseLeave={() => setHoveredColumn(null)}

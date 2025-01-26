@@ -73,7 +73,7 @@ export default function SignIn() {
   }
 
   return (
-    <div className="w-1/4 h-screen flex flex-col item-center justify-between mx-auto mt-[10%]">
+    <div className="w-1/2 sm:w-1/4 h-screen flex flex-col item-center justify-between mx-auto mt-[10%]">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <h1 className="py-2 font-semibold text-2xl">Sign In</h1>

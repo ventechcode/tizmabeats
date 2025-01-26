@@ -34,6 +34,8 @@ export async function GET(request: NextRequest) {
     );
   }
 
+  console.log(`Downloading ${download_id}`);
+
   const blob = await fetch(download.url);
   const blobData = await blob.blob();
 

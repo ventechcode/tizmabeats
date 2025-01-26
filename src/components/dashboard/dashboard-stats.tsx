@@ -42,7 +42,7 @@ export async function DashboardStats() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            ${totalRevenue._sum.price?.toFixed(2) || "0.00"}
+            ${totalRevenue._sum.total?.toFixed(2) || "0,00"}
           </div>
         </CardContent>
       </Card>

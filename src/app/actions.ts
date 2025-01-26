@@ -55,14 +55,14 @@ export const getOrders = async () => {
     select: {
       id: true,
       createdAt: true,
-      price: true,
+      total: true,
       user: {
         select: {
           email: true,
           name: true,
         },
       },
-      beat: {
+      beats: {
         select: {
           id: true,
           name: true,
@@ -88,40 +88,8 @@ export const getDashboardStats = async () => {
   const totalUsers = await prisma.user.count();
   const totalRevenue = await prisma.order.aggregate({
     _sum: {
-      price: true,
+      total: true,
     },
   });
   return { totalBeats, totalOrders, totalUsers, totalRevenue };
-};
-
-export const getUniqueGenres = async () => {
-  const genres = await prisma.beat.findMany({
-    select: {
-      genre: true,
-    },
-    where: {
-      purchased: false,
-    },
-    orderBy: {
-      genre: "asc",
-    },
-    distinct: ["genre"],
-  });
-  return genres.map((beat) => beat.genre);
-};
-
-export const getUniqueBpms = async () => {
-  const bpms = await prisma.beat.findMany({
-    select: {
-      bpm: true,
-    },
-    where: {
-      purchased: false,
-    },
-    orderBy: {
-      bpm: "asc",
-    },
-    distinct: ["bpm"],
-  });
-  return bpms.map((beat) => beat.bpm);
 };

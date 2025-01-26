@@ -35,8 +35,11 @@ model BeatLicense {
   beatId          String
   beat            Beat          @relation(fields: [beatId], references: [id], onDelete: Cascade)
   price           Float
+  pruchased       Boolean       @default(false)
   stripePriceId   String
   licenseOptionId String
+  orderId         String?
+  order           Order?        @relation("OrderBeatLicenses", fields: [orderId], references: [id], onDelete: SetNull)
   licenseOption   LicenseOption @relation(fields: [licenseOptionId], references: [id])
   download        Download?
 }
@@ -75,13 +78,16 @@ model User {
 }
 
 model Order {
-  id        String   @id @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  price     Float
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  beat      Beat[]   @relation("OrderBeats")
+  id           String        @id @default(uuid())
+  custom_id    String?       @unique
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  total        Float         @default(0)
+  status       String        @default("pending")
+  userId       String?
+  user         User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  beatLicenses BeatLicense[] @relation("OrderBeatLicenses")
+  beats        Beat[]        @relation("OrderBeats")
 }
 
 model Download {

@@ -256,7 +256,8 @@ export default function ProductTable({ products }: { products: Product[] }) {
               selectedKeys={[rowsPerPage.toString()]}
               onSelectionChange={(keys) => {
                 const selectedValue = Array.from(keys).map(Number)[0]
-                setRowsPerPage(selectedValue)
+                if (selectedValue) setRowsPerPage(selectedValue);
+                else setRowsPerPage(5);
               }}
               className="bg-crust rounded-lg"
               classNames={{

@@ -23,4 +23,6 @@ const WavyBackgroundWrapper = React.memo(() => {
   return <WavyBackground speed="slow" blur={5} backgroundFill={bgHexColor()} />;
 });
 
+WavyBackgroundWrapper.displayName = "WavyBackgroundWrapper";
+
 export default WavyBackgroundWrapper;
