@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { use, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import {
   Table,
@@ -74,6 +74,11 @@ export default function ProductTable({ products }: { products: Product[] }) {
   const [hoveredColumn, setHoveredColumn] = useState<string | null>(null)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    router.refresh()
+    router.prefetch("/dashboard/products/new")
+  }, [])
 
   const hasSearchFilter = Boolean(filterValue)
 

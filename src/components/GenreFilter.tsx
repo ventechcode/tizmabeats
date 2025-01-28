@@ -40,12 +40,12 @@ export default function GenreFilter({
           selectedKeys={"Loading..."}
           className="w-36 lg:w-64 rounded-lg text-text"
           classNames={{
-            listboxWrapper: "bg-surface0 rounded-lg",
-            mainWrapper: "bg-surface0 rounded-lg",
-            label: "mb-5 text-text",
-            value: "text-subtext0",
-            listbox:
-              "bg-surface0 rounded-lg overflow-y-auto h-full text-subtext0",
+            mainWrapper: "bg-surface0 rounded-lg h-10 md:h-14 ",
+            label: "mb-8 md:mb-5 text-sm md:text-lg",
+            value: "text-subtext0 text-xs md:text-[1rem] mb-4 md:mb-0",
+            selectorIcon: "mb-3 md:mb-0",
+            popoverContent:
+              "bg-surface0 rounded-lg text-subtext0 overflow-y-auto h-full",
           }}
         >
           <SelectItem key={"loading"}>Loading...</SelectItem>
@@ -58,9 +58,10 @@ export default function GenreFilter({
           selectedKeys={values}
           className="w-36 lg:w-64 rounded-lg text-text"
           classNames={{
-            mainWrapper: "bg-surface0 rounded-lg",
-            label: "mb-5 text-text",
-            value: "text-subtext0",
+            mainWrapper: "bg-surface0 rounded-lg h-10 md:h-14 ",
+            label: "mb-8 md:mb-5 text-sm md:text-lg",
+            value: "text-subtext0 text-xs md:text-[1rem] mb-4 md:mb-0",
+            selectorIcon: "mb-3 md:mb-0",
             popoverContent:
               "bg-surface0 rounded-lg text-subtext0 overflow-y-auto h-full",
           }}

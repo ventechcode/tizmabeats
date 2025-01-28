@@ -7,7 +7,7 @@ const {
 } = require("tailwindcss/lib/util/flattenColorPalette");
 
 const config: Config = {
-  darkMode: "class",  
+  darkMode: "class",
   presets: [require("@catppuccin/tailwindcss")],
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -18,10 +18,10 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        'accentColor': '#89b4fa',
-        'primary': '#89b4fa', 
-        'mocha-red': '#f38ba8',
-        'mocha-green': '#a6e3a1',
+        accentColor: "#89b4fa",
+        primary: "#89b4fa",
+        "mocha-red": "#f38ba8",
+        "mocha-green": "#a6e3a1",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
@@ -30,6 +30,14 @@ const config: Config = {
       },
       animation: {
         shimmer: "shimmer 2s linear infinite",
+        hide: "hide 150ms cubic-bezier(0.16, 1, 0.3, 1)",
+        slideDownAndFade:
+          "slideDownAndFade 150ms cubic-bezier(0.16, 1, 0.3, 1)",
+        slideLeftAndFade:
+          "slideLeftAndFade 150ms cubic-bezier(0.16, 1, 0.3, 1)",
+        slideUpAndFade: "slideUpAndFade 150ms cubic-bezier(0.16, 1, 0.3, 1)",
+        slideRightAndFade:
+          "slideRightAndFade 150ms cubic-bezier(0.16, 1, 0.3, 1)",
       },
       keyframes: {
         shimmer: {
@@ -40,13 +48,30 @@ const config: Config = {
             backgroundPosition: "-200% 0",
           },
         },
+        hide: { from: { opacity: "1" }, to: { opacity: "0" } },
+        slideDownAndFade: {
+          from: { opacity: "0", transform: "translateY(-6px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        slideLeftAndFade: {
+          from: { opacity: "0", transform: "translateX(6px)" },
+          to: { opacity: "1", transform: "translateX(0)" },
+        },
+        slideUpAndFade: {
+          from: { opacity: "0", transform: "translateY(6px)" },
+          to: { opacity: "1", transform: "translateY(0)" },
+        },
+        slideRightAndFade: {
+          from: { opacity: "0", transform: "translateX(-6px)" },
+          to: { opacity: "1", transform: "translateX(0)" },
+        },
       },
     },
   },
   plugins: [
     require("@catppuccin/tailwindcss")({
       prefix: false,
-      defaultTheme: "mocha"
+      defaultTheme: "mocha",
     }),
     function ({ matchUtilities, theme }: any) {
       const flattenColorPalette = (colorPalette: any) => {

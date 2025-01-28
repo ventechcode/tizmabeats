@@ -10,8 +10,6 @@ import Background from "@/components/Background";
 import useSWR from "swr";
 import SkeletonBeatList from "@/components/SkeletonBeatList";
 import Loading from "../loading";
-import { set } from "zod";
-
 export default function BeatsPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -21,10 +19,6 @@ export default function BeatsPage() {
   const [query, setQuery] = useState(baseQuery);
   const [beats, setBeats] = useState<Beat[]>([]);
   const [search, setSearch] = useState(searchParams.get("search") || null);
-  const [genres, setGenres] = useState([searchParams.get("genre") || null]);
-  const [bpms, setBpms] = useState([searchParams.get("bpm") || null]);
-
-  const [initialLoading, setInitialLoading] = useState(true);
   
   const { data, isLoading } = useSWR(query, async (query) => {
     const res = await fetch(query);
@@ -35,10 +29,6 @@ export default function BeatsPage() {
     setBeats(data);
     return data;
   });
-
-  useEffect(() => {
-    setInitialLoading(false);
-  }, []);
 
   // Fetch data whenever queryParams changes
   useEffect(() => {
@@ -68,13 +58,11 @@ export default function BeatsPage() {
 
   const onGenreChange = (selections: Set<string>) => {
     let selectedGenres = Array.from(selections).join(",");
-    setGenres(Array.from(selections));
     router.push(`?${createQueryString("genre", selectedGenres)}`);
   };
 
   const onBpmChange = (selections: Set<string>) => {
     let selectedBpms = Array.from(selections).join(",");
-    setBpms(Array.from(selections));
     router.push(`?${createQueryString("bpm", selectedBpms)}`);
   };
 
@@ -85,7 +73,6 @@ export default function BeatsPage() {
   };
 
   return (
-
     <div className="flex flex-col items-center">
       <SearchFilterSection
         onGenreChange={onGenreChange}

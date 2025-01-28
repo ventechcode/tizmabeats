@@ -24,18 +24,18 @@ export default function RootLayout({
   return (
     <html>
       <head>
-      <link rel="preload" href="/api/beats" as="fetch"></link>
+        <link rel="preload" href="/api/beats" as="fetch"></link>
       </head>
       <body className={`${inter.className} bg-base text-text`}>
-        <main className="flex flex-col justify-between">
-          <SpeedInsights />
-          <Providers>
-            <Nav className="z-50 bg-crust relative w-full" />
-            <div className="flex-grow h-screen">{children}</div>
-            <AudioPlayerWrapper />
+        <SpeedInsights />
+        <Providers>
+          <main className="flex flex-col justify-between min-h-screen">
+            <Nav className="z-50 bg-crust w-full relative" />
+            <div className="flex-1 pb-16">{children}</div>
             <MyFooter />
-          </Providers>
-        </main>
+          </main>
+          <AudioPlayerWrapper />
+        </Providers>
       </body>
     </html>
   );

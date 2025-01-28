@@ -22,7 +22,7 @@ export function Nav({ className }: { className?: string }) {
             <div className="flex items-center justify-start">
               <div className="sm:hidden">
                 {/* Mobile menu button*/}
-                <DisclosureButton className="inline-flex items-center justify-center p-2 rounded-md text-text hover:text-accentColor focus:outline-none">
+                <DisclosureButton className="flex flex-col items-center justify-center p-2 rounded-md text-text hover:text-accentColor focus:outline-none">
                   <span className="sr-only">Open main menu</span>
                   {open ? (
                     <svg
@@ -78,16 +78,26 @@ export function Nav({ className }: { className?: string }) {
               <ShoppingCart />
             </div>
           </div>
-
+          
           <DisclosurePanel className="sm:hidden">
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              <NavLink href="/beats">Beats</NavLink>
-              <NavLink href="/beat-bundles">Beat-Bundles</NavLink>
-              <NavLink href="/contact">Contact</NavLink>
-              {session.data?.user && (
-                <NavLink href="/dashboard">Dashboard</NavLink>
-              )}
-            </div>
+            {({ close }) => (
+              <div className="flex flex-col flex-wrap px-2 pt-2 pb-3 space-y-1 w-max">
+                <NavLink href="/beats" onClick={() => close()}>
+                  Beats
+                </NavLink>
+                <NavLink href="/beat-bundles" onClick={() => close()}>
+                  Beat-Bundles
+                </NavLink>
+                <NavLink href="/contact" onClick={() => close()}>
+                  Contact
+                </NavLink>
+                {session.data?.user && (
+                  <NavLink href="/dashboard" onClick={() => close()}>
+                    Dashboard
+                  </NavLink>
+                )}
+              </div>
+            )}
           </DisclosurePanel>
         </>
       )}
@@ -102,6 +112,9 @@ export function NavLink(props: ComponentProps<typeof Link>) {
   return (
     <Link
       {...props}
+      onClick={(e) => {
+        props.onClick?.(e); 
+      }}
       className={`py-1 px-2 mx-1 md:mx-3 ${
         isActive ? "bg-text text-mantle" : "text-text bg-crust"
       } text-md lg:text-lg hover:text-mantle hover:bg-text rounded-lg hover:rounded-lg hover:duration-500 uppercase font-bold whitespace-nowrap`}

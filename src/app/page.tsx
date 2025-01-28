@@ -42,10 +42,10 @@ export default function Home() {
   };
 
   return (
-    <main className="flex flex-col items-center justify-start mx-auto h-screen">
+    <main className="flex flex-col items-center justify-start mx-auto">
       <TypewriterEffectSmooth
         words={words}
-        className="relative z-10 mt-44 sm:mt-24 text-3xl"
+        className="z-10 relative mt-44 sm:mt-24"
       />
       <h1 className="relative z-10 text-sm sm:text-md md:text-lg text-text">
         Hip-Hop, Techno, House and more!

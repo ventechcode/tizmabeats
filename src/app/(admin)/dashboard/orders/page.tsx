@@ -2,6 +2,9 @@ import { getOrders } from "@/app/actions";
 import DashboardHeader from "@/components/dashboard/dashboard-header";
 import OrderTable from "@/components/OrderTable";
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0;
+
 export default async function OrdersPage() {
   const orders = await getOrders();
   return (

@@ -2,6 +2,9 @@ import { getCustomers } from "@/app/actions";
 import CustomerTable from "@/components/CustomerTable";
 import DashboardHeader from "@/components/dashboard/dashboard-header";
 
+export const dynamic = 'force-dynamic'
+export const revalidate = 0;
+
 export default async function CustomersPage() {
   const customers = await getCustomers();
   return (

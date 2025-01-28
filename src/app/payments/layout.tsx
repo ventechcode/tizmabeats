@@ -6,7 +6,7 @@ export default function PaymentsLayout({
   return (
     <main className="flex items-center justify-center min-h-screen">
       {children}
-      <BackgroundBeams />
+      {/* <BackgroundBeams /> has caused 100% cpu usage at least in dev */} 
     </main>
   );
 }

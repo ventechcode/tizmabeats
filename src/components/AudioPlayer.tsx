@@ -111,11 +111,15 @@ export default function AudioPlayer() {
       });
 
       audioPlayer.beat?.wavesurferRef.current.on("interaction", () => {
-        setElapsedTime(audioPlayer.beat?.wavesurferRef.current.getCurrentTime() || 0);
+        setElapsedTime(
+          audioPlayer.beat?.wavesurferRef.current.getCurrentTime() || 0
+        );
       });
 
       audioPlayer.beat?.wavesurferRef.current.on("audioprocess", () => {
-        setElapsedTime(audioPlayer.beat?.wavesurferRef.current.getCurrentTime() || 0);
+        setElapsedTime(
+          audioPlayer.beat?.wavesurferRef.current.getCurrentTime() || 0
+        );
       });
 
       // Start playback as soon as WaveSurfer is ready
@@ -197,38 +201,85 @@ export default function AudioPlayer() {
       <audio ref={audioRef} className="hidden"></audio>
       <div className="flex flex-row flex-wrap items-center w-1/5">
         <div className="ml-3">
-          <p className="font-semibold truncate overflow-hidden">{audioPlayer.beat?.name}</p>
-          <div className="text-[12px] sm:text-sm">{audioPlayer.beat?.genre}</div>
+          <p className="font-semibold truncate overflow-hidden">
+            {audioPlayer.beat?.name}
+          </p>
+          <div className="text-[12px] sm:text-sm">
+            {audioPlayer.beat?.genre}
+          </div>
         </div>
       </div>
 
-      <div className="w-8 pr-4 sm:pr-12 text-sm sm:text-text">
-        {formatTime(elapsedTime)}
+      <div className="flex flex-row items-center justify-center sm:w-full self-justify-center">
+        <div className="w-8 sm:pr-12 text-sm sm:text-text">
+          {formatTime(elapsedTime)}
+        </div>
+
+        <div id="waveform" className="w-3/5 hidden sm:block"></div>
+
+        <button
+          onClick={() => {
+            if (audioPlayer?.isPlaying(audioPlayer.beat!)) {
+              audioPlayer?.pause(audioPlayer.beat!);
+            } else {
+              audioPlayer?.play(audioPlayer.beat!);
+            }
+          }}
+          className="text-text hover:text-accentColor transition-colors flex-shrink-0 sm:hidden px-2"
+        >
+          {audioPlayer?.isPlaying(audioPlayer.beat!) ? (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="w-12 h-12"
+            >
+              <path
+                fillRule="evenodd"
+                d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12ZM9 8.25a.75.75 0 0 0-.75.75v6c0 .414.336.75.75.75h.75a.75.75 0 0 0 .75-.75V9a.75.75 0 0 0-.75-.75H9Zm5.25 0a.75.75 0 0 0-.75.75v6c0 .414.336.75.75.75H15a.75.75 0 0 0 .75-.75V9a.75.75 0 0 0-.75-.75h-.75Z"
+                clipRule="evenodd"
+              />
+            </svg>
+          ) : (
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="w-12 h-12"
+            >
+              <path
+                fillRule="evenodd"
+                d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12Zm14.024-.983a1.125 1.125 0 0 1 0 1.966l-5.603 3.113A1.125 1.125 0 0 1 9 15.113V8.887c0-.857.921-1.4 1.671-.983l5.603 3.113Z"
+                clipRule="evenodd"
+              />
+            </svg>
+          )}
+        </button>
+
+        <div className="w-8 sm:pl-4 text-sm sm:text-text">
+          {formatTime(metadata.duration)}
+        </div>
       </div>
 
-      <div id="waveform" className="w-3/5"></div>
+      <div className="flex flex-row items-center space-x-2">
+        <div className="sm:w-24 md:w-32 ml-10 hidden md:flex flex-row items-center space-x-2">
+          {getVolumeIcon()}
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={volume}
+            onChange={handleVolumeChange}
+            className="range range-xs range-primary text-text"
+            aria-label="Volume control"
+          />
+        </div>
 
-      <div className="w-8 pl-2 sm:pl-4 text-sm sm:text-text">
-        {formatTime(metadata.duration)}
-      </div>
-
-      <div className="sm:w-24 md:w-32 ml-10 hidden md:flex flex-row items-center space-x-2">
-        {getVolumeIcon()}
-        <input
-          type="range"
-          min={0}
-          max={100}
-          value={volume}
-          onChange={handleVolumeChange}
-          className="range range-xs range-primary text-text"
-          aria-label="Volume control"
+        <HiMiniXMark
+          className="text-text cursor-pointer ml-8 sm:ml-24 hover:text-accentColor duration-300"
+          onClick={() => audioPlayer.stop()}
         />
       </div>
-
-      <HiMiniXMark
-        className="text-text cursor-pointer ml-8 sm:ml-24 hover:text-accentColor duration-300"
-        onClick={() => audioPlayer.stop()}
-      />
     </div>
   );
 }

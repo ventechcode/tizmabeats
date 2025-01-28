@@ -11,13 +11,14 @@ import {
   TableProperties,
   Settings,
 } from "lucide-react";
+import { Tooltip } from "@/components/ui/tooltip";
 
 export default function AdminNav() {
   const pathname = usePathname();
 
   return (
     <nav className="flex items-center py-4 pl-10 bg-mantle w-full">
-      <div className="flex items-center space-x-4">
+      <div className="flex items-center justify-between lg:justify-start space-x-4 w-2/3 lg:w-auto">
         <Link
           href="/dashboard"
           className={`${
@@ -28,21 +29,22 @@ export default function AdminNav() {
         >
           <div className="flex gap-x-2 items-center justify-center">
             <LayoutDashboard />
-            <p className="font-semibold uppercase">Dashboard</p>
+            <p className="hidden md:block font-semibold uppercase">Dashboard</p>
           </div>
         </Link>
         <Link
           href="/dashboard/products"
           prefetch={true}
           className={`${
-            pathname == "/dashboard/products" || pathname == "/dashboard/products/new"
+            pathname == "/dashboard/products" ||
+            pathname == "/dashboard/products/new"
               ? "border-b-[3px] border-accentColor"
               : "hover:border-subtext0 hover:border-b-2 hover:text-subtext0"
           } h-8`}
         >
           <div className="flex gap-x-2 items-center justify-center">
             <PackageSearch />
-            <p className="font-semibold uppercase">Products</p>
+            <p className="hidden md:block font-semibold uppercase">Products</p>
           </div>
         </Link>
         <Link
@@ -55,7 +57,7 @@ export default function AdminNav() {
         >
           <div className="flex gap-x-2 items-center justify-center">
             <Users />
-            <p className="font-semibold uppercase">Customers</p>
+            <p className="hidden md:block font-semibold uppercase">Customers</p>
           </div>
         </Link>
         <Link
@@ -68,7 +70,7 @@ export default function AdminNav() {
         >
           <div className="flex gap-x-2 items-center justify-center">
             <TableProperties />
-            <p className="font-semibold uppercase">Orders</p>
+            <p className="hidden md:block font-semibold uppercase">Orders</p>
           </div>
         </Link>
         <Link
@@ -81,17 +83,19 @@ export default function AdminNav() {
         >
           <div className="flex gap-x-2 items-center justify-center">
             <Settings />
-            <p className="font-semibold uppercase">Settings</p>
+            <p className="hidden md:block font-semibold uppercase">Settings</p>
           </div>
         </Link>
       </div>
 
       {/* Add ml-auto directly to push the logout icon */}
       <div className="ml-auto flex items-center gap-x-12">
-        <TbLogout
-          className="scale-150 text-2xl cursor-pointer mr-6 hover:text-accentColor duration-300 tooltip:logout"
-          onClick={() => signOut({ callbackUrl: "/auth/signin" })}
-        />
+        <Tooltip content="Logout" side="left" className="hidden sm:block">
+          <TbLogout
+            className="scale-125 md:scale-150 text-2xl cursor-pointer mr-6 hover:text-accentColor duration-300 tooltip:logout"
+            onClick={() => signOut({ callbackUrl: "/auth/signin" })}
+          />
+        </Tooltip>
       </div>
     </nav>
   );

@@ -1,207 +1,136 @@
 import {
   Body,
   Container,
-  Column,
   Head,
   Heading,
   Hr,
   Html,
-  Img,
   Link,
   Preview,
-  Row,
-  Section,
+  Tailwind,
   Text,
-} from "@react-email/components"
-import * as React from "react"
+} from "@react-email/components";
+import * as React from "react";
 
 interface OrderConfirmationEmailProps {
-  userName: string
-  orderId: string
-  beatLinceses: any
-  userEmail: string
+  userName: string;
+  orderId: string;
+  beatLinceses: any;
 }
 
-export const OrderConfirmationEmail = ({ userName, orderId, beatLinceses, userEmail }: OrderConfirmationEmailProps) => {
-  const previewText = `Thanks for your purchase, ${userName.split(" ")[0]}!`
+export const OrderConfirmationEmail = ({
+  userName,
+  orderId,
+  beatLinceses,
+}: OrderConfirmationEmailProps) => {
+  const previewText = `Thanks for your purchase, ${userName.split(" ")[0]}!`;
 
   return (
-    <Html>
-      <Head />
-      <Preview>{previewText}</Preview>
-      <Body style={main}>
-        <Container style={container}>
-          <Section style={box}>
-            <Row style={{ ...boxContent, alignItems: "center", justifyContent: "center" }}>
-              <Column style={{ width: "100%", textAlign: "center" as const }}>
-                <Img
-                  src="https://react-email-demo-ijnnx5hul-resend.vercel.app/static/vercel-icon.png"
-                  width="40"
-                  height="40"
-                  alt="Checkmark"
-                  style={{ display: "inline", marginRight: "12px" }}
-                />
-                <Heading as="h1" style={headingGreen}>
-                  Payment Successful
-                </Heading>
-              </Column>
-            </Row>
-            <Text style={{ ...paragraph, textAlign: "center" }}>{previewText}</Text>
-            <Row style={orderInfo}>
-              <Column>
-                <Text style={orderInfoLabel}>Order:</Text>
-              </Column>
-              <Column align="right">
-                <Text style={orderInfoValue}>#{orderId}</Text>
-              </Column>
-            </Row>
-            <Hr style={hr} />
-            <Row style={tableHeader}>
-              <Column>
-                <Text style={tableHeaderText}>Item</Text>
-              </Column>
-              <Column>
-                <Text style={{ ...tableHeaderText, textAlign: "center" as const }}>Amount</Text>
-              </Column>
-              <Column align="right">
-                <Text style={tableHeaderText}>Product</Text>
-              </Column>
-            </Row>
-            <Hr style={hr} />
-            {beatLinceses.map((item: any) => (
-              <Row key={item.id} style={tableRow}>
-                <Column>
-                  <Text style={beatName}>{item.beat.name}</Text>
-                  <Text style={licenseName}>{item.licenseOption.name}-License</Text>
-                </Column>
-                <Column>
-                  <Text style={{ ...beatPrice, textAlign: "center" as const }}>{item.price}€</Text>
-                </Column>
-                <Column align="right">
-                  <Link style={downloadLink} href={`http://localhost:3000/api/download?id=${item.download.id}`}>
+    <Tailwind
+      config={{
+        darkMode: "class",
+        plugins: [
+          require("@catppuccin/tailwindcss")({
+            prefix: false,
+            defaultTheme: "mocha",
+          }),
+        ],
+        theme: {
+          extend: {
+            colors: {
+              base: "#f9f9f9",
+              mantle: "#f5f5f5",
+              crust: "#f9a826",
+              text: "#333333",
+              subtext0: "#4f4f4f",
+            },
+            fontFamily: {
+              sans: ["Inter", "sans-serif"],
+            },
+          },
+        },
+      }}
+    >
+      <Html>
+        <Head />
+        <Preview>{previewText}</Preview>
+        <Body className="bg-mantle font-sans">
+          <Container className="bg-base mx-auto my-0 p-5 pb-12 mb-16 max-w-3xl rounded-lg shadow-sm">
+            <div className="px-12 py-10 border border-gray-200 rounded-lg">
+              <div className="flex items-center justify-center mb-6">
+                <div className="text-center w-full">
+                  <Heading className="text-text text-2xl font-semibold mt-4 mb-2">
+                    Order Confirmation
+                  </Heading>
+                </div>
+              </div>
+
+              <Text className="text-text text-base leading-6 text-center mb-6">
+                {previewText}
+              </Text>
+
+              <div className="flex justify-between mb-4">
+                <Text className="text-subtext0 text-xs font-semibold">
+                  Order:
+                </Text>
+                <Text className="text-subtext0 text-xs font-semibold">
+                  #{orderId}
+                </Text>
+              </div>
+
+              <Hr className="border-t border-gray-200 my-4" />
+
+              <div className="flex justify-between mb-4">
+                <Text className="text-gray-500 text-xs font-semibold">
+                  Item
+                </Text>
+                <Text className="text-gray-500 text-xs font-semibold text-center">
+                  Amount
+                </Text>
+                <Text className="text-gray-500 text-xs font-semibold text-right">
+                  Product
+                </Text>
+              </div>
+
+              <Hr className="border-t border-gray-200 my-4" />
+
+              {beatLinceses.map((item: any) => (
+                <div
+                  key={item.id}
+                  className="flex justify-between items-start mb-4"
+                >
+                  <div className="flex-1">
+                    <Text className="text-gray-900 text-base font-medium">
+                      {item.beat.name}
+                    </Text>
+                    <Text className="text-gray-500 text-sm mt-1">
+                      {item.licenseOption.name}-License
+                    </Text>
+                  </div>
+                  <Text className="text-[#525f7f] text-sm font-medium mx-4">
+                    {item.price}€
+                  </Text>
+                  <Link
+                    href={`http://localhost:3000/api/download?id=${item.download.id}`}
+                    className="text-blue-500 text-sm no-underline hover:underline"
+                  >
                     Download
                   </Link>
-                </Column>
-              </Row>
-            ))}
-            <Hr style={hr} />
-            <Text style={paragraph}>
-              Order confirmation has been sent to{" "}
-              <Link href={`mailto:${userEmail}`} style={link}>
-                {userEmail}
+                </div>
+              ))}
+
+              <Link
+                href={`http://localhost:3000/orders/${orderId}`}
+                className="bg-crust text-text text-center text-sm font-semibold rounded-lg py-2 px-4 mt-6 inline-block"
+              >
+                View Order
               </Link>
-              .
-            </Text>
-            <Text style={paragraph}>You can also download the files later from your email.</Text>
-            <Text style={paragraph}>Links will expire after 72 hours.</Text>
-          </Section>
-        </Container>
-      </Body>
-    </Html>
-  )
-}
+            </div>
+          </Container>
+        </Body>
+      </Html>
+    </Tailwind>
+  );
+};
 
-export default OrderConfirmationEmail
-
-const main = {
-  backgroundColor: "#f6f9fc",
-  fontFamily: '-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Ubuntu,sans-serif',
-}
-
-const container = {
-  backgroundColor: "#ffffff",
-  margin: "0 auto",
-  padding: "20px 0 48px",
-  marginBottom: "64px",
-}
-
-const box = {
-  padding: "0 48px",
-}
-
-const boxContent = {
-  border: "1px solid #e6ebf1",
-  borderRadius: "8px",
-  padding: "40px 48px",
-}
-
-const headingGreen = {
-  color: "#22c55e",
-  fontSize: "24px",
-  fontWeight: "600",
-  lineHeight: "1.3",
-  margin: "16px 0",
-}
-
-const paragraph = {
-  color: "#525f7f",
-  fontSize: "16px",
-  lineHeight: "24px",
-  textAlign: "left" as const,
-}
-
-const orderInfo = {
-  margin: "16px 0",
-}
-
-const orderInfoLabel = {
-  color: "#8898aa",
-  fontSize: "12px",
-  fontWeight: "600",
-}
-
-const orderInfoValue = {
-  color: "#525f7f",
-  fontSize: "12px",
-  fontWeight: "600",
-}
-
-const hr = {
-  borderColor: "#e6ebf1",
-  margin: "16px 0",
-}
-
-const tableHeader = {
-  margin: "16px 0",
-}
-
-const tableHeaderText = {
-  color: "#8898aa",
-  fontSize: "12px",
-  fontWeight: "600",
-}
-
-const tableRow = {
-  margin: "16px 0",
-}
-
-const beatName = {
-  color: "#1a1a1a",
-  fontSize: "16px",
-  fontWeight: "500",
-  margin: "0",
-}
-
-const licenseName = {
-  color: "#8898aa",
-  fontSize: "14px",
-  margin: "4px 0 0",
-}
-
-const beatPrice = {
-  color: "#525f7f",
-  fontSize: "14px",
-  fontWeight: "500",
-}
-
-const downloadLink = {
-  color: "#3b82f6",
-  fontSize: "14px",
-  textDecoration: "none",
-}
-
-const link = {
-  color: "#3b82f6",
-  textDecoration: "none",
-}
-
+export default OrderConfirmationEmail;

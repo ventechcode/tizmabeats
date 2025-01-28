@@ -8,7 +8,7 @@ function AdminLayout({
 }>) {
 
   return (
-    <main className="min-h-screen bg-base">
+    <main className="bg-base text-text">
       <AdminNav />
       {children}
     </main>

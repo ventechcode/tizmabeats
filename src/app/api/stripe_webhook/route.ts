@@ -112,7 +112,6 @@ export async function POST(request: NextRequest) {
           react: OrderConfirmationEmail({
             userName: user.name,
             orderId: order_id,
-            userEmail: user.email,
             beatLinceses: order.beatLicenses,
           }),
         });

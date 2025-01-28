@@ -1,6 +1,7 @@
 "use server";
 
 import prisma from "@/utils/prisma";
+import { revalidatePath } from "next/cache";
 
 export async function getProducts() {
   const products = await prisma.beat.findMany({
