@@ -8,6 +8,7 @@ frontend:
       commands:
         - npm run build
         - env | grep -e AUTH_SECRET -e JWT_SECRET -e AUTH_TRUST_HOST >> .env
+        - echo "NEXTAUTH_URL=https://amplify-integration.d3fvo4240q2ts6.amplifyapp.com" >> .env
   artifacts:
     baseDirectory: .next
     files:
