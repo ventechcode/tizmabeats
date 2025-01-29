@@ -45,9 +45,12 @@ const formSchema = z.object({
 interface NewProductFormProps {
   licenseOptions: {
     id: string;
+    createdAt: Date;
+    updatedAt: Date;
     name: string;
     basePrice: number;
-    contents: string;
+    contents: string[];
+    usageTerms: string[];
   }[];
 }
 
