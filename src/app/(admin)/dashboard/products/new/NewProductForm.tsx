@@ -47,7 +47,7 @@ interface NewProductFormProps {
     id: string;
     name: string;
     basePrice: number;
-    contents: string[];
+    contents: string;
   }[];
 }
 
