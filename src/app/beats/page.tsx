@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import BeatList from "@/components/BeatList";
 import { useGlobalAudioPlayer } from "@/hooks/useAudioPlayer";
-import Background from "@/components/Background";
 import useSWR from "swr";
 import SkeletonBeatList from "@/components/SkeletonBeatList";
 import Loading from "../loading";
@@ -86,8 +85,6 @@ export default function BeatsPage() {
       )}
 
       {isLoading && !data ? <SkeletonBeatList beats={beats || [1,2,3,4,5,6,7,8]} /> : <BeatList beats={data || []} />}
-
-      <Background />
     </div>
   );
 }

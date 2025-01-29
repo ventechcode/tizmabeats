@@ -1,5 +1,3 @@
-import { BackgroundBeams } from "@/components/ui/background-beams";
-
 export default function PaymentsLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
