@@ -19,7 +19,6 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import { revalidatePath } from "next/cache";
 
 const licenseSchema = z.object({
   id: z.string(),
@@ -533,7 +532,7 @@ export default function NewProductForm({
                     <FormControl>
                       <Input
                         type="file"
-                        accept="audio/mp3"
+                        accept="audio/*"
                         className="text-text border-text"
                         placeholder="Select audio file"
                         ref={inputFileRef}

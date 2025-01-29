@@ -10,7 +10,6 @@ import { ShoppingCartContext } from "@/app/providers";
 import { useContext, useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
 import { Beat } from "@/types";
-import { Button } from "./ui/button";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY as string
@@ -141,17 +140,17 @@ export default function ShoppingCart() {
               (incl. taxes and shipping costs)
             </p>
           </div>
-          <Button
+          <button
             disabled={shoppingCart?.cart.length == 0}
             onClick={handleCheckout}
-            className="ml-auto"
+            className="ml-2 sm:ml-4 h-12 w-24 sm:h-14 sm:w-32 animate-shimmer flex items-center justify-center rounded-md border border-slate-800 bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] px-6 font-medium text-[#4c4f69] transition-colors focus:outline-none hover:text-[#cdd6f4] "
           >
             {isLoading ? (
               <span className="loading loading-dots loading-md text-text"></span>
             ) : (
               "Checkout"
             )}
-          </Button>
+          </button>
         </div>
       </SheetContent>
     </Sheet>

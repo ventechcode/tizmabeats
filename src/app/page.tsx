@@ -1,23 +1,49 @@
 import Link from "next/link";
+import { flavorEntries } from "@catppuccin/palette";
+import {
+  TypewriterEffect,
+  TypewriterEffectSmooth,
+} from "@/components/ui/typewriter-effect";
 
 export default function Home() {
+  const words = [
+    {
+      text: "Create",
+    },
+    {
+      text: "awesome",
+    },
+    {
+      text: "projects",
+    },
+    {
+      text: "with",
+    },
+    {
+      text: "our",
+    },
+    {
+      text: "Beats.",
+      className: "text-accentColor",
+    },
+  ];
+
   return (
-    <main className="flex flex-col items-center justify-center space-y-2 mt-32">
-      <h1 className="relative z-10 text-lg md:text-2xl">
-        Create awesome projects with our beats
-      </h1>
-      <h2 className="relative z-10 text-sm sm:text-md md:text-lg text-subtext0">
+    <main className="flex flex-col items-center justify-center space-y-5 py-20">
+      <TypewriterEffect words={words} />
+      <h1 className="relative z-10 text-sm sm:text-md md:text-lg text-subtext0">
         Hip-Hop, Techno, House and more!
-      </h2>
-      <div className="bg-text text-crust hover:text-text hover:bg-crust duration-300 p-2 rounded-lg mt-4">
-        <Link
-          href="/beats"
-          prefetch={true}
-          className="p-[3px] relative z-10 mt-5"
-        >
+      </h1>
+      <Link
+        href="/beats"
+        prefetch={true}
+        className="p-[3px] relative z-10 mt-5"
+      >
+        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-lg" />
+        <div className="px-8 py-2 sm:bg-base rounded-[6px] hover:text-white relative group transition duration-500 text-white sm:text-text hover:bg-transparent">
           Explore Beats
-        </Link>
-      </div>
+        </div>
+      </Link>
     </main>
   );
 }
