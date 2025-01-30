@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { flavorEntries } from "@catppuccin/palette";
 import {
   TypewriterEffect,
   TypewriterEffectSmooth,
 } from "@/components/ui/typewriter-effect";
+import Background from "@/components/Background";
 
 export default function Home() {
   const words = [
@@ -30,7 +30,7 @@ export default function Home() {
 
   return (
     <main className="flex flex-col items-center justify-center space-y-5 py-20">
-      <TypewriterEffect words={words} />
+      <TypewriterEffect words={words} className="z-50" />
       <h1 className="relative z-10 text-sm sm:text-md md:text-lg text-subtext0">
         Hip-Hop, Techno, House and more!
       </h1>
@@ -44,6 +44,7 @@ export default function Home() {
           Explore Beats
         </div>
       </Link>
+      <Background />
     </main>
   );
 }

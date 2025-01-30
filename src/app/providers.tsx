@@ -2,7 +2,7 @@
 
 import { Beat } from "@/types";
 import { SessionProvider } from "next-auth/react";
-import { ThemeProvider } from "next-themes";
+import { ThemeProvider, useTheme } from "next-themes";
 import { createContext, useState, useEffect } from "react";
 import { AudioPlayerProvider } from "@/hooks/useAudioPlayer";
 
@@ -49,6 +49,7 @@ export function ShoppingCartProvider({ children }: any) {
     }
   }, [cart, initialized]);
 
+
   const addToCart = (item: any) =>
     setCart((prev) => {
       console.log(item);
@@ -88,16 +89,46 @@ export function ShoppingCartProvider({ children }: any) {
 
 export { ShoppingCartContext };
 
+function InitialThemeSetter() {
+  const { resolvedTheme, setTheme } = useTheme();
+
+  useEffect(() => {
+    // Ensure correct theme mapping on first load
+    if (resolvedTheme === "light") {
+      setTheme("latte");
+    } else if (resolvedTheme === "dark") {
+      setTheme("mocha");
+    }
+
+    // Listener for system theme changes
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+    const handleChange = (e: MediaQueryListEvent) => {
+      setTheme(e.matches ? "mocha" : "latte");
+      console.log("System theme changed to:", e.matches ? "mocha" : "latte");
+    };
+
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
+  }, [resolvedTheme, setTheme]);
+
+  return null;
+}
+
 function Providers({ children }: { children: React.ReactNode }) {
   return (
     <SessionProvider>
       <ThemeProvider
         attribute="class"
-        defaultTheme="mocha"
         enableSystem={true}
+        defaultTheme="system"
         storageKey="theme"
-        themes={["latte", "mocha"]}
+        themes={["mocha", "latte"]}
       >
+        <InitialThemeSetter />
         <ShoppingCartProvider>
           <AudioPlayerProvider>{children}</AudioPlayerProvider>
         </ShoppingCartProvider>

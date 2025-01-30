@@ -12,15 +12,17 @@ export default function Footer() {
       <p className="hover:cursor-pointer hover:underline">Privacy Policy</p>
       <p className="hover:cursor-pointer hover:underline">Terms of Service</p>
       <p className="hover:cursor-pointer hover:underline">Legal</p>
-      <Tooltip content={theme === "mocha" ? "Light Theme" : "Dark Theme"}>
+      <Tooltip content={theme === "mocha" ? "Light Theme" : "Dark Theme"} className="hidden sm:block">
         <label className="swap swap-rotate hover:scale-110 duration-300 hover:cursor-pointer mt-1">
           {/* this hidden checkbox controls the state */}
           <input
             type="checkbox"
             className="theme-controller"
-            value={theme}
-            onChange={() => {
-              theme === "mocha" ? setTheme("latte") : setTheme("mocha");
+            checked={theme === "mocha"}
+            onChange={(e) => {
+              const isChecked = e.target.checked;
+              console.log(isChecked);
+              theme === "latte" ? setTheme("mocha") : setTheme("latte");
             }}
           />
 
@@ -31,7 +33,7 @@ export default function Footer() {
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="swap-off size-7"
+            className="swap-on size-7"
           >
             <path
               strokeLinecap="round"
@@ -47,7 +49,7 @@ export default function Footer() {
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="swap-on size-7"
+            className="swap-off size-7"
           >
             <path
               strokeLinecap="round"
