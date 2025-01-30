@@ -13,7 +13,7 @@ export default function Footer() {
       <p className="hover:cursor-pointer hover:underline">Terms of Service</p>
       <p className="hover:cursor-pointer hover:underline">Legal</p>
       <Tooltip content={theme === "mocha" ? "Light Theme" : "Dark Theme"}>
-        <label className="swap swap-rotate hover:scale-110 duration-300 hover:cursor-pointer ">
+        <label className="swap swap-rotate hover:scale-110 duration-300 hover:cursor-pointer mt-1">
           {/* this hidden checkbox controls the state */}
           <input
             type="checkbox"
