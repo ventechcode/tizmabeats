@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@aws-amplify/backend": "^1.14.0",
+    "@aws-amplify/storage": "^6.7.8",
     "@catppuccin/palette": "^1.7.1",
     "@faker-js/faker": "^8.4.1",
     "@ffmpeg/ffmpeg": "^0.12.15",
@@ -46,6 +47,7 @@
     "@tabler/icons-react": "^3.6.0",
     "@vercel/blob": "^0.27.0",
     "@vercel/speed-insights": "^1.1.0",
+    "aws-amplify": "^6.12.2",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "class-variance-authority": "^0.7.0",
