@@ -7,7 +7,7 @@ export default function Footer() {
   const { theme, setTheme } = useTheme();
 
   return (
-    <footer className="w-full bg-mantle pl-12 py-4">
+    <footer className="w-full bg-mantle pl-12 py-4 z-40">
       <div className="z-40 grid grid-cols-2 items-center gap-3 md:flex md:flex-row md:items-center md:justify-around text-sm">
         <p className="text-subtext1 hover:cursor-pointer hidden md:block">
           {" "}
@@ -23,8 +23,9 @@ export default function Footer() {
           Legal
         </p>
         <Tooltip
+          showArrow={false}
           content={theme === "mocha" ? "Light Theme" : "Dark Theme"}
-          className="hidden sm:block z-50"
+          className="hidden sm:block z-50 bg-surface2 text-subtext1"
         >
           <label className="swap swap-rotate hover:scale-110 duration-300 hover:cursor-pointer mt-1">
             {/* this hidden checkbox controls the state */}

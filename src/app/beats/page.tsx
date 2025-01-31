@@ -9,6 +9,7 @@ import { useGlobalAudioPlayer } from "@/hooks/useAudioPlayer";
 import useSWR from "swr";
 import SkeletonBeatList from "@/components/SkeletonBeatList";
 import Loading from "../loading";
+import Background from "@/components/Background";
 export default function BeatsPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -85,6 +86,8 @@ export default function BeatsPage() {
       )}
 
       {isLoading && !data ? <SkeletonBeatList beats={beats || [1,2,3,4,5,6,7,8]} /> : <BeatList beats={data || []} />}
+
+      <Background />
     </div>
   );
 }

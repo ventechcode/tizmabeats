@@ -3,7 +3,6 @@ import { CardBody, CardContainer, CardItem } from "./ui/3d-card";
 import { Beat, BeatLicense } from "@/types";
 import { ShoppingCartContext } from "@/app/providers";
 import {
-  AudioPlayerContext,
   useGlobalAudioPlayer,
 } from "@/hooks/useAudioPlayer";
 
@@ -247,7 +246,7 @@ export default function BeatCard({
               translateZ={36}
               className="px-4 py-2 rounded-xl text-xs text-subtext1"
             >
-              FULL LICENCE
+              STEMS
             </CardItem>
           </div>
         </CardBody>

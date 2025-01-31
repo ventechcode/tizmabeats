@@ -30,7 +30,7 @@ export default function Home() {
 
   return (
     <main className="flex flex-col items-center justify-center space-y-5 py-20">
-      <TypewriterEffect words={words} className="z-50" />
+      <TypewriterEffectSmooth words={words} className="z-50" />
       <h1 className="relative z-10 text-sm sm:text-md md:text-lg text-subtext0">
         Hip-Hop, Techno, House and more!
       </h1>
