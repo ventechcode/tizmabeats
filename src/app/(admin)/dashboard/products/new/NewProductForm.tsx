@@ -192,9 +192,15 @@ export default function NewProductForm({
       const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
 
       ffmpeg.on("progress", ({ progress, time }) => {
-        console.log(`Progress: ${progress} | Time: ${time}`);
+        messageRef.current!.innerHTML = `Processing... ${progress.toFixed(2)}%`;
         if (progressRef.current) {
           progressRef.current.value = progress * 100;
+        }
+      });
+
+      ffmpeg.on("log", (e) => {
+        if (messageRef.current) {
+          messageRef.current!.innerHTML = e.message;
         }
       });
 
@@ -211,16 +217,12 @@ export default function NewProductForm({
 
       // Transcode audio file
       const file = inputFileRef.current?.files?.[0];
+      console.log("Selected file:", file);
 
       if (!file) {
         alert("No mp3 file for audio streaming selected");
         return;
       }
-
-      const fileName = file.name.replace("#", "");
-
-      const src = await fetchFile(file);
-      await ffmpeg.writeFile("input.mp3", src);
 
       if (messageRef.current) {
         messageRef.current.innerHTML = "Extracting peaks and duration...";
@@ -244,34 +246,46 @@ export default function NewProductForm({
         const duration = wS.getDuration();
         metadata.peaks = peaks;
         metadata.duration = duration;
+        console.log("Metadata:", metadata);
       });
 
       wS.load(URL.createObjectURL(file));
 
-      if (messageRef.current) {
-        messageRef.current.innerHTML = "Reducing audio quality...";
-      }
+      // if (messageRef.current) {
+      //   messageRef.current.innerHTML = "Reducing audio quality...";
+      // }
 
-      await ffmpeg.exec(["-i", "input.mp3", "-b:a", "96k", "output.mp3"]);
+      // await ffmpeg.exec(["-i", "input.mp3", "-b:a", "96k", "output.mp3"]);
 
-      const reducedAudio = new Blob([await ffmpeg.readFile("output.mp3")], {
-        type: "audio/mp3",
-      });
+      // const reducedAudio = new Blob([await ffmpeg.readFile("output.mp3")], {
+      //   type: "audio/mp3",
+      // });
+
+      const src = await fetchFile(file);
+      await ffmpeg.writeFile("input.mp3", src);
 
       if (messageRef.current) {
         messageRef.current.innerHTML =
           "Converting audio file to streamable format...";
       }
 
+      // Convert to 128k bitrate AAC audio and HLS playlist
       await ffmpeg.exec([
         "-i",
-        "output.mp3",
+        "input.mp3",
+        "-c:a",
+        "aac",
+        "-b:a",
+        "128k",
+        "-vn", // Audio only
+        "-f",
+        "hls",
         "-hls_time",
-        "10",
-        "-hls_playlist_type",
-        "vod",
+        "10", // 10-second segments
         "-hls_segment_filename",
-        "segment_%03d.ts",
+        "segment_%03d.m4s", // SoundCloud-style naming
+        "-hls_playlist_type",
+        "vod", // VOD declaration
         "playlist.m3u8",
       ]);
 
@@ -287,7 +301,7 @@ export default function NewProductForm({
       const segmentFilenames = playlistText
         .split("\n")
         .map((line) => line.trim())
-        .filter((line) => line && line.endsWith(".ts"));
+        .filter((line) => line && line.endsWith(".m4s"));
 
       // Read all segment files dynamically
       const segments = await Promise.all(
@@ -301,21 +315,58 @@ export default function NewProductForm({
         progressRef.current.value = 0;
       }
 
-      const blob = await upload(
-        `/beats/${id}/stream/playlist.m3u8`,
-        playlistBlob,
-        {
-          access: "public",
-          handleUploadUrl: "/api/upload",
-          clientPayload: id,
-          onUploadProgress: (progress) => {
-            console.log("HLS playlist upload progress:", progress);
-            if (progressRef.current) {
-              progressRef.current.value = progress.percentage;
-            }
-          },
+      const playlistData = new FormData();
+      playlistData.append("beatId", id);
+      playlistData.append("fileName", "playlist.m3u8");
+      playlistData.append("fileType", playlistBlob.type);
+      playlistData.append("fileSize", playlistBlob.size.toString());
+      playlistData.append("dir", "public");
+
+      try {
+        const res = await fetch("/api/dashboard/upload", {
+          method: "POST",
+          body: playlistData,
+        });
+
+        const { url, error } = await res.json();
+
+        if (error) {
+          console.error("Upload failed:", error);
+          return;
         }
-      );
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("PUT", url);
+
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const percent = Math.round((event.loaded / event.total) * 100);
+            if (progressRef.current) {
+              progressRef.current.value = percent;
+            }
+          }
+        };
+
+        xhr.send(playlistBlob);
+      } catch (error) {
+        console.error("Upload failed:", error);
+      }
+
+      // const blob = await upload(
+      //   `/beats/${id}/stream/playlist.m3u8`,
+      //   playlistBlob,
+      //   {
+      //     access: "public",
+      //     handleUploadUrl: "/api/upload",
+      //     clientPayload: id,
+      //     onUploadProgress: (progress) => {
+      //       console.log("HLS playlist upload progress:", progress);
+      //       if (progressRef.current) {
+      //         progressRef.current.value = progress.percentage;
+      //       }
+      //     },
+      //   }
+      // );
 
       if (progressRef.current) {
         progressRef.current.value = 0;
@@ -324,43 +375,120 @@ export default function NewProductForm({
       for (let i = 0; i < segments.length; i++) {
         const paddedIndex = String(i).padStart(3, "0");
         const segmentBlob = new Blob([segments[i]], {
-          type: "video/mp2t",
+          type: "application/octet-stream",
         });
 
         if (messageRef.current) {
-          messageRef.current.innerHTML = `Uploading segment_${paddedIndex}.ts...`;
+          messageRef.current.innerHTML = `Uploading segment_${paddedIndex}.m4s...`;
         }
 
-        await upload(
-          `/beats/${id}/stream/segment_${paddedIndex}.ts`,
-          segmentBlob,
-          {
-            access: "public",
-            handleUploadUrl: "/api/upload",
-            multipart: true,
-            clientPayload: id,
-            onUploadProgress: (progress) => {
-              if (progressRef.current) {
-                progressRef.current.value = progress.percentage;
-              }
-            },
+        const segmentData = new FormData();
+        segmentData.append("beatId", id);
+        segmentData.append("fileName", `segment_${paddedIndex}.m4s`);
+        segmentData.append("fileType", segmentBlob.type);
+        segmentData.append("fileSize", segmentBlob.size.toString());
+        segmentData.append("dir", "public");
+
+        try {
+          const res = await fetch("/api/dashboard/upload", {
+            method: "POST",
+            body: segmentData,
+          });
+
+          const { url, error } = await res.json();
+
+          if (error) {
+            console.error("Upload failed:", error);
+            return;
           }
-        );
+
+          const xhr = new XMLHttpRequest();
+          xhr.open("PUT", url);
+
+          xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+              const percent = Math.round((event.loaded / event.total) * 100);
+              if (progressRef.current) {
+                progressRef.current.value = percent;
+              }
+            }
+          };
+
+          xhr.send(segmentBlob);
+        } catch (error) {
+          console.error("Upload failed:", error);
+        }
+
+        // await upload(
+        //   `/beats/${id}/stream/segment_${paddedIndex}.ts`,
+        //   segmentBlob,
+        //   {
+        //     access: "public",
+        //     handleUploadUrl: "/api/upload",
+        //     multipart: true,
+        //     clientPayload: id,
+        //     onUploadProgress: (progress) => {
+        //       if (progressRef.current) {
+        //         progressRef.current.value = progress.percentage;
+        //       }
+        //     },
+        //   }
+        // );
       }
 
       if (messageRef.current) {
         messageRef.current.innerHTML = `Uploading audio metadata...`;
       }
 
-      await upload(
-        `/beats/${id}/stream/audio-info.json`,
-        JSON.stringify(metadata),
-        {
-          access: "public",
-          handleUploadUrl: "/api/upload",
-          clientPayload: id,
-        }
+      const metadataData = new FormData(); // Metadata inception 🤯
+      metadataData.append("beatId", id);
+      metadataData.append("fileName", `metadata.json`);
+      metadataData.append("fileType", "application/json");
+      metadataData.append(
+        "fileSize",
+        JSON.stringify(metadata).length.toString()
       );
+      metadataData.append("dir", "public");
+
+      try {
+        const res = await fetch("/api/dashboard/upload", {
+          method: "POST",
+          body: metadataData,
+        });
+
+        const { url, error } = await res.json();
+
+        if (error) {
+          console.error("Upload failed:", error);
+          return;
+        }
+
+        const xhr = new XMLHttpRequest();
+        xhr.open("PUT", url);
+
+        xhr.upload.onprogress = (event) => {
+          if (event.lengthComputable) {
+            const percent = Math.round((event.loaded / event.total) * 100);
+            if (progressRef.current) {
+              progressRef.current.value = percent;
+            }
+          }
+        };
+
+        xhr.send(JSON.stringify(metadata));
+      } catch (error) {
+        console.error("Upload failed:", error);
+      }
+
+      // await upload(
+      //   `/beats/${id}/stream/audio-info.json`,
+      //   JSON.stringify(metadata),
+      //   {
+      //     access: "public",
+      //     handleUploadUrl: "/api/upload",
+      //     clientPayload: id,
+      //   }
+      // );
 
       if (messageRef.current) {
         messageRef.current.innerHTML = "Uploading product files...";
@@ -374,30 +502,69 @@ export default function NewProductForm({
           messageRef.current.innerHTML = `Uploading ${file?.name}...`;
         }
         if (file) {
-          const fileName = file.name.replace("#", "");
-          const res = await upload(
-            `/beats/${id}/products/${license.name}/${fileName}`,
-            file,
-            {
-              access: "public",
-              handleUploadUrl: "/api/upload",
-              clientPayload: id,
-              onUploadProgress: (progress) => {
-                if (progressRef.current) {
-                  progressRef.current.value = progress.percentage;
-                }
-              },
+          const productData = new FormData(); // Metadata inception 🤯
+          productData.append("beatId", id);
+          productData.append("fileName", file.name);
+          productData.append("fileType", file.type);
+          productData.append("fileSize", file.size.toString());
+          productData.append("dir", "private");
+
+          try {
+            const res = await fetch("/api/dashboard/upload", {
+              method: "POST",
+              body: productData,
+            });
+
+            const { url, error } = await res.json();
+
+            if (error) {
+              console.error("Upload failed:", error);
+              return;
             }
+
+            const xhr = new XMLHttpRequest();
+            xhr.open("PUT", url);
+
+            xhr.upload.onprogress = (event) => {
+              if (event.lengthComputable) {
+                const percent = Math.round((event.loaded / event.total) * 100);
+                if (progressRef.current) {
+                  progressRef.current.value = percent;
+                }
+              }
+            };
+
+            xhr.send(file);
+          } catch (error) {
+            console.error("Upload failed:", error);
+          }
+
+          // const res = await upload(
+          //   `/beats/${id}/products/${license.name}/${fileName}`,
+          //   file,
+          //   {
+          //     access: "public",
+          //     handleUploadUrl: "/api/upload",
+          //     clientPayload: id,
+          //     onUploadProgress: (progress) => {
+          //       if (progressRef.current) {
+          //         progressRef.current.value = progress.percentage;
+          //       }
+          //     },
+          //   }
+          // );
+          productSrcs.push(
+            `https://tizmabeats.s3.eu-central-1.amazonaws.com/private/${id}/${license.name}/${file.name}`
           );
-          productSrcs.push(res.url);
         }
       }
 
       if (messageRef.current) {
         messageRef.current.innerHTML = "Updating database...";
+        progressRef.current!.value = 0;
       }
 
-      const audioSrc = blob.url;
+      const audioSrc = `https://tizmabeats.s3.eu-central-1.amazonaws.com/public/${id}/playlist.m3u8`;
       const length = metadata.duration;
 
       const res = await fetch("/api/beats", {
@@ -418,8 +585,12 @@ export default function NewProductForm({
           })),
         }),
       });
+
       if (res.ok) {
-        alert("Beat created successfully");
+        if (messageRef.current) {
+          messageRef.current.innerHTML = "Upload complete!";
+          progressRef.current!.value = 100;
+        }
       }
     } catch (error) {
       console.error("Error creating beat:", error);
@@ -432,6 +603,7 @@ export default function NewProductForm({
         productFiles.current[key] = null;
       }
       form.reset();
+      alert("Beat created successfully!");
     }
   };
 
@@ -563,7 +735,9 @@ export default function NewProductForm({
                       key={option.id}
                       onClick={() => handleLicenseSelect(option)}
                       className={`h-20 hover:bg-mantle hover:cursor-pointer border-2 rounded-md flex flex-col items-start justify-around pl-2 py-1 duration-300 ${
-                        isSelected ? "border-accentColor bg-mantle" : "border-text"
+                        isSelected
+                          ? "border-accentColor bg-mantle"
+                          : "border-text"
                       }`}
                     >
                       <p className="text-md">{option.name}</p>

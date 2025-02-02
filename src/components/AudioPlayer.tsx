@@ -28,7 +28,7 @@ export default function AudioPlayer() {
       if (!audioRef.current) return;
 
       const audio_info = await fetch(
-        `https://blhf5x3zv0lnny2n.public.blob.vercel-storage.com/beats/${audioPlayer.beat?.id}/stream/audio-info.json`
+        `https://tizmabeats.s3.eu-central-1.amazonaws.com/public/${audioPlayer?.beat?.id}/metadata.json`
       );
       const metadata = await audio_info.json();
       setMetadata(metadata);

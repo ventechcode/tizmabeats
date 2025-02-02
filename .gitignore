@@ -43,3 +43,8 @@ next-env.d.ts
 
 # database seed 
 /prisma/seed.ts
+
+# amplify
+.amplify
+amplify_outputs*
+amplifyconfiguration*

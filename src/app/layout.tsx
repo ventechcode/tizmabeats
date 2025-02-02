@@ -7,12 +7,6 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import MyFooter from "@/components/MyFooter";
 import AudioPlayerWrapper from "@/components/AudioPlayerWrapper";
 const inter = Inter({ subsets: ["latin"] });
-import { Amplify } from "aws-amplify";
-import outputs from '../../amplify_outputs.json';
-
-Amplify.configure(outputs);
-
-
 
 export const metadata: Metadata = {
   title: "Tizmabeats",
