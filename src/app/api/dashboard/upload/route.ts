@@ -64,11 +64,3 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }
 }
-
-export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: "5mb", // 10 MB max client upload size
-    },
-  },
-};
