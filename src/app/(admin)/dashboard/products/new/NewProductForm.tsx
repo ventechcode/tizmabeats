@@ -494,8 +494,6 @@ export default function NewProductForm({
         messageRef.current.innerHTML = "Uploading product files...";
       }
 
-      const productSrcs: string[] = [];
-
       for (const license of selectedLicenses) {
         const file = productFiles.current[license.name];
         if (messageRef.current) {
@@ -553,9 +551,7 @@ export default function NewProductForm({
           //     },
           //   }
           // );
-          productSrcs.push(
-            `https://tizmabeats.s3.eu-central-1.amazonaws.com/private/${id}/${license.name}/${file.name}`
-          );
+          license.productSrc = `private/${id}/${file.name}`;
         }
       }
 
@@ -564,7 +560,7 @@ export default function NewProductForm({
         progressRef.current!.value = 0;
       }
 
-      const audioSrc = `https://tizmabeats.s3.eu-central-1.amazonaws.com/public/${id}/playlist.m3u8`;
+      const audioSrc = `/${id}/playlist.m3u8`;
       const length = metadata.duration;
 
       const res = await fetch("/api/beats", {
@@ -581,7 +577,7 @@ export default function NewProductForm({
             id: license.id,
             name: license.name,
             price: license.price,
-            productSrc: productSrcs.find((src) => src.includes(license.name)),
+            productSrc: license.productSrc,
           })),
         }),
       });

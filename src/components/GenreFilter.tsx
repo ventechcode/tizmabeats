@@ -17,7 +17,7 @@ export default function GenreFilter({
     const res = await fetch(url);
     const data = await res.json();
     return data;
-  });
+  }, { revalidateOnFocus: false });
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());

@@ -28,19 +28,11 @@ export default function AudioPlayer() {
       if (!audioRef.current) return;
 
       const audio_info = await fetch(
-        `https://tizmabeats.s3.eu-central-1.amazonaws.com/public/${audioPlayer?.beat?.id}/metadata.json`
+        `${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}/${audioPlayer?.beat?.id}/metadata.json`
       );
+
       const metadata = await audio_info.json();
       setMetadata(metadata);
-
-      // Destroy previous HLS instance if it exists
-      if (hlsRef.current) {
-        try {
-          hlsRef.current.destroy();
-        } catch (error) {
-          console.warn("Error while destroying HLS instance:", error);
-        }
-      }
 
       const hls = new Hls();
       hlsRef.current = hls;
@@ -56,7 +48,7 @@ export default function AudioPlayer() {
           .catch((error) => console.error("Autoplay failed:", error));
       });
 
-      hls.loadSource(audioPlayer.beat?.audioSrc!);
+      hls.loadSource(`${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}${audioPlayer?.beat?.audioSrc}`);
       hls.attachMedia(audioRef.current);
 
       // Create a blob URL for the audio element

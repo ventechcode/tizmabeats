@@ -1,23 +1,8 @@
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
-import { PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
-
-const region = process.env.S3_REGION;
-const accessKeyId = process.env.ACCESS_KEY;
-const secretAccessKey = process.env.SECRET_ACCESS_KEY;
-
-if (!region || !accessKeyId || !secretAccessKey) {
-  throw new Error("Missing AWS configuration");
-}
-
-const s3 = new S3Client({
-  region,
-  credentials: {
-    accessKeyId,
-    secretAccessKey,
-  },
-});
+import { s3Client } from "@/utils/s3client";
 
 export async function POST(req: NextRequest): Promise<NextResponse> {
   const token = await getToken({
@@ -56,7 +41,7 @@ export async function POST(req: NextRequest): Promise<NextResponse> {
       ContentType: fileType,
     });
 
-    const url = await getSignedUrl(s3, command, { expiresIn: 3600 });
+    const url = await getSignedUrl(s3Client, command, { expiresIn: 3600 });
 
     return NextResponse.json({ url });
   } catch (error) {
