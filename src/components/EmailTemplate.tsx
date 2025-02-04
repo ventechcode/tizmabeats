@@ -1,136 +1,195 @@
-import {
-  Body,
-  Container,
-  Head,
-  Heading,
-  Hr,
-  Html,
-  Link,
-  Preview,
-  Tailwind,
-  Text,
-} from "@react-email/components";
 import * as React from "react";
+import { Preview } from "@react-email/components"; // Add this import
 
 interface OrderConfirmationEmailProps {
   userName: string;
   orderId: string;
-  beatLinceses: any;
+  beatLinceses: {
+    id: string;
+    beat: {
+      name: string;
+    };
+    price: number;
+    licenseOption: {
+      name: string;
+    };
+    download: {
+      id: string;
+      url: string;
+    } | null;
+  }[];
 }
 
 export const OrderConfirmationEmail = ({
   userName,
   orderId,
   beatLinceses,
-}: OrderConfirmationEmailProps) => {
-  const previewText = `Thanks for your purchase, ${userName.split(" ")[0]}!`;
+}: OrderConfirmationEmailProps) => (
+  <div
+    style={{
+      fontFamily: "'Helvetica Neue', Arial, sans-serif",
+      maxWidth: "100%",
+      alignItems: "center",
+      borderRadius: "8px",
+      backgroundColor: "#eff1f5",
+      padding: "20px",
+      color: "#4c4f69",
+    }}
+  >
+    <Preview>Thanks for your purchase, {userName}!</Preview>
 
-  return (
-    <Tailwind
-      config={{
-        darkMode: "class",
-        plugins: [
-          require("@catppuccin/tailwindcss")({
-            prefix: false,
-            defaultTheme: "mocha",
-          }),
-        ],
-        theme: {
-          extend: {
-            colors: {
-              base: "#f9f9f9",
-              mantle: "#f5f5f5",
-              crust: "#f9a826",
-              text: "#333333",
-              subtext0: "#4f4f4f",
-            },
-            fontFamily: {
-              sans: ["Inter", "sans-serif"],
-            },
-          },
-        },
+    <div
+      style={{
+        maxWidth: "600px",
+        backgroundColor: "#e6e9ef",
+        borderRadius: "8px",
+        margin: "0 auto",
+        padding: "20px",
+        boxShadow: "0 4px 10px rgba(0, 0, 0, 0.1)",
       }}
     >
-      <Html>
-        <Head />
-        <Preview>{previewText}</Preview>
-        <Body className="bg-mantle font-sans">
-          <Container className="bg-base mx-auto my-0 p-5 pb-12 mb-16 max-w-3xl rounded-lg shadow-sm">
-            <div className="px-12 py-10 border border-gray-200 rounded-lg">
-              <div className="flex items-center justify-center mb-6">
-                <div className="text-center w-full">
-                  <Heading className="text-text text-2xl font-semibold mt-4 mb-2">
-                    Order Confirmation
-                  </Heading>
-                </div>
-              </div>
+      <h1
+        style={{ color: "#4c4f69", marginBottom: "20px", textAlign: "center" }}
+      >
+        Order Receipt
+      </h1>
+      <p style={{ fontSize: "15px", color: "#4c4f69", textAlign: "center", marginBottom: "12px" }}>
+        Thanks for your purchase, <strong>{userName}</strong> !
+      </p>
 
-              <Text className="text-text text-base leading-6 text-center mb-6">
-                {previewText}
-              </Text>
-
-              <div className="flex justify-between mb-4">
-                <Text className="text-subtext0 text-xs font-semibold">
-                  Order:
-                </Text>
-                <Text className="text-subtext0 text-xs font-semibold">
-                  #{orderId}
-                </Text>
-              </div>
-
-              <Hr className="border-t border-gray-200 my-4" />
-
-              <div className="flex justify-between mb-4">
-                <Text className="text-gray-500 text-xs font-semibold">
-                  Item
-                </Text>
-                <Text className="text-gray-500 text-xs font-semibold text-center">
-                  Amount
-                </Text>
-                <Text className="text-gray-500 text-xs font-semibold text-right">
-                  Product
-                </Text>
-              </div>
-
-              <Hr className="border-t border-gray-200 my-4" />
-
-              {beatLinceses.map((item: any) => (
-                <div
-                  key={item.id}
-                  className="flex justify-between items-start mb-4"
-                >
-                  <div className="flex-1">
-                    <Text className="text-gray-900 text-base font-medium">
-                      {item.beat.name}
-                    </Text>
-                    <Text className="text-gray-500 text-sm mt-1">
-                      {item.licenseOption.name}-License
-                    </Text>
-                  </div>
-                  <Text className="text-[#525f7f] text-sm font-medium mx-4">
-                    {item.price}€
-                  </Text>
-                  <Link
-                    href={`http://localhost:3000/api/download?id=${item.download.id}`}
-                    className="text-blue-500 text-sm no-underline hover:underline"
-                  >
-                    Download
-                  </Link>
-                </div>
-              ))}
-
-              <Link
-                href={`http://localhost:3000/orders/${orderId}`}
-                className="bg-crust text-text text-center text-sm font-semibold rounded-lg py-2 px-4 mt-6 inline-block"
+      <div
+        style={{
+          width: "100%",
+          marginBottom: "10px",
+          color: "#4c4f69",
+        }}
+      >
+        <span style={{ float: "left" }}>
+          <strong>Order:</strong>
+        </span>
+        <span style={{ float: "right" }}>
+          <strong>#{orderId}</strong>
+        </span>
+        <div style={{ clear: "both" }}></div>{" "}
+        {/* Required for float clearing */}
+      </div>
+      <table
+        style={{
+          width: "100%",
+          borderCollapse: "collapse",
+          marginBottom: "20px",
+        }}
+      >
+        <thead style={{ borderRadius: "8px" }}>
+          <tr style={{ backgroundColor: "#dce0e8", borderRadius: "8px" }}>
+            <th
+              style={{ textAlign: "left", padding: "12px", color: "#6c6f85" }}
+            >
+              Beat
+            </th>
+            <th
+              style={{ textAlign: "center", padding: "12px", color: "#6c6f85" }}
+            >
+              License
+            </th>
+            <th
+              style={{ textAlign: "right", padding: "12px", color: "#6c6f85" }}
+            >
+              Price
+            </th>
+          </tr>
+        </thead>
+        <tbody style={{ borderRadius: "8px" }}>
+          {beatLinceses.map((item: any) => (
+            <tr key={item.id}>
+              <td
+                style={{
+                  padding: "10px",
+                  borderBottom: "1px solid #acb0be",
+                  whiteSpace: "nowrap",
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  maxWidth: "150px",
+                  color: "#6c6f85",
+                  borderRadius: "8px",
+                }}
+                title={item.beat.name}
               >
-                View Order
-              </Link>
-            </div>
-          </Container>
-        </Body>
-      </Html>
-    </Tailwind>
-  );
-};
+                {item.beat.name}
+              </td>
+              <td
+                style={{
+                  textAlign: "center",
+                  padding: "10px",
+                  borderBottom: "1px solid #acb0be",
+                  color: "#6c6f85",
+                }}
+              >
+                {item.licenseOption.name}
+              </td>
+              <td
+                style={{
+                  textAlign: "right",
+                  padding: "10px",
+                  borderBottom: "1px solid #acb0be",
+                  color: "#6c6f85",
+                }}
+              >
+                {item.price}€
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-export default OrderConfirmationEmail;
+      <div
+        style={{
+          textAlign: "right",
+          marginBottom: "20px",
+          fontSize: "17px",
+          color: "#4c4f69",
+        }}
+      >
+        <strong>Total: </strong>
+        {beatLinceses.reduce((acc, item) => acc + item.price, 0).toString()}€
+      </div>
+
+      <a
+        href={`http://localhost:3000/orders/${orderId}`}
+        style={{
+          display: "inline-block",
+          padding: "10px 20px",
+          backgroundColor: "#11111b",
+          color: "#dce0e8",
+          textDecoration: "none",
+          borderRadius: "6px",
+          fontWeight: "bold",
+        }}
+      >
+        View Order
+      </a>
+
+      <hr
+        style={{
+          border: "none",
+          borderTop: "1px solid #acb0be",
+          borderRadius: "8px",
+          margin: "20px 0",
+        }}
+      />
+
+      <p style={{ fontSize: "14px", color: "#5c5f77", textAlign: "center" }}>
+        If you have any questions or need help, don't hesitate to contact us at{" "}
+        <a href={`mailto:support@tizmabeats.com`} style={{ color: "#1e66f5" }}>
+          support@tizmabeats.com
+        </a>
+      </p>
+      <p style={{ fontSize: "14px", color: "#6c6f85", textAlign: "center" }}>
+        Thanks for shopping with us!
+      </p>
+      <p style={{ color: "#6c6f85", textAlign: "center", fontSize: "14px" }}>
+        <strong>2025 © TIZMABEATS</strong>
+      </p>
+    </div>
+  </div>
+);
