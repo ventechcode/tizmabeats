@@ -3,7 +3,6 @@ import { getProducts } from "@/app/actions";
 import DashboardHeader from "@/components/dashboard/dashboard-header";
 
 export const dynamic = 'force-dynamic'
-export const revalidate = 0;
 
 export default async function ProductsPage() {
   let products = await getProducts();
