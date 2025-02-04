@@ -552,6 +552,7 @@ export default function NewProductForm({
           //   }
           // );
           license.productSrc = `private/${id}/${file.name}`;
+          console.log("Product file uploaded:", license.productSrc);
         }
       }
 
@@ -573,7 +574,7 @@ export default function NewProductForm({
           id,
           audioSrc,
           length,
-          licenses: values.licenses.map((license) => ({
+          licenses: selectedLicenses.map((license) => ({
             id: license.id,
             name: license.name,
             price: license.price,

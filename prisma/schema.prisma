@@ -98,7 +98,7 @@ model Download {
   updatedAt    DateTime       @default(now())
   url          String
   licenseId    String         @unique
-  license      BeatLicense    @relation(fields: [licenseId], references: [id])
+  license      BeatLicense    @relation(fields: [licenseId], references: [id], onDelete: Cascade)
   DownloadLink DownloadLink[]
 }
 
@@ -107,5 +107,5 @@ model DownloadLink {
   createdAt  DateTime @default(now())
   expiresAt  DateTime @default(dbgenerated("now() + interval '48 hours'"))
   downloadId String
-  download   Download @relation(fields: [downloadId], references: [id])
+  download   Download @relation(fields: [downloadId], references: [id], onDelete: Cascade)
 }

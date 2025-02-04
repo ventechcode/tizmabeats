@@ -160,7 +160,7 @@ export default function AudioPlayer() {
           showArrow={false}
         >
           <IoVolumeMuteOutline
-            className="text-text text-2xl hover:cursor-pointer"
+            className="text-subtext0 text-2xl cursor-pointer hover:text-text duration-300"
             onClick={() => {
               const storedVolume = localStorage.getItem("volume");
               setVolume(storedVolume ? parseInt(storedVolume) : 100);
@@ -180,7 +180,7 @@ export default function AudioPlayer() {
           showArrow={false}
         >
           <IoVolumeLowOutline
-            className="text-text text-2xl hover:cursor-pointer"
+            className="text-subtext0 text-2xl cursor-pointer hover:text-text duration-300"
             onClick={() => {
               setVolume(0);
               audioPlayer.beat?.wavesurferRef.current.setVolume(0);
@@ -198,7 +198,7 @@ export default function AudioPlayer() {
           sideOffset={10}
         >
           <IoVolumeHighOutline
-            className="text-text text-2xl hover:cursor-pointer"
+            className="text-subtext0 text-2xl cursor-pointer hover:text-text duration-300"
             onClick={() => {
               setVolume(0);
               audioPlayer.beat?.wavesurferRef.current.setVolume(0);
@@ -287,19 +287,12 @@ export default function AudioPlayer() {
           />
         </div>
 
-        <Tooltip
-          content="Close"
-          side="top"
-          className="z-50 bg-surface2 text-subtext1"
-          showArrow={false}
-        >
-          <button>
+        <button>
             <HiMiniXMark
-              className="text-text cursor-pointer"
+              className="text-subtext0 hover:text-text cursor-pointer duration-300"
               onClick={() => audioPlayer.stop()}
             />
           </button>
-        </Tooltip>
       </div>
     </div>
   );
