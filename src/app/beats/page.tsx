@@ -4,12 +4,15 @@ import SearchFilterSection from "@/components/SearchFilterSection";
 import { Beat } from "@/types";
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import BeatList from "@/components/BeatList";
 import { useGlobalAudioPlayer } from "@/hooks/useAudioPlayer";
-import Background from "@/components/Background";
 import useSWR from "swr";
 import SkeletonBeatList from "@/components/SkeletonBeatList";
 import Loading from "../loading";
+import dynamic from "next/dynamic";
+
+const Background = dynamic(() => import("@/components/Background"));
+const BeatList = dynamic(() => import("@/components/BeatList"));
+
 export default function BeatsPage() {
   const searchParams = useSearchParams();
   const router = useRouter();

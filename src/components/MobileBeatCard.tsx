@@ -45,7 +45,7 @@ export default function MobileBeatCard({
 
   return (
     <div
-      className={`flex items-center justify-between space-x-4 py-2 px-4 bg-surface0 rounded-lg mx-4 ${className}`}
+      className={`flex items-center justify-between space-x-4 py-2 px-4 bg-surface0 rounded-lg mx-4 h-18 ${className}`}
     >
       <div className="flex items-center space-x-2">
         <button
@@ -56,7 +56,7 @@ export default function MobileBeatCard({
               audioPlayer?.play(beat);
             }
           }}
-          className="text-text hover:text-accentColor transition-colors flex-shrink-0"
+          className="text-text transition-colors flex-shrink-0"
         >
           {audioPlayer?.isPlaying(beat) ? (
             <svg
@@ -99,78 +99,73 @@ export default function MobileBeatCard({
           </div>
         </div>
       </div>
-      <div className="flex items-center space-x-4">
-        <div className="text-xs text-subtext0">
-          {convertDuration(beat.length)}
-        </div>
-        <Dialog onOpenChange={(open) => setIsDialogOpen(open)}>
-          {shoppingCart!.contains(beat) ? (
-            <button
-              className="px-3 py-1 rounded-full bg-mocha-red text-text text-xs font-bold flex-shrink-0"
-              onClick={() => shoppingCart?.removeFromCart(beat)}
-            >
-              Remove
+      <Dialog onOpenChange={(open) => setIsDialogOpen(open)}>
+        {shoppingCart!.contains(beat) ? (
+          <button
+            className="px-3 py-1 rounded-full bg-mocha-red text-text text-xs font-bold flex-shrink-0"
+            onClick={() => shoppingCart?.removeFromCart(beat)}
+          >
+            Remove
+          </button>
+        ) : (
+          <DialogTrigger>
+            <button className="h-8 w-14 px-4 py-2 rounded-full bg-text text-crust text-xs font-bold flex-shrink-0">
+              Buy
             </button>
-          ) : (
+          </DialogTrigger>
+        )}
+        <DialogContent className="bg-base border-none text-text w-[90%] max-w-md mx-auto rounded-lg">
+          <DialogHeader>
+            <DialogTitle>Choose License for {beat.name}</DialogTitle>
+            <DialogDescription className="text-subtext0 text-xs">
+              Select the license that best fits your needs
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-2 mt-4">
+            {beat.licenses.map((license: BeatLicense) => (
+              <div
+                key={license.id}
+                onClick={() => {
+                  setSelectedLicense(license);
+                  beat.selectedLicense = license;
+                }}
+                className={`p-3 ${
+                  selectedLicense?.id == license.id
+                    ? "bg-mantle border-accentColor"
+                    : "border-text"
+                } border rounded-md flex justify-between items-center cursor-pointer`}
+              >
+                <div>
+                  <p className="text-sm font-medium text-text">
+                    {license.licenseOption.name}
+                  </p>
+                  <p className="text-xs text-subtext0">
+                    {license.licenseOption.contents.join(", ")}
+                  </p>
+                </div>
+                <p className="text-sm font-semibold">{license.price}€</p>
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-between items-center mt-6">
+            <div className="text-sm">
+              <span className="font-medium">Subtotal:</span>
+              <span className="ml-2 font-semibold">
+                {selectedLicense?.price}€
+              </span>
+            </div>
             <DialogTrigger>
-              <button className="px-4 py-2 rounded-full bg-text text-crust text-xs font-bold flex-shrink-0">
-                Buy
+              <button
+                className="flex items-center justify-center bg-text text-crust rounded-full px-4 py-2 text-sm font-semibold"
+                onClick={handleAddToCart}
+              >
+                <TbShoppingBagPlus className="h-5 w-5 mr-2" />
+                Add to Cart
               </button>
             </DialogTrigger>
-          )}
-          <DialogContent className="bg-base border-none text-text w-[90%] max-w-md mx-auto rounded-lg">
-            <DialogHeader>
-              <DialogTitle>Choose License for {beat.name}</DialogTitle>
-              <DialogDescription className="text-subtext0 text-xs">
-                Select the license that best fits your needs
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-2 mt-4">
-              {beat.licenses.map((license: BeatLicense) => (
-                <div
-                  key={license.id}
-                  onClick={() => {
-                    setSelectedLicense(license);
-                    beat.selectedLicense = license;
-                  }}
-                  className={`p-3 ${
-                    selectedLicense?.id == license.id
-                      ? "bg-mantle border-accentColor"
-                      : "border-text"
-                  } border rounded-md flex justify-between items-center cursor-pointer`}
-                >
-                  <div>
-                    <p className="text-sm font-medium text-text">
-                      {license.licenseOption.name}
-                    </p>
-                    <p className="text-xs text-subtext0">
-                      {license.licenseOption.contents.join(", ")}
-                    </p>
-                  </div>
-                  <p className="text-sm font-semibold">{license.price}€</p>
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-between items-center mt-6">
-              <div className="text-sm">
-                <span className="font-medium">Subtotal:</span>
-                <span className="ml-2 font-semibold">
-                  {selectedLicense?.price}€
-                </span>
-              </div>
-              <DialogTrigger>
-                <button
-                  className="flex items-center justify-center bg-text text-crust rounded-full px-4 py-2 text-sm font-semibold"
-                  onClick={handleAddToCart}
-                >
-                  <TbShoppingBagPlus className="h-5 w-5 mr-2" />
-                  Add to Cart
-                </button>
-              </DialogTrigger>
-            </div>
-          </DialogContent>
-        </Dialog>
-      </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

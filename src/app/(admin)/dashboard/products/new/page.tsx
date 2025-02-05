@@ -1,7 +1,5 @@
 import dynamic from "next/dynamic";
 import prisma from "@/utils/prisma";
-import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
 import DashboardHeader from "@/components/dashboard/dashboard-header";
 
 const NewProductForm = dynamic(() => import("./NewProductForm"), {

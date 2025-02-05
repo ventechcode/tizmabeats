@@ -29,6 +29,7 @@ import {
   DialogClose,
   DialogTitle,
 } from "./ui/dialog"
+import { deleteProduct } from "@/app/actions"
 
 type Product = {
   id: string
@@ -176,7 +177,11 @@ export default function ProductTable({ products }: { products: Product[] }) {
                       </button>
                     </DialogTrigger>
                     <DialogTrigger>
-                      <button className="flex items-center gap-1 border-2 border-red text-red bg-transparent rounded-lg hover:text-red/70 hover:border-red/70  duration-300 p-2">
+                      <button onClick={() => {
+                        deleteProduct(product.id)
+                        setShowDeleteDialog(false)
+                        router.refresh()
+                      }} className="flex items-center gap-1 border-2 border-red text-red bg-transparent rounded-lg hover:text-red/70 hover:border-red/70  duration-300 p-2">
                         <TrashIcon />
                         <p>Delete</p>
                       </button>

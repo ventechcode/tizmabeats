@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 const svgToDataUri = require("mini-svg-data-uri");
-import daisyui from "daisyui";
+import daisyui from "daisyui"; 
 
 const {
   default: flattenColorPalette,
@@ -71,7 +71,6 @@ const config: Config = {
   plugins: [
     require("@catppuccin/tailwindcss")({
       prefix: false,
-      defaultTheme: "mocha",
     }),
     function ({ matchUtilities, theme }: any) {
       const flattenColorPalette = (colorPalette: any) => {

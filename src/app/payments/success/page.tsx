@@ -63,8 +63,8 @@ export default async function Success({ searchParams }: SuccessProps) {
   const { user, total, id, beatLicenses } = order;
 
   return (
-    <div className="w-[90%] md:w-[70%] lg:w-[50%] xl:w-[40%] 2xl:w-[50%] bg-mantle rounded-lg shadow-xl border border-text z-50 bg-transparent mb-12 sm:mb-24">
-      <ClearShoppingCart/>
+    <div className="w-[90%] md:w-[70%] lg:w-[50%] xl:w-[40%] 2xl:w-[50%] rounded-lg shadow-xl border border-text z-50 bg-transparent my-6">
+      <ClearShoppingCart />
       <div className="flex flex-col p-8">
         <div className="flex items-center justify-center space-x-4 pb-4">
           <IoMdCheckmarkCircleOutline className="text-4xl xl:text-5xl scale-150 text-mocha-green" />
@@ -101,7 +101,7 @@ export default async function Success({ searchParams }: SuccessProps) {
                 </h2>
                 <div className="flex flex-col sm:flex-row sm:items-center">
                   <p className="text-sm text-subtext2">
-                    {beatLicense.licenseOption.name}-License
+                    {beatLicense.licenseOption.name}
                   </p>
                 </div>
               </div>

@@ -1,6 +1,8 @@
 "use server";
 
 import prisma from "@/utils/prisma";
+import { s3Client } from "@/utils/s3client";
+import {DeleteObjectsCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
 import { revalidatePath } from "next/cache";
 
 export async function getProducts() {
@@ -94,3 +96,43 @@ export const getDashboardStats = async () => {
   });
   return { totalBeats, totalOrders, totalUsers, totalRevenue };
 };
+
+export const deleteProduct = async (id: string) => {
+  await prisma.beat.delete({
+    where: {
+      id: id,
+    },
+  });
+
+  const publicPrefix = `public/${id}/`;
+  const privatePrefix = `private/${id}/`;
+
+   // Function to delete all objects under a given prefix
+   const deleteFolderObjects = async (prefix: string) => {
+    // List objects with the specified prefix
+    const listResponse = await s3Client.send(new ListObjectsV2Command({
+      Bucket: process.env.S3_BUCKET,
+      Prefix: prefix,
+    }));
+
+    if (!listResponse.Contents || listResponse.Contents.length === 0) {
+      console.log(`No objects found under prefix: ${prefix}`);
+      return;
+    }
+
+    // Prepare list of keys to delete
+    const objectsToDelete = listResponse.Contents.map(item => ({ Key: item.Key }));
+
+    // Delete all objects in the list
+    await s3Client.send(new DeleteObjectsCommand({
+      Bucket: process.env.S3_BUCKET,
+      Delete: { Objects: objectsToDelete },
+    }));
+
+    console.log(`Deleted objects under prefix: ${prefix}`);
+  };
+
+  // Delete objects under both public and private prefixes
+  await deleteFolderObjects(publicPrefix);
+  await deleteFolderObjects(privatePrefix);
+}

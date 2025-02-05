@@ -1,11 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faXmark } from "@fortawesome/free-solid-svg-icons";
 import WaveSurfer from "wavesurfer.js";
 import Hls from "hls.js";
-import { Beat } from "@/types";
 import {
   IoVolumeLowOutline,
   IoVolumeHighOutline,
@@ -13,6 +10,7 @@ import {
 } from "react-icons/io5";
 import { HiMiniXMark } from "react-icons/hi2";
 import { useGlobalAudioPlayer } from "@/hooks/useAudioPlayer";
+import { Tooltip } from "@/components/ui/tooltip";
 
 export default function AudioPlayer() {
   const audioPlayer = useGlobalAudioPlayer();
@@ -30,19 +28,11 @@ export default function AudioPlayer() {
       if (!audioRef.current) return;
 
       const audio_info = await fetch(
-        `https://blhf5x3zv0lnny2n.public.blob.vercel-storage.com/beats/${audioPlayer.beat?.id}/stream/audio-info.json`
+        `${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}/${audioPlayer?.beat?.id}/metadata.json`
       );
+
       const metadata = await audio_info.json();
       setMetadata(metadata);
-
-      // Destroy previous HLS instance if it exists
-      if (hlsRef.current) {
-        try {
-          hlsRef.current.destroy();
-        } catch (error) {
-          console.warn("Error while destroying HLS instance:", error);
-        }
-      }
 
       const hls = new Hls();
       hlsRef.current = hls;
@@ -58,7 +48,7 @@ export default function AudioPlayer() {
           .catch((error) => console.error("Autoplay failed:", error));
       });
 
-      hls.loadSource(audioPlayer.beat?.audioSrc!);
+      hls.loadSource(`${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}${audioPlayer?.beat?.audioSrc}`);
       hls.attachMedia(audioRef.current);
 
       // Create a blob URL for the audio element
@@ -163,41 +153,63 @@ export default function AudioPlayer() {
   const getVolumeIcon = () => {
     if (volume == 0)
       return (
-        <IoVolumeMuteOutline
-          className="text-text text-3xl"
-          onClick={() => {
-            const storedVolume = localStorage.getItem("volume");
-            setVolume(storedVolume ? parseInt(storedVolume) : 100);
-            audioPlayer.beat?.wavesurferRef.current.setVolume(
-              storedVolume ? parseInt(storedVolume) / 100 : 1
-            );
-          }}
-        />
+        <Tooltip
+          content="Unmute"
+          side="top"
+          className="z-50 bg-surface2 text-subtext1"
+          showArrow={false}
+        >
+          <IoVolumeMuteOutline
+            className="text-subtext0 text-2xl cursor-pointer hover:text-text duration-300"
+            onClick={() => {
+              const storedVolume = localStorage.getItem("volume");
+              setVolume(storedVolume ? parseInt(storedVolume) : 100);
+              audioPlayer.beat?.wavesurferRef.current.setVolume(
+                storedVolume ? parseInt(storedVolume) / 100 : 1
+              );
+            }}
+          />
+        </Tooltip>
       );
     else if (volume < 50)
       return (
-        <IoVolumeLowOutline
-          className="text-text text-3xl"
-          onClick={() => {
-            setVolume(0);
-            audioPlayer.beat?.wavesurferRef.current.setVolume(0);
-          }}
-        />
+        <Tooltip
+          content="Mute"
+          side="top"
+          className="z-50 bg-surface2 text-subtext1"
+          showArrow={false}
+        >
+          <IoVolumeLowOutline
+            className="text-subtext0 text-2xl cursor-pointer hover:text-text duration-300"
+            onClick={() => {
+              setVolume(0);
+              audioPlayer.beat?.wavesurferRef.current.setVolume(0);
+            }}
+          />
+        </Tooltip>
       );
     else if (volume >= 50)
       return (
-        <IoVolumeHighOutline
-          className="text-text text-3xl"
-          onClick={() => {
-            setVolume(0);
-            audioPlayer.beat?.wavesurferRef.current.setVolume(0);
-          }}
-        />
+        <Tooltip
+          content="Mute"
+          side="top"
+          className="z-50 bg-surface2 text-subtext1"
+          showArrow={false}
+          sideOffset={10}
+        >
+          <IoVolumeHighOutline
+            className="text-subtext0 text-2xl cursor-pointer hover:text-text duration-300"
+            onClick={() => {
+              setVolume(0);
+              audioPlayer.beat?.wavesurferRef.current.setVolume(0);
+            }}
+          />
+        </Tooltip>
       );
   };
 
   return (
-    <div className="fixed bottom-0 z-50 h-16 sm:h-20 bg-mantle w-full flex flex-row justify-between items-center px-4 sm:px-8">
+    <div className="fixed bottom-0 z-40 h-16 sm:h-20 bg-mantle w-full flex flex-row justify-between items-center px-4 sm:px-8">
       <audio ref={audioRef} className="hidden"></audio>
       <div className="flex flex-row flex-wrap items-center w-1/5">
         <div className="ml-3">
@@ -261,7 +273,7 @@ export default function AudioPlayer() {
         </div>
       </div>
 
-      <div className="flex flex-row items-center space-x-2">
+      <div className="flex flex-row items-center space-x-12">
         <div className="sm:w-24 md:w-32 ml-10 hidden md:flex flex-row items-center space-x-2">
           {getVolumeIcon()}
           <input
@@ -275,10 +287,12 @@ export default function AudioPlayer() {
           />
         </div>
 
-        <HiMiniXMark
-          className="text-text cursor-pointer ml-8 sm:ml-24 hover:text-accentColor duration-300"
-          onClick={() => audioPlayer.stop()}
-        />
+        <button>
+            <HiMiniXMark
+              className="text-subtext0 hover:text-text cursor-pointer duration-300"
+              onClick={() => audioPlayer.stop()}
+            />
+          </button>
       </div>
     </div>
   );

@@ -3,11 +3,13 @@
 
 generator client {
   provider = "prisma-client-js"
+  binaryTargets = ["native", "rhel-openssl-1.0.x"]
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model Beat {
@@ -96,7 +98,7 @@ model Download {
   updatedAt    DateTime       @default(now())
   url          String
   licenseId    String         @unique
-  license      BeatLicense    @relation(fields: [licenseId], references: [id])
+  license      BeatLicense    @relation(fields: [licenseId], references: [id], onDelete: Cascade)
   DownloadLink DownloadLink[]
 }
 
@@ -105,5 +107,5 @@ model DownloadLink {
   createdAt  DateTime @default(now())
   expiresAt  DateTime @default(dbgenerated("now() + interval '48 hours'"))
   downloadId String
-  download   Download @relation(fields: [downloadId], references: [id])
+  download   Download @relation(fields: [downloadId], references: [id], onDelete: Cascade)
 }

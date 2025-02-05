@@ -90,7 +90,7 @@ export default function AdminNav() {
 
       {/* Add ml-auto directly to push the logout icon */}
       <div className="ml-auto flex items-center gap-x-12">
-        <Tooltip content="Logout" side="left" className="hidden sm:block">
+        <Tooltip content="Logout" side="left" showArrow={false} className="hidden sm:block bg-surface2 text-subtext1">
           <TbLogout
             className="scale-125 md:scale-150 text-2xl cursor-pointer mr-6 hover:text-accentColor duration-300 tooltip:logout"
             onClick={() => signOut({ callbackUrl: "/auth/signin" })}

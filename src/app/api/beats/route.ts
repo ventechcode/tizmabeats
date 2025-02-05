@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
       where: {
         genre: genres?.length ? { in: genres } : undefined,
         bpm: bpms?.length ? { in: bpms } : undefined,
-        name: search ? { contains: search, mode: "insensitive" } : undefined,
+        name: search ? { contains: search, mode: "insensitive"} : undefined,
         purchased: false,
       },
       orderBy: {
