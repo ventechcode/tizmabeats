@@ -79,8 +79,6 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@aws-amplify/backend": "^1.14.0",
-    "@aws-amplify/backend-cli": "^1.4.9",
     "@catppuccin/tailwindcss": "^0.1.6",
     "@types/bcrypt": "^5.0.2",
     "@types/bcryptjs": "^2.4.6",
@@ -91,7 +89,6 @@
     "aws-cdk-lib": "^2.177.0",
     "constructs": "^10.4.2",
     "daisyui": "^4.12.10",
-    "esbuild": "^0.24.2",
     "eslint": "^8",
     "eslint-config-next": "14.2.4",
     "postcss": "^8",

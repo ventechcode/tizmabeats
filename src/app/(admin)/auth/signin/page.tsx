@@ -73,7 +73,7 @@ export default function SignIn() {
   }
 
   return (
-    <div className="w-1/2 sm:w-1/4 h-screen flex flex-col item-center justify-between mx-auto mt-[10%]">
+    <div className="bg-surface0 p-6 rounded-lg shadow-lg w-[90%] sm:w-[70%] md:w-[50%] lg:w-[30%]">
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <h1 className="py-2 font-semibold text-2xl">Sign In</h1>
@@ -113,7 +113,7 @@ export default function SignIn() {
             )}
           />
           {error && <p className="text-red">{error}</p>}
-          <Button type="submit">
+          <Button type="submit" className="w-full md:w-1/4">
             {!loading ? (
               "Login"
             ) : (
