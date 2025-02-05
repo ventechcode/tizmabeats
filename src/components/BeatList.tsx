@@ -2,6 +2,7 @@ import { Beat } from "@/types";
 import BeatCard from "@/components/BeatCard";
 import MobileBeatCard from "./MobileBeatCard";
 import SkeletonBeatCard from "./SkeletonBeatCard";
+import MobileSkeletonBeatCard from "./MobileSkeletonBeatCard";
 
 const BeatList = ({ beats }: { beats: Beat[] }) => {
   if (beats.length === 0) {

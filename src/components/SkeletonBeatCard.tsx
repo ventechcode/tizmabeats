@@ -3,9 +3,9 @@
 import React from "react";
 import { CardBody, CardContainer, CardItem } from "./ui/3d-card";
 
-export default function SkeletonBeatCard() {
+export default function SkeletonBeatCard({ className }: { className?: string }) {
   return (
-    <CardContainer className="inter-var block w-96 h-64">
+    <CardContainer className={`inter-var block w-96 h-64 ${className}`}>
       <CardBody className="bg-gray-50 relative group/card dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] bg-transparent border-2 dark:border-text w-full mx-4 sm:m-0 sm:w-auto h-auto rounded-xl py-3 px-3 sm:p-6 animate-pulse">
         <div className="h-7 rounded-md bg-gray-200 w-44"></div>
         <div className="flex flex-row justify-between mt-2">
