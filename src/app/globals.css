@@ -2,41 +2,30 @@
 @tailwind components;
 @tailwind utilities;
 
-  /* body {
-    @apply bg-base text-text;
-  } */
-
-/* body {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-} */
-
-/* :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  30% {
+    transform: translateX(0);
+  }
+  50% { 
+    transform: translateX(var(--scroll-distance)); 
+  }
+  70% {
+    transform: translateX(var(--scroll-distance));
+  }
+  100% {
+    transform: translateX(0%);
+  }
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-} */
+.marquee-animate {
+  animation: marquee ease-in-out infinite;
+  animation-duration: var(--scroll-duration);
+  display: inline-block;
+}
 
-/* body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-} */
-
-/* @layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-} */
+.marquee-animate:hover {
+  animation-play-state: paused;
+}

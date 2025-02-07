@@ -23,6 +23,10 @@ export default function AudioPlayer() {
   const [playlistUrl, setPlaylistUrl] = useState<string | null>();
   const [metadata, setMetadata] = useState({ duration: 0, peaks: [] });
 
+  const titleRef = useRef<HTMLParagraphElement>(null);
+  const titleContainerRef = useRef<HTMLDivElement>(null);
+  const [shouldScroll, setShouldScroll] = useState(false);
+
   useEffect(() => {
     const setupHls = async () => {
       if (!audioRef.current) return;
@@ -48,7 +52,9 @@ export default function AudioPlayer() {
           .catch((error) => console.error("Autoplay failed:", error));
       });
 
-      hls.loadSource(`${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}${audioPlayer?.beat?.audioSrc}`);
+      hls.loadSource(
+        `${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}${audioPlayer?.beat?.audioSrc}`
+      );
       hls.attachMedia(audioRef.current);
 
       // Create a blob URL for the audio element
@@ -137,6 +143,44 @@ export default function AudioPlayer() {
     };
   }, [audioPlayer.beat, audioRef, playlistUrl, metadata]);
 
+  // Dynamic title animation setup
+  useEffect(() => {
+    const checkOverflow = () => {
+      if (titleRef.current && titleContainerRef.current) {
+        const titleWidth = titleRef.current.scrollWidth;
+        const containerWidth = titleContainerRef.current.clientWidth;
+        const isOverflowing = titleWidth > containerWidth;
+        setShouldScroll(isOverflowing);
+
+        // Set CSS custom properties for dynamic animation
+        titleContainerRef.current.style.setProperty(
+          "--scroll-distance",
+          `-${titleWidth - containerWidth}px`
+        );
+        titleContainerRef.current.style.setProperty(
+          "--scroll-duration",
+          `${titleWidth / 20}s` // 50px per second scroll speed
+        );
+      }
+    };
+
+    // Initial check
+    checkOverflow();
+
+    // Setup ResizeObserver for responsive behavior
+    const resizeObserver = new ResizeObserver(checkOverflow);
+    if (titleContainerRef.current) {
+      resizeObserver.observe(titleContainerRef.current);
+    }
+    if (titleRef.current) {
+      resizeObserver.observe(titleRef.current);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [audioPlayer.beat?.name, audioPlayer.beat]);
+
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
@@ -211,9 +255,17 @@ export default function AudioPlayer() {
   return (
     <div className="fixed bottom-0 z-40 h-16 sm:h-20 bg-mantle w-full flex flex-row justify-between items-center px-4 sm:px-8">
       <audio ref={audioRef} className="hidden"></audio>
-      <div className="flex flex-row flex-wrap items-center w-1/5">
-        <div className="ml-3">
-          <p className="font-semibold truncate overflow-hidden">
+      <div className="flex flex-row flex-wrap items-center w-2/6">
+        <div
+          className="ml-3 overflow-hidden relative"
+          ref={titleContainerRef}
+        >
+          <p
+            ref={titleRef}
+            className={`font-semibold whitespace-nowrap ${
+              shouldScroll ? "marquee-animate" : "truncate"
+            }`}
+          >
             {audioPlayer.beat?.name}
           </p>
           <div className="text-[12px] sm:text-sm">
@@ -223,7 +275,7 @@ export default function AudioPlayer() {
       </div>
 
       <div className="flex flex-row items-center justify-center sm:w-full self-justify-center">
-        <div className="w-8 sm:pr-12 text-sm sm:text-text">
+        <div className="w-8 pl-2 sm:pr-12 text-xs sm:text-sm sm:text-text">
           {formatTime(elapsedTime)}
         </div>
 
@@ -237,7 +289,7 @@ export default function AudioPlayer() {
               audioPlayer?.play(audioPlayer.beat!);
             }
           }}
-          className="text-text hover:text-accentColor transition-colors flex-shrink-0 sm:hidden px-2"
+          className="text-text transition-colors flex-shrink-0 sm:hidden px-2"
         >
           {audioPlayer?.isPlaying(audioPlayer.beat!) ? (
             <svg
@@ -268,7 +320,7 @@ export default function AudioPlayer() {
           )}
         </button>
 
-        <div className="w-8 sm:pl-4 text-sm sm:text-text">
+        <div className="w-8 sm:pl-4 text-xs sm:text-sm sm:text-text">
           {formatTime(metadata.duration)}
         </div>
       </div>
@@ -288,11 +340,11 @@ export default function AudioPlayer() {
         </div>
 
         <button>
-            <HiMiniXMark
-              className="text-subtext0 hover:text-text cursor-pointer duration-300"
-              onClick={() => audioPlayer.stop()}
-            />
-          </button>
+          <HiMiniXMark
+            className="text-subtext0 hover:text-text cursor-pointer duration-300"
+            onClick={() => audioPlayer.stop()}
+          />
+        </button>
       </div>
     </div>
   );
