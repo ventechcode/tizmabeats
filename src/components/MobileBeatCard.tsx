@@ -36,7 +36,7 @@ export default function MobileBeatCard({
     shoppingCart?.addToCart({
       id: selectedLicense?.id,
       name: beat.name,
-      license: selectedLicense?.licenseOption.name,
+      license: selectedLicense!,
       price: selectedLicense?.price,
       quantity: 1,
     });
@@ -86,8 +86,8 @@ export default function MobileBeatCard({
             </svg>
           )}
         </button>
-        <div className="truncate">
-          <h2 className="text-base font-semibold text-text truncate">
+        <div>
+          <h2 className="text-base font-semibold text-text truncate w-max">
             {beat.name}
           </h2>
           <div className="flex text-xs text-subtext0 space-x-2">

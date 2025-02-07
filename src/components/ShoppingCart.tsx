@@ -42,7 +42,7 @@ export default function ShoppingCart() {
 
   return (
     <Sheet>
-      <SheetTrigger >
+      <SheetTrigger>
         <div className="relative hover:text-accentColor hover:duration-300 text-text">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -50,7 +50,7 @@ export default function ShoppingCart() {
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="size-8 md:size-10"
+            className="size-8 md:size-10"          
           >
             <path
               strokeLinecap="round"
@@ -69,7 +69,7 @@ export default function ShoppingCart() {
         </div>
       </SheetTrigger>
       <SheetContent
-        className={`bg-mantle border-0 flex flex-col justify-between ${
+        className={`bg-mantle border-0 flex flex-col ${
           shoppingCart && shoppingCart.cart.length > 0
             ? "justify-start"
             : "justify-between"
@@ -82,7 +82,9 @@ export default function ShoppingCart() {
               Items:
             </SheetDescription>
           ) : (
-            <SheetDescription className="text-subtext0">Your cart is currently empty.</SheetDescription>
+            <SheetDescription className="text-subtext0">
+              Your cart is currently empty.
+            </SheetDescription>
           )}
         </SheetHeader>
         <div
@@ -110,18 +112,32 @@ export default function ShoppingCart() {
               </svg>
             ) : (
               shoppingCart?.cart.map((beat: any) => (
-                <li key={beat.id} className="mr-4">
-                  <div className="flex justify-between items-center px-4 py-3 my-4 bg-surface0 duration-300 rounded-md shadow-sm">
-                    <div className="flex flex-row items-center space-x-1">
+                <li key={beat.id} className=""> {/* Add mr-4 when shopping cart overscroll y */}
+                  <div className="flex justify-between items-center px-4 py-3 my-4 bg-surface0 duration-300 rounded-md shadow-lg">
+                    <div className="flex flex-col space-y-1">
                       <div>{beat.name}</div>
-                      <div className="text-sm text-subtext0">
-                        ({beat.license} {beat.price}€)
+                      <div className="flex items-center space-x-1">
+                        <div className="text-sm text-subtext1">
+                          {beat.license.licenseOption.name}
+                        </div>
+                        <div className="text-subtext0 text-xs">
+                          ({beat.license.licenseOption.contents.join(",")})
+                        </div>
                       </div>
                     </div>
-                    <div onClick={() => shoppingCart?.removeFromCart(beat.id)}>
-                      <p className="text-xs text-subtext2 hover:text-subtext0 duration-300 hover:cursor-pointer">
-                        Remove
-                      </p>
+                    <div className="flex flex-col items-end space-y-1">
+                      <div>
+                        <div className="text-subtext1">
+                          {beat.license.price}€
+                        </div>
+                      </div>
+                      <div
+                        onClick={() => shoppingCart?.removeFromCart(beat.id)}
+                      >
+                        <p className="text-xs text-subtext0 hover:text-mocha-red duration-300 hover:cursor-pointer">
+                          Remove
+                        </p>
+                      </div>
                     </div>
                   </div>
                 </li>
@@ -129,14 +145,14 @@ export default function ShoppingCart() {
             )}
           </ul>
         </div>
-        <div className="flex">
+        <div className="flex flex-row justify-between">
           <div className="font-bold text-text md:text-lg sm:text-xl">
             Total:{" "}
             {shoppingCart?.cart?.reduce((prev, val) => {
               return prev + val.price;
             }, 0)}
             €
-            <p className="text-[9px] sm:text-xs md:text-sm font-light text-subtext0 w-max">
+            <p className="text-[10px] sm:text-xs md:text-sm font-light text-subtext0 sm:w-max">
               (incl. taxes and shipping costs)
             </p>
           </div>

@@ -217,7 +217,7 @@ export default function BeatCard({
                         shoppingCart?.addToCart({
                           id: selectedLicense?.id,
                           name: beat.name,
-                          license: selectedLicense?.licenseOption.name,
+                          license: selectedLicense!,
                           price: selectedLicense?.price,
                           quantity: 1,
                         });
