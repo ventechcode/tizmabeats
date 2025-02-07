@@ -1,7 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
-import { upload } from "@vercel/blob/client";
+import { useRef, useState } from "react";
 import { v4 as uuid } from "uuid";
 import WaveSurfer from "wavesurfer.js";
 import { z } from "zod";
