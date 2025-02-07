@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import type { Beat, BeatLicense } from "@/types";
 import { ShoppingCartContext } from "@/app/providers";
 import { useGlobalAudioPlayer } from "@/hooks/useAudioPlayer";
@@ -26,6 +26,10 @@ export default function MobileBeatCard({
   );
   const audioPlayer = useGlobalAudioPlayer();
 
+  const titleRef = useRef<HTMLParagraphElement>(null);
+  const titleContainerRef = useRef<HTMLDivElement>(null);
+  const [shouldScroll, setShouldScroll] = useState(false);
+
   const convertDuration = (duration: number) => {
     const minutes = Math.floor(duration / 60);
     const seconds = Math.floor(duration % 60);
@@ -43,9 +47,47 @@ export default function MobileBeatCard({
     setIsDialogOpen(false);
   };
 
+  // Dynamic title animation setup
+  useEffect(() => {
+    const checkOverflow = () => {
+      if (titleRef.current && titleContainerRef.current) {
+        const titleWidth = titleRef.current.scrollWidth;
+        const containerWidth = titleContainerRef.current.clientWidth;
+        const isOverflowing = titleWidth > containerWidth;
+        setShouldScroll(isOverflowing);
+
+        // Set CSS custom properties for dynamic animation
+        titleContainerRef.current.style.setProperty(
+          "--scroll-distance",
+          `-${titleWidth - containerWidth}px`
+        );
+        titleContainerRef.current.style.setProperty(
+          "--scroll-duration",
+          `${titleWidth / 20}s` // 50px per second scroll speed
+        );
+      }
+    };
+
+    // Initial check
+    checkOverflow();
+
+    // Setup ResizeObserver for responsive behavior
+    const resizeObserver = new ResizeObserver(checkOverflow);
+    if (titleContainerRef.current) {
+      resizeObserver.observe(titleContainerRef.current);
+    }
+    if (titleRef.current) {
+      resizeObserver.observe(titleRef.current);
+    }
+
+    return () => {
+      resizeObserver.disconnect();
+    };
+  }, [audioPlayer.beat?.name, audioPlayer.beat]);
+
   return (
     <div
-      className={`flex items-center justify-between space-x-4 py-2 px-4 bg-surface0 rounded-lg mx-4 h-18 ${className}`}
+      className={`flex items-center justify-between space-x-2 py-2 px-2 bg-surface0 rounded-lg mx-2 h-18 ${className}`}
     >
       <div className="flex items-center space-x-2">
         <button
@@ -63,7 +105,7 @@ export default function MobileBeatCard({
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="currentColor"
-              className="w-10 h-10"
+              className="w-12 h-12"
             >
               <path
                 fillRule="evenodd"
@@ -76,7 +118,7 @@ export default function MobileBeatCard({
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="currentColor"
-              className="w-10 h-10"
+              className="w-12 h-12"
             >
               <path
                 fillRule="evenodd"
@@ -86,8 +128,13 @@ export default function MobileBeatCard({
             </svg>
           )}
         </button>
-        <div>
-          <h2 className="text-base font-semibold text-text truncate w-max">
+        <div ref={titleContainerRef} className="overflow-hidden">
+          <h2
+            ref={titleRef}
+            className={`font-semibold text-text w-48 xs:w-64 whitespace-nowrap ${
+              shouldScroll ? "marquee-animate" : ""
+            }`}
+          >
             {beat.name}
           </h2>
           <div className="flex text-xs text-subtext0 space-x-2">
@@ -109,7 +156,7 @@ export default function MobileBeatCard({
           </button>
         ) : (
           <DialogTrigger>
-            <button className="h-8 w-14 px-4 py-2 rounded-full bg-text text-crust text-xs font-bold flex-shrink-0">
+            <button className="h-9 w-16 px-4 py-2 rounded-full bg-text text-crust text-xs font-bold flex-shrink-0">
               Buy
             </button>
           </DialogTrigger>

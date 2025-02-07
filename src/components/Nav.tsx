@@ -22,7 +22,7 @@ export function Nav({ className }: { className?: string }) {
             <div className="flex items-center justify-start">
               <div className="sm:hidden">
                 {/* Mobile menu button*/}
-                <DisclosureButton className="flex flex-col items-center justify-center p-2 rounded-md text-text hover:text-accentColor focus:outline-none">
+                <DisclosureButton className="flex flex-col items-center justify-center p-2 rounded-md text-text sm:hover:text-accentColor focus:outline-none">
                   <span className="sr-only">Open main menu</span>
                   {open ? (
                     <svg
@@ -133,7 +133,7 @@ export function NavLogo({
   return (
     <Link
       href="/"
-      className="text-xl sm:text-lg p-2 md:text-xl lg:text-2xl text-text hover:text-accentColor hover:duration-300 uppercase"
+      className="text-xl sm:text-lg p-2 md:text-xl lg:text-2xl text-text sm:hover:text-accentColor hover:duration-300 uppercase"
     >
       TizmaBeats
     </Link>

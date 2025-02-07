@@ -45,13 +45,6 @@ export default function AudioPlayer() {
         console.error("HLS error:", event, data);
       });
 
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        // Start playback as soon as the manifest is parsed
-        audioRef.current
-          ?.play()
-          .catch((error) => console.error("Autoplay failed:", error));
-      });
-
       hls.loadSource(
         `${process.env.NEXT_PUBLIC_CLOUDFRONT_URL}${audioPlayer?.beat?.audioSrc}`
       );
@@ -247,7 +240,7 @@ export default function AudioPlayer() {
               setVolume(0);
               audioPlayer.beat?.wavesurferRef.current.setVolume(0);
             }}
-          />
+          /> 
         </Tooltip>
       );
   };
@@ -255,7 +248,7 @@ export default function AudioPlayer() {
   return (
     <div className="fixed bottom-0 z-40 h-16 sm:h-20 bg-mantle w-full flex flex-row justify-between items-center px-4 sm:px-8">
       <audio ref={audioRef} className="hidden"></audio>
-      <div className="flex flex-row flex-wrap items-center w-2/6">
+      <div className="flex flex-row flex-wrap items-center w-1/3">
         <div
           className="ml-3 overflow-hidden relative"
           ref={titleContainerRef}
@@ -279,7 +272,7 @@ export default function AudioPlayer() {
           {formatTime(elapsedTime)}
         </div>
 
-        <div id="waveform" className="w-3/5 hidden sm:block"></div>
+        <div id="waveform" className="w-2/3 hidden sm:block"></div>
 
         <button
           onClick={() => {

@@ -20,7 +20,7 @@ export default function Searchbar({
     <Input
       label="Search"
       classNames={{
-        base: "w-3/4 h-8 sm:h-12 sm:h-full md:w-3/5 sm:mt-5 sm:px-5 mb-4 sm:mb-0",
+        base: "w-full px-2 h-8 sm:h-12 sm:h-full md:w-3/5 sm:mt-5 sm:px-5 mb-2 sm:mb-0",
         label: "text-text relative text-xs sm:text-sm",
         input: [
           "bg-surface0",

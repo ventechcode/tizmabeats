@@ -1,7 +1,7 @@
 export default function MobileBeatCard({ className }: { className?: string }) {
   return (
     <div
-      className={`bg-transparent flex items-center justify-between space-x-4 py-2 px-4 rounded-lg mx-4 ${className} animate-pulse h-18`}
+      className={`bg-transparent flex items-center justify-between space-x-4 py-2 px-2 rounded-lg mx-4 ${className} animate-pulse h-18`}
     >
       <div className="flex items-center space-x-2">
         <button className="text-gray-200 transition-colors flex-shrink-0">

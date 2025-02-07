@@ -34,7 +34,7 @@ export default function BpmFilter({
     <>
       {!data || isLoading ? (
         <Select
-          label="BPMs"
+          label="Bpms"
           selectionMode="multiple"
           placeholder="All"
           selectedKeys={"Loading..."}
@@ -53,7 +53,7 @@ export default function BpmFilter({
         </Select>
       ) : (
         <Select
-          label="BPMs"
+          label="Bpms"
           selectionMode="multiple"
           placeholder="All"
           selectedKeys={values}
