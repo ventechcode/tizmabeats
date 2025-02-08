@@ -93,24 +93,24 @@ export default async function Success({ searchParams }: SuccessProps) {
           {beatLicenses.map((beatLicense: any) => (
             <div
               className="grid grid-cols-3 gap-4 w-full mb-4 justify-between"
-              key={beatLicense.id}
+              key={beatLicense?.id}
             >
               <div className="flex flex-col items-start">
                 <h2 className="text-lg font-medium text-text">
-                  {beatLicense.beat.name}
+                  {beatLicense?.beat.name}
                 </h2>
                 <div className="flex flex-col sm:flex-row sm:items-center">
                   <p className="text-sm text-subtext2">
-                    {beatLicense.licenseOption.name}
+                    {beatLicense?.licenseOption.name}
                   </p>
                 </div>
               </div>
               <p className="text-subtext0 self-center text-center">
-                {beatLicense.price}€
+                {beatLicense?.price}€
               </p>
               <DownloadButton
                 item={beatLicense}
-                beatName={beatLicense.beat.name}
+                beatName={beatLicense?.beat.name}
               />
             </div>
           ))}

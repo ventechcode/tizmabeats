@@ -184,10 +184,10 @@ export default function MobileBeatCard({
               >
                 <div>
                   <p className="text-sm font-medium text-text">
-                    {license.licenseOption.name}
+                    {license?.licenseOption.name}
                   </p>
                   <p className="text-xs text-subtext0">
-                    {license.licenseOption.contents.join(", ")}
+                    {license?.licenseOption.contents.join(", ")}
                   </p>
                 </div>
                 <p className="text-sm font-semibold">{license.price}€</p>
