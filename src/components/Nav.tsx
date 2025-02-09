@@ -10,6 +10,13 @@ import {
 import { usePathname } from "next/navigation";
 import ShoppingCart from "./ShoppingCart";
 import { useSession } from "next-auth/react";
+import dynamic from "next/dynamic";
+
+// Dynamically import to disable SSR
+const Logo3D = dynamic(() => import("@/components/Logo3D"), {
+  ssr: false,
+  loading: () => <div className="loading loading-spinner" />,
+});
 
 export function Nav({ className }: { className?: string }) {
   const session = useSession();
@@ -58,12 +65,18 @@ export function Nav({ className }: { className?: string }) {
                 </DisclosureButton>
               </div>
               <div className="hidden sm:flex sm:items-center">
-                <NavLogo imgSrc="/logo.svg" alt="TizmaBeats" />
+                <Link href={"/"}>
+                  <Logo3D />
+                </Link>
+                {/* <NavLogo imgSrc="/logo.svg" alt="TizmaBeats" /> */}
               </div>
             </div>
             <div className="flex items-center justify-center">
               <div className="sm:hidden">
-                <NavLogo imgSrc="/logo.svg" alt="TizmaBeats" />
+                <Link href={"/"}>
+                  <Logo3D />
+                </Link>
+                {/* <NavLogo imgSrc="/logo.svg" alt="TizmaBeats" /> */}
               </div>
               <div className="hidden sm:flex sm:items-center">
                 <NavLink href="/beats">Beats</NavLink>
@@ -78,7 +91,7 @@ export function Nav({ className }: { className?: string }) {
               <ShoppingCart />
             </div>
           </div>
-          
+
           <DisclosurePanel className="sm:hidden">
             {({ close }) => (
               <div className="flex flex-col flex-wrap px-2 pt-2 pb-3 space-y-1 w-max">
@@ -113,7 +126,7 @@ export function NavLink(props: ComponentProps<typeof Link>) {
     <Link
       {...props}
       onClick={(e) => {
-        props.onClick?.(e); 
+        props.onClick?.(e);
       }}
       className={`py-1 px-2 mx-1 md:mx-3 ${
         isActive ? "bg-text text-mantle" : "text-text bg-crust"

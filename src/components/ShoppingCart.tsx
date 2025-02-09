@@ -118,10 +118,10 @@ export default function ShoppingCart() {
                       <div>{beat.name}</div>
                       <div className="flex items-center space-x-1">
                         <div className="text-sm text-subtext1">
-                          {beat.license?.licenseOption.name}
+                          {beat.license?.licenseOption?.name}
                         </div>
                         <div className="text-subtext0 text-xs">
-                          ({beat.license?.licenseOption.contents.join(",")})
+                          ({beat.license?.licenseOption?.contents.join(",")})
                         </div>
                       </div>
                     </div>

@@ -125,7 +125,7 @@ export const OrderConfirmationEmail = ({
                   color: "#6c6f85",
                 }}
               >
-                {item.licenseOption.name}
+                {item.licenseOption?.name}
               </td>
               <td
                 style={{

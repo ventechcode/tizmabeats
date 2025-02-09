@@ -101,7 +101,7 @@ export default async function Success({ searchParams }: SuccessProps) {
                 </h2>
                 <div className="flex flex-col sm:flex-row sm:items-center">
                   <p className="text-sm text-subtext2">
-                    {beatLicense?.licenseOption.name}
+                    {beatLicense?.licenseOption?.name}
                   </p>
                 </div>
               </div>

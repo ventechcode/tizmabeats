@@ -193,11 +193,11 @@ export default function BeatCard({
                       } hover:bg-mantle hover:cursor-pointer border-2 rounded-md flex flex-col justify-around pl-2 py-1`}
                     >
                       <p className="text-md text-text">
-                        {license?.licenseOption.name}
+                        {license?.licenseOption?.name}
                       </p>
                       <p className="text-subtext1 text-sm">{license.price}€</p>
                       <p className="text-subtext0 text-[10px]">
-                        {license?.licenseOption.contents
+                        {license?.licenseOption?.contents
                           .map((s) => s)
                           .join(", ")}
                       </p>

@@ -147,7 +147,7 @@ export default function ProductTable({ products }: { products: Product[] }) {
                 .sort((a, b) => a.price - b.price)
                 .map((license) => (
                   <div key={license.id}>
-                    {license?.licenseOption.name} - {license.price}€
+                    {license?.licenseOption?.name} - {license.price}€
                   </div>
                 ))}
             </div>

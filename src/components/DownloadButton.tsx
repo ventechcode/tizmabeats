@@ -16,7 +16,7 @@ export default function DownloadButton({ item, beatName }: any) {
           const url = window.URL.createObjectURL(blob);
           const a = document.createElement("a");
           a.href = url;
-          a.download = `${beatName}-${item.licenseOption.name}`;
+          a.download = `${beatName}-${item.licenseOption?.name}`;
           a.click();
           window.URL.revokeObjectURL(url);
         } finally {
