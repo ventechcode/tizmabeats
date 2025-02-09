@@ -75,9 +75,9 @@ export default async function Success({ searchParams }: SuccessProps) {
         <p className="text-subtext1 mt-2 mb-8 text-center">
           Thanks for your purchase, {user?.name.split(" ")[0]}!
         </p>
-        <div className="flex flex-row justify-between items-center">
-          <p className="text-subtext2 text-xs py-3 font-semibold">Order:</p>
-          <p className="text-subtext0 text-xs py-3 font-semibold">{"#" + id}</p>
+        <div className="flex flex-col xs:flex-row xs:justify-between xs:items-center">
+          <p className="text-subtext2 text-xs py-1 xs:py-3 font-semibold">Order:</p>
+          <p className="text-subtext0 text-xs py-1 xs:py-3 font-semibold">{"#" + id}</p>
         </div>
         <div className="mb-8">
           <div className="grid grid-cols-3 gap-4 w-full mb-2 justify-between">

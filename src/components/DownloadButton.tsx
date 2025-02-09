@@ -1,9 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 
 export default function DownloadButton({ item, beatName }: any) {
   const [isLoading, setIsLoading] = useState(false);
+  const [redeemed, setRedeemed] = useState(false); 
+  
+  if (redeemed) {
+    return (
+      <button className="text-xs sm:text-sm text-green justify-self-end cursor-default">
+        Redeemed <IoMdCheckmarkCircleOutline className="inline" size={16} />
+      </button>
+    );
+  }
 
   return (
     <button
@@ -21,6 +31,7 @@ export default function DownloadButton({ item, beatName }: any) {
           window.URL.revokeObjectURL(url);
         } finally {
           setIsLoading(false);
+          setRedeemed(true);
         }
       }}
     >

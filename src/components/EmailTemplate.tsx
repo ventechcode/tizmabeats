@@ -53,9 +53,6 @@ export const OrderConfirmationEmail = ({
       >
         Order Receipt
       </h1>
-      <p style={{ fontSize: "15px", color: "#4c4f69", textAlign: "center", marginBottom: "12px" }}>
-        Thanks for your purchase, <strong>{userName}</strong> !
-      </p>
 
       <div
         style={{
