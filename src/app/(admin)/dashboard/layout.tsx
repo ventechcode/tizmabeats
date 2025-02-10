@@ -1,5 +1,5 @@
 import React from "react";;
-import AdminNav from "@/components/AdminNav";
+import AdminNav from "@/components/dashboard/AdminNav";
 
 function AdminLayout({
   children,
@@ -8,7 +8,7 @@ function AdminLayout({
 }>) {
 
   return (
-    <main className="bg-base text-text">
+    <main>
       <AdminNav />
       {children}
     </main>

@@ -17,7 +17,7 @@ export default function AdminNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex items-center py-4 pl-10 bg-mantle w-full">
+    <nav className="flex items-center py-4 pl-10 bg-mantle w-full relative">
       <div className="flex items-center justify-between lg:justify-start space-x-4 w-2/3 lg:w-auto">
         <Link
           href="/dashboard"
@@ -29,7 +29,7 @@ export default function AdminNav() {
         >
           <div className="flex gap-x-2 items-center justify-center">
             <LayoutDashboard />
-            <p className="hidden md:block font-semibold uppercase">Dashboard</p>
+            <p className="hidden md:block font-semibold uppercase">Overview</p>
           </div>
         </Link>
         <Link

@@ -15,7 +15,7 @@ import dynamic from "next/dynamic";
 // Dynamically import to disable SSR
 const Logo3D = dynamic(() => import("@/components/Logo3D"), {
   ssr: false,
-  loading: () => <div className="loading loading-spinner" />,
+  loading: () => <h1 className="text-xl sm:text-lg p-2 md:text-xl lg:text-2xl text-text uppercase">TizmaBeats</h1>,
 });
 
 export function Nav({ className }: { className?: string }) {

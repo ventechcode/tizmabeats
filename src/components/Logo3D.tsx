@@ -38,7 +38,7 @@ function RotatingModel({ modelPath }: { modelPath: string }) {
 export default function Logo3D() {
   return (
     <div className="w-16 h-16 sm:w-20 sm:h-20">
-      <Canvas camera={{ position: [0, 0, 2], fov: 50 }}>
+      <Canvas camera={{ position: [0, 0, 2], fov: 61 }}>
         <ambientLight intensity={1} />
         <pointLight position={[10, 10, 10]} />
         <RotatingModel modelPath="/assets/headphones-raw.glb" />

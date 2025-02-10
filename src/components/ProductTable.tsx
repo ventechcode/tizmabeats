@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import React, { use, useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Table,
   TableHeader,
@@ -18,8 +18,15 @@ import {
   Pagination,
   type Selection,
   type SortDescriptor,
-} from "@heroui/react"
-import { SearchIcon, ChevronDownIcon, ChevronUpIcon, TrashIcon, EditIcon, Plus } from "lucide-react"
+} from "@heroui/react";
+import {
+  SearchIcon,
+  ChevronDownIcon,
+  ChevronUpIcon,
+  TrashIcon,
+  EditIcon,
+  Plus,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -28,25 +35,26 @@ import {
   DialogTrigger,
   DialogClose,
   DialogTitle,
-} from "./ui/dialog"
-import { deleteProduct } from "@/app/actions"
+} from "./ui/dialog";
+import { deleteProduct } from "@/app/actions";
+import Link from "next/link";
 
 type Product = {
-  id: string
-  createdAt: Date
-  name: string
-  purchased: boolean
+  id: string;
+  createdAt: Date;
+  name: string;
+  purchased: boolean;
   producer: {
-    username: string
-  }
+    username: string;
+  };
   licenses: {
-    id: string
-    price: number
+    id: string;
+    price: number;
     licenseOption: {
-      name: string
-    }
-  }[]
-}
+      name: string;
+    };
+  }[];
+};
 
 const columns: any[] = [
   { name: "ID", uid: "id", sortable: true },
@@ -56,90 +64,96 @@ const columns: any[] = [
   { name: "LICENSES", uid: "licenses" },
   { name: "PURCHASED", uid: "purchased", sortable: true },
   { name: "ACTIONS", uid: "actions" },
-]
+];
 
-const INITIAL_VISIBLE_COLUMNS = ["name", "createdAt", "producer", "licenses", "purchased", "actions"]
+const INITIAL_VISIBLE_COLUMNS = [
+  "name",
+  "createdAt",
+  "producer",
+  "licenses",
+  "purchased",
+  "actions",
+];
 
 export default function ProductTable({ products }: { products: Product[] }) {
-  const [filterValue, setFilterValue] = useState("")
-  const [selectedKey, setSelectedKey] = useState<string>("")
-  const [visibleColumns, setVisibleColumns] = useState<Selection>(new Set(INITIAL_VISIBLE_COLUMNS))
-  const [rowsPerPage, setRowsPerPage] = useState(5)
+  const [filterValue, setFilterValue] = useState("");
+  const [selectedKey, setSelectedKey] = useState<string>("");
+  const [visibleColumns, setVisibleColumns] = useState<Selection>(
+    new Set(INITIAL_VISIBLE_COLUMNS)
+  );
+  const [rowsPerPage, setRowsPerPage] = useState(5);
   const [sortDescriptor, setSortDescriptor] = useState<SortDescriptor>({
     column: "createdAt",
     direction: "descending",
-  })
-  const [page, setPage] = useState(1)
-  const [isOpen, setIsOpen] = useState(false)
-  const [isOpenRows, setIsOpenRows] = useState(false)
-  const [hoveredColumn, setHoveredColumn] = useState<string | null>(null)
-  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
-  const router = useRouter()
+  });
+  const [page, setPage] = useState(1);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenRows, setIsOpenRows] = useState(false);
+  const [hoveredColumn, setHoveredColumn] = useState<string | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const router = useRouter();
 
-  useEffect(() => {
-    router.refresh()
-    router.prefetch("/dashboard/products/new")
-  }, [])
-
-  const hasSearchFilter = Boolean(filterValue)
+  const hasSearchFilter = Boolean(filterValue);
 
   const headerColumns = React.useMemo(() => {
-    if (visibleColumns === "all") return columns
-    return columns.filter((column) => Array.from(visibleColumns).includes(column.uid))
-  }, [visibleColumns])
+    if (visibleColumns === "all") return columns;
+    return columns.filter((column) =>
+      Array.from(visibleColumns).includes(column.uid)
+    );
+  }, [visibleColumns]);
 
   const filteredItems = React.useMemo(() => {
-    let filteredProducts = [...products]
+    let filteredProducts = [...products];
 
     if (hasSearchFilter) {
       filteredProducts = filteredProducts.filter((product) =>
-        product.name.toLowerCase().includes(filterValue.toLowerCase()),
-      )
+        product.name.toLowerCase().includes(filterValue.toLowerCase())
+      );
     }
 
-    return filteredProducts
-  }, [hasSearchFilter, filterValue, products])
+    return filteredProducts;
+  }, [hasSearchFilter, filterValue, products]);
 
-  const pages = Math.ceil(filteredItems.length / rowsPerPage)
+  const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
   const items = React.useMemo(() => {
-    const start = (page - 1) * rowsPerPage
-    const end = start + rowsPerPage
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
 
-    return filteredItems.slice(start, end)
-  }, [page, filteredItems, rowsPerPage])
+    return filteredItems.slice(start, end);
+  }, [page, filteredItems, rowsPerPage]);
 
   const sortedItems = React.useMemo(() => {
     return [...items].sort((a: Product, b: Product) => {
-      const first = a[sortDescriptor.column as keyof Product]
-      const second = b[sortDescriptor.column as keyof Product]
-      const cmp = first < second ? -1 : first > second ? 1 : 0
-      return sortDescriptor.direction === "descending" ? -cmp : cmp
-    })
-  }, [sortDescriptor, items])
+      const first = a[sortDescriptor.column as keyof Product];
+      const second = b[sortDescriptor.column as keyof Product];
+      const cmp = first < second ? -1 : first > second ? 1 : 0;
+      return sortDescriptor.direction === "descending" ? -cmp : cmp;
+    });
+  }, [sortDescriptor, items]);
 
   const formatDate = (dateString: string, locale = "en-US") => {
-    const date = new Date(dateString)
+    const date = new Date(dateString);
     return date.toLocaleDateString(locale, {
       year: "numeric",
       month: "long",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-    })
-  }
+    });
+  };
 
   const renderCell = React.useCallback(
     (product: Product, columnKey: React.Key): React.ReactNode => {
       switch (columnKey) {
         case "id":
-          return product.id
+          return product.id;
         case "createdAt":
-          return formatDate(product.createdAt.toString(), "en-US")
+          return formatDate(product.createdAt.toString(), "en-US");
         case "name":
-          return product.name
+          return product.name;
         case "producer":
-          return product.producer.username
+          return product.producer.username;
         case "licenses":
           return (
             <div>
@@ -151,9 +165,9 @@ export default function ProductTable({ products }: { products: Product[] }) {
                   </div>
                 ))}
             </div>
-          )
+          );
         case "purchased":
-          return product.purchased ? "Yes" : "No"
+          return product.purchased ? "Yes" : "No";
         case "actions":
           return (
             <div className="flex justify-center items-center gap-2">
@@ -168,7 +182,9 @@ export default function ProductTable({ products }: { products: Product[] }) {
                 <DialogContent className="bg-crust rounded-lg border-none">
                   <DialogHeader>
                     <DialogTitle>Delete Product</DialogTitle>
-                    <DialogDescription>Are you sure you want to delete this product?</DialogDescription>
+                    <DialogDescription>
+                      Are you sure you want to delete this product?
+                    </DialogDescription>
                   </DialogHeader>
                   <div className="flex justify-end items-center gap-x-8 mt-2">
                     <DialogTrigger>
@@ -177,11 +193,14 @@ export default function ProductTable({ products }: { products: Product[] }) {
                       </button>
                     </DialogTrigger>
                     <DialogTrigger>
-                      <button onClick={() => {
-                        deleteProduct(product.id)
-                        setShowDeleteDialog(false)
-                        router.refresh()
-                      }} className="flex items-center gap-1 border-2 border-red text-red bg-transparent rounded-lg hover:text-red/70 hover:border-red/70  duration-300 p-2">
+                      <button
+                        onClick={() => {
+                          deleteProduct(product.id);
+                          setShowDeleteDialog(false);
+                          router.refresh();
+                        }}
+                        className="flex items-center gap-1 border-2 border-red text-red bg-transparent rounded-lg hover:text-red/70 hover:border-red/70  duration-300 p-2"
+                      >
                         <TrashIcon />
                         <p>Delete</p>
                       </button>
@@ -190,17 +209,17 @@ export default function ProductTable({ products }: { products: Product[] }) {
                 </DialogContent>
               </Dialog>
             </div>
-          )
+          );
         default:
-          return null
+          return null;
       }
     },
-    [showDeleteDialog],
-  )
+    [showDeleteDialog]
+  );
 
   const onSelectionChange = (keys: Selection) => {
-    setSelectedKey(keys.toString())
-  }
+    setSelectedKey(keys.toString());
+  };
 
   const topContent = React.useMemo(() => {
     return (
@@ -253,7 +272,9 @@ export default function ProductTable({ products }: { products: Product[] }) {
             <DropdownTrigger className="flex w-full ml-2 sm:ml-0 sm:w-max mt-2">
               <Button
                 className="bg-crust text-text rounded-lg"
-                endContent={isOpenRows ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                endContent={
+                  isOpenRows ? <ChevronUpIcon /> : <ChevronDownIcon />
+                }
                 variant="flat"
               >
                 {rowsPerPage} Rows
@@ -265,7 +286,7 @@ export default function ProductTable({ products }: { products: Product[] }) {
               selectionMode="single"
               selectedKeys={[rowsPerPage.toString()]}
               onSelectionChange={(keys) => {
-                const selectedValue = Array.from(keys).map(Number)[0]
+                const selectedValue = Array.from(keys).map(Number)[0];
                 if (selectedValue) setRowsPerPage(selectedValue);
                 else setRowsPerPage(5);
               }}
@@ -301,20 +322,19 @@ export default function ProductTable({ products }: { products: Product[] }) {
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
-          <Button
-            className="bg-text text-crust rounded-lg hover:text-text hover:bg-crust duration-300 w-full ml-2 sm:w-auto mt-2"
-            variant="flat"
-            onPress={() => router.push("/dashboard/products/new")}
+          <Link
+            href="/dashboard/products/new"
+            className="p-2 bg-text text-crust rounded-lg hover:text-text hover:bg-crust duration-300 w-full ml-2 sm:w-auto mt-2"
           >
             <div className="flex items-center justify-center gap-x-2 font-semibold">
               <Plus className="" />
               <p className="hidden lg:block font-semibold">New Product</p>
             </div>
-          </Button>
+          </Link>
         </div>
       </div>
-    )
-  }, [filterValue, visibleColumns, isOpen, isOpenRows, rowsPerPage])
+    );
+  }, [filterValue, visibleColumns, isOpen, isOpenRows, rowsPerPage]);
 
   const bottomContent = React.useMemo(() => {
     return (
@@ -323,7 +343,7 @@ export default function ProductTable({ products }: { products: Product[] }) {
           {/* {selectedKey
             ? `${filteredItems.find((item: Product) => item.id == selectedKey)?.name} selected`
             : `${filteredItems.length} products`} */}
-            {`${filteredItems.length} products`}
+          {`${filteredItems.length} products`}
         </span>
         <Pagination
           unselectable="on"
@@ -340,8 +360,8 @@ export default function ProductTable({ products }: { products: Product[] }) {
           }}
         />
       </div>
-    )
-  }, [selectedKey, filteredItems.length, page, pages])
+    );
+  }, [selectedKey, filteredItems.length, page, pages]);
 
   return (
     <Table
@@ -372,8 +392,11 @@ export default function ProductTable({ products }: { products: Product[] }) {
             allowsSorting={column.sortable}
             onMouseEnter={() => column.sortable && setHoveredColumn(column.uid)}
             onMouseLeave={() => setHoveredColumn(null)}
-            
-            className={column.sortable ? "hover:cursor-pointer hover:text-subtext0 w-12" : ""}
+            className={
+              column.sortable
+                ? "hover:cursor-pointer hover:text-subtext0 w-12"
+                : ""
+            }
           >
             {column.name}
           </TableColumn>
@@ -399,6 +422,5 @@ export default function ProductTable({ products }: { products: Product[] }) {
         )}
       </TableBody>
     </Table>
-  )
+  );
 }
-
