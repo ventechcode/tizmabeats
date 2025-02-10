@@ -51,13 +51,14 @@ export default function SignIn() {
   async function onSubmit(values: z.infer<typeof signInSchema>) {
     setLoading(true);
     const callbackUrl = searchParams.get("callbackUrl") || "/dashboard";
+    console.log("callbackUrl", callbackUrl);
     const { username, password } = values;
 
     try {
       const result = await signIn("credentials", {
         email: username,
         password,
-        redirect: false, // Do not redirect to the callbackUrl yet
+        redirect: false,
       });
 
       if (!result?.ok) {
