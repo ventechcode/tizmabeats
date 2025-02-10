@@ -20,9 +20,9 @@ export default function AdminNav() {
     <nav className="flex items-center py-4 pl-10 bg-mantle w-full relative">
       <div className="flex items-center justify-between lg:justify-start space-x-4 w-2/3 lg:w-auto">
         <Link
-          href="/dashboard"
+          href="/dashboard/overview"
           className={`${
-            pathname == "/dashboard"
+            pathname == "/dashboard/overview"
               ? "border-b-[3px] border-accentColor"
               : "hover:border-subtext0 hover:border-b-2 hover:text-subtext0"
           } h-8`}

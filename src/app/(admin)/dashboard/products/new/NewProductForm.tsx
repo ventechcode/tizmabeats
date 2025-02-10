@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 
 const licenseSchema = z.object({
@@ -603,13 +603,17 @@ export default function NewProductForm({
     }
   };
 
+  const router = useRouter();
+
   return (
     <div className="w-full flex flex-col items-center">
       <div className="w-full max-w-[95%] sm:max-w-[90%] md:max-w-[90%] xl:max-w-[75%] mx-auto mb-4 flex flex-row items-center justify-start">
-        <Link prefetch href="/dashboard/products">
+        <button onClick={() => {
+          router.push("/dashboard/products");
+          router.refresh();
+        }}>
           <ArrowLeft className="w-8 h-8 cursor-pointer mt-4 xl:mt-0 lg:ml-0 ml-4 hover:text-accentColor duration-300" />
-        </Link>
-        <div></div>
+        </button>
       </div>
 
       <div className="bg-crust py-4 px-6 rounded-md w-full max-w-[95%] sm:max-w-[90%] md:max-w-[90%] xl:max-w-[75%] mx-auto mb-12">

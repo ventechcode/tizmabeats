@@ -62,6 +62,7 @@ export default function SignIn() {
 
       if (!result?.ok) {
         setError(result?.error!);
+        setLoading(false);
         return;
       }
 

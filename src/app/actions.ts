@@ -3,7 +3,6 @@
 import prisma from "@/utils/prisma";
 import { s3Client } from "@/utils/s3client";
 import {DeleteObjectsCommand, ListObjectsV2Command } from "@aws-sdk/client-s3";
-import { revalidatePath } from "next/cache";
 
 export async function getProducts() {
   const products = await prisma.beat.findMany({
@@ -33,6 +32,7 @@ export async function getProducts() {
       createdAt: "desc",
     },
   });
+
   return products;
 }
 
