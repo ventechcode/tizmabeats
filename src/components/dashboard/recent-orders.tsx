@@ -28,7 +28,7 @@ export async function RecentOrders() {
           <TableBody>
             {recentOrders.map((order: any) => (
               <TableRow key={order.id} className="text-subtext0 border-none">
-                <TableCell>{order.user.name}</TableCell>
+                <TableCell>{order.user?.name}</TableCell>
                 <TableCell>{order.total.toFixed(2).replace('.', ',')}€</TableCell>
                 <TableCell>{order.createdAt.toLocaleDateString()}</TableCell>
               </TableRow>

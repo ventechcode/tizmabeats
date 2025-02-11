@@ -1,6 +1,29 @@
-import { NextAuthOptions } from "next-auth";
+import {
+  NextAuthOptions,
+} from "next-auth";
 import prisma from "./utils/prisma";
+
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+      email: string;
+      name: string;
+      username: string;
+    };
+  }
+}
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
+
+declare module "next-auth" {
+  interface User {
+    username: string;
+  }
+
+  interface AdapterUser {
+    username: string;
+  }
+}
 import bcrypt from "bcryptjs";
 
 export const authOptions: NextAuthOptions = {
@@ -27,15 +50,47 @@ export const authOptions: NextAuthOptions = {
           throw new Error("Invalid email or password");
         }
 
-        return { id: user.id, email: user.email, name: `${user.surname} ${user.lastname}`, test: "test" };
+        return {
+          id: user.id,
+          email: user.email,
+          name: `${user.surname} ${user.lastname}`,
+          username: user.username,
+        };
       },
     },
   ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        return {
+          ...token,
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          username: user.username,
+        };
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      if (token) {
+        session.user = {
+          ...session.user,
+          id: token.id as string,
+          email: token.email as string,
+          name: token.name as string,
+          username: token.username as string,
+        };
+      }
+      return session;
+    },
+  },
   session: {
-    strategy: "jwt", // Use JWT-based session strategy
+    strategy: "jwt",
   },
   secret: process.env.NEXTAUTH_SECRET,
   pages: {
-    signIn: "/auth/signin", // Redirect here for unauthenticated users
+    signIn: "/auth/signin",
   },
 };
+

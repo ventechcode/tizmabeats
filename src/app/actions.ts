@@ -93,6 +93,9 @@ export const getDashboardStats = async () => {
     _sum: {
       total: true,
     },
+    where: {
+      status: "completed",
+    },
   });
   return { totalBeats, totalOrders, totalUsers, totalRevenue };
 };

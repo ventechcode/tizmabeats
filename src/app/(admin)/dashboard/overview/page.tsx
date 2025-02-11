@@ -2,14 +2,13 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/auth";
 
 import { DashboardShell } from "@/components/dashboard/dashboard-shell";
-import { Suspense } from "react";
 import { DashboardStats } from "@/components/dashboard/dashboard-stats";
-import { DashboardStatsSkeleton } from "@/components/dashboard/dashboard-stats-skeleton";
 import { RecentBeats } from "@/components/dashboard/recent-beats";
-import { DashboardTableSkeleton } from "@/components/dashboard/dashboard-table-skeleton";
 import { RecentOrders } from "@/components/dashboard/recent-orders";
 import { TopProducers } from "@/components/dashboard/top-producers";
 import DashboardHeader from "@/components/dashboard/dashboard-header";
+
+export const dynamic = "force-dynamic";
 
 export default async function Dashboard() {
   const session = await getServerSession(authOptions);
