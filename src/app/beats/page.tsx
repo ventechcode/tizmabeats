@@ -1,95 +1,51 @@
-"use client";
-
 import SearchFilterSection from "@/components/SearchFilterSection";
-import { Beat } from "@/types";
-import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { useGlobalAudioPlayer } from "@/hooks/useAudioPlayer";
-import useSWR from "swr";
-import SkeletonBeatList from "@/components/SkeletonBeatList";
-import Loading from "../loading";
-import dynamic from "next/dynamic";
+import Background from "@/components/Background";
+import BeatList from "@/components/BeatList";
 
-const Background = dynamic(() => import("@/components/Background"));
-const BeatList = dynamic(() => import("@/components/BeatList"));
+export default async function BeatsPage({
+  searchParams,
+}: {
+  searchParams: { search: string; genres: string; bpms: string };
+}) {
+  console.log(new URLSearchParams(searchParams).toString());
 
-export default function BeatsPage() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const audioPlayer = useGlobalAudioPlayer();
-
-  const baseQuery = "/api/beats";
-  const [query, setQuery] = useState(baseQuery);
-  const [beats, setBeats] = useState<Beat[]>([]);
-  const [search, setSearch] = useState(searchParams.get("search") || null);
-  
-  const { data, isLoading } = useSWR(query, async (query) => {
-    const res = await fetch(query);
-    const data = await res.json();
-    for (const beat of data) {
-      setWavesurferRef(beat);
+  const data = await fetch(
+    `${process.env.API_URL}/beats?${new URLSearchParams(searchParams).toString()}`,
+    {
+      next: {
+        tags: ["bpms"],
+        revalidate: 0, // no revalidation
+      },
     }
-    setBeats(data);
-    return data;
+  );
+  const beats = await data.json();
+
+  const genres = await fetch(`${process.env.API_URL}/beats/genres`, {
+    next: {
+      tags: ["genres"],
+      revalidate: 3600 * 24, // 24 hours cached data validity
+    },
   });
 
-  // Fetch data whenever queryParams changes
-  useEffect(() => {
-    if (isLoading) console.log("Loading...");
-    const queryString = searchParams.toString();
-    const fullQuery = queryString ? `${baseQuery}?${queryString}` : baseQuery;
+  const uniqueGenres = await genres.json();
 
-    setQuery(fullQuery);
+  const bpms = await fetch(`${process.env.API_URL}/beats/bpms`, {
+    next: {
+      tags: ["bpms"],
+      revalidate: 3600 * 24, // 24 hours cached data validity
+    },
+  });
 
-    router.replace(`?${queryString}`);
-  }, [searchParams]);
-
-  const createQueryString = (name: string, value: string) => {
-    const params = new URLSearchParams(searchParams.toString());
-    if (value) {
-      params.set(name, value);
-    } else {
-      params.delete(name);
-    }
-    return params.toString();
-  };
-
-  const onSearch = (value: string) => {
-    setSearch(value);
-    router.push(`?${createQueryString("search", value)}`);
-  };
-
-  const onGenreChange = (selections: Set<string>) => {
-    let selectedGenres = Array.from(selections).join(",");
-    router.push(`?${createQueryString("genre", selectedGenres)}`);
-  };
-
-  const onBpmChange = (selections: Set<string>) => {
-    let selectedBpms = Array.from(selections).join(",");
-    router.push(`?${createQueryString("bpm", selectedBpms)}`);
-  };
-
-  const setWavesurferRef = (beat: Beat) => {
-    if (audioPlayer.beat?.id === beat.id) {
-      beat.wavesurferRef = audioPlayer.beat?.wavesurferRef;
-    }
-  };
+  const uniqueBpms = await bpms.json();
 
   return (
     <div className="flex flex-col items-center">
       <SearchFilterSection
-        onGenreChange={onGenreChange}
-        onBpmChange={onBpmChange}
-        onSearch={onSearch}
-        initialSearch={search!}
+        searchParams={searchParams}
+        bpms={uniqueBpms}
+        genres={uniqueGenres}
       />
-
-      {(isLoading && !data && beats.length === 0 && search === "") && (
-        <Loading />
-      )}
-
-      {isLoading && !data ? <SkeletonBeatList beats={beats || [1,2,3,4,5,6,7,8]} /> : <BeatList beats={data || []} />}
-
+      <BeatList beats={beats} />
       <Background />
     </div>
   );

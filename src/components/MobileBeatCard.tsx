@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useContext, useEffect, useRef, useState } from "react";
 import type { Beat, BeatLicense } from "@/types";
 import { ShoppingCartContext } from "@/app/providers";

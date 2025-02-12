@@ -4,17 +4,13 @@ import { useEffect, useState } from "react";
 import { Input } from "@nextui-org/input";
 
 export default function Searchbar({
-  onSearch,
-  initialValue,
+  value,
+  updateSearch,
 }: {
-  onSearch: (value: string) => void;
-  initialValue: string;
+  value: string;
+  updateSearch: (param: string) => void;
 }) {
-  const [searchValue, setSearchValue] = useState("");
-
-  useEffect(() => {
-    setSearchValue(initialValue);
-  }, [initialValue]);
+  const [searchValue, setSearchValue] = useState(value);
 
   return (
     <Input
@@ -38,8 +34,8 @@ export default function Searchbar({
         ],       
       }}
       onValueChange={(value) => {
-        onSearch(value);
         setSearchValue(value);
+        updateSearch(value);
       }}
       placeholder="Type to search..."
       startContent={<SearchIcon />}

@@ -1,10 +1,10 @@
-import React, { useContext, useState } from "react";
+"use client";
+
+import React, { useContext, useEffect, useState } from "react";
 import { CardBody, CardContainer, CardItem } from "./ui/3d-card";
 import { Beat, BeatLicense } from "@/types";
 import { ShoppingCartContext } from "@/app/providers";
-import {
-  useGlobalAudioPlayer,
-} from "@/hooks/useAudioPlayer";
+import { useGlobalAudioPlayer } from "@/hooks/useAudioPlayer";
 
 import {
   Dialog,
@@ -35,11 +35,14 @@ export default function BeatCard({
 
     const audioPlayer = useGlobalAudioPlayer();
 
+    useEffect(() => {
+      if (beat.id == audioPlayer?.beat?.id) {
+        beat.wavesurferRef = audioPlayer?.beat.wavesurferRef;
+      }
+    }, [beat]);
+
     return (
-      <CardContainer
-        className={className}
-        isDialogOpen={isDialogOpen}
-      >
+      <CardContainer className={className} isDialogOpen={isDialogOpen}>
         <CardBody className="bg-gray-50 relative group/card dark:hover:shadow-2xl dark:hover:shadow-emerald-500/[0.1] bg-transparent border-2 dark:border-text w-full mx-4 sm:m-0 sm:w-auto h-auto rounded-xl py-3 px-3 sm:p-6">
           <CardItem
             translateZ="44"

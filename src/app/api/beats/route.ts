@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
 
   // Parse the genres query parameter
-  const genreParams = params.get("genre");
+  const genreParams = params.get("genres");
   let genres: string[] | undefined = genreParams
     ? genreParams.includes(",")
       ? genreParams.split(",")
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
     : undefined;
 
   // Parse the bpm query parameter
-  const bpmParams = params.get("bpm");
+  const bpmParams = params.get("bpms");
   let bpms: number[] | undefined = bpmParams
     ? bpmParams.includes(",")
       ? bpmParams.split(",").map((bpm) => parseInt(bpm, 10))
@@ -27,12 +27,15 @@ export async function GET(req: NextRequest) {
   // Parse the search query parameter
   const search = params.get("search");
 
+  console.log("bpms:", bpms);
+  console.log("genres:", genres);
+
   try {
     const beats = await prisma.beat.findMany({
       where: {
         genre: genres?.length ? { in: genres } : undefined,
         bpm: bpms?.length ? { in: bpms } : undefined,
-        name: search ? { contains: search, mode: "insensitive"} : undefined,
+        name: search ? { contains: search, mode: "insensitive" } : undefined,
         purchased: false,
       },
       orderBy: {
@@ -44,10 +47,12 @@ export async function GET(req: NextRequest) {
           select: {
             id: true,
             price: true,
-            licenseOption: { select: { name: true, contents: true, usageTerms: true } },
+            licenseOption: {
+              select: { name: true, contents: true, usageTerms: true },
+            },
           },
           orderBy: { price: "asc" },
-        }
+        },
       },
     });
 
@@ -109,7 +114,7 @@ export async function POST(req: NextRequest) {
           url: license.productSrc,
           license: { connect: { id: beatLicense.id } },
         },
-      })
+      });
       beatLicenses.push(beatLicense);
     }
 
@@ -133,7 +138,10 @@ export async function POST(req: NextRequest) {
     });
 
     if (!product) {
-      return NextResponse.json({ error: "Error creating product" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Error creating product" },
+        { status: 500 }
+      );
     }
 
     for (const license of beatLicenses) {
@@ -148,7 +156,10 @@ export async function POST(req: NextRequest) {
       });
 
       if (!price) {
-        return NextResponse.json({ error: "Error creating price" }, { status: 500 });
+        return NextResponse.json(
+          { error: "Error creating price" },
+          { status: 500 }
+        );
       }
 
       const res = await prisma.beatLicense.update({
@@ -159,7 +170,10 @@ export async function POST(req: NextRequest) {
       });
 
       if (!res) {
-        return NextResponse.json({ error: "Error updating beat license" }, { status: 500 });
+        return NextResponse.json(
+          { error: "Error updating beat license" },
+          { status: 500 }
+        );
       }
     }
 
