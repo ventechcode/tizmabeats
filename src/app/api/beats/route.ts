@@ -5,69 +5,6 @@ import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
-export async function GET(req: NextRequest) {
-  const params = req.nextUrl.searchParams;
-
-  // Parse the genres query parameter
-  const genreParams = params.get("genres");
-  let genres: string[] | undefined = genreParams
-    ? genreParams.includes(",")
-      ? genreParams.split(",")
-      : [genreParams]
-    : undefined;
-
-  // Parse the bpm query parameter
-  const bpmParams = params.get("bpms");
-  let bpms: number[] | undefined = bpmParams
-    ? bpmParams.includes(",")
-      ? bpmParams.split(",").map((bpm) => parseInt(bpm, 10))
-      : [parseInt(bpmParams, 10)]
-    : undefined;
-
-  // Parse the search query parameter
-  const search = params.get("search");
-
-  console.log("bpms:", bpms);
-  console.log("genres:", genres);
-
-  try {
-    const beats = await prisma.beat.findMany({
-      where: {
-        genre: genres?.length ? { in: genres } : undefined,
-        bpm: bpms?.length ? { in: bpms } : undefined,
-        name: search ? { contains: search, mode: "insensitive" } : undefined,
-        purchased: false,
-      },
-      orderBy: {
-        createdAt: "desc",
-      },
-      include: {
-        producer: { select: { username: true } },
-        licenses: {
-          select: {
-            id: true,
-            price: true,
-            licenseOption: {
-              select: { name: true, contents: true, usageTerms: true },
-            },
-          },
-          orderBy: { price: "asc" },
-        },
-      },
-    });
-
-    return NextResponse.json(beats);
-  } catch (error) {
-    console.error("Error fetching beats:", error);
-    return NextResponse.json(
-      { error: "Error fetching beats" },
-      { status: 500 }
-    );
-  } finally {
-    await prisma.$disconnect();
-  }
-}
-
 export async function POST(req: NextRequest) {
   const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
   if (!token) {

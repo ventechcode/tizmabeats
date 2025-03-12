@@ -1,42 +1,74 @@
 import SearchFilterSection from "@/components/SearchFilterSection";
 import Background from "@/components/Background";
 import BeatList from "@/components/BeatList";
+import prisma from "@/utils/prisma";
+import { Beat } from "@/types";
 
 export default async function BeatsPage({
   searchParams,
 }: {
   searchParams: { search: string; genres: string; bpms: string };
 }) {
-  console.log(new URLSearchParams(searchParams).toString());
-
-  const data = await fetch(
-    `${process.env.API_URL}/beats?${new URLSearchParams(searchParams).toString()}`,
-    {
-      next: {
-        tags: ["bpms"],
-        revalidate: 0, // no revalidation
+  const beats = await prisma.beat.findMany({
+    where: {
+      genre: searchParams.genres?.length
+        ? { in: searchParams.genres.split(",") }
+        : undefined,
+      bpm: searchParams.bpms?.length
+        ? { in: searchParams.bpms.split(",").map(Number) }
+        : undefined,
+      name: searchParams.search
+        ? { contains: searchParams.search!, mode: "insensitive" }
+        : undefined,
+      purchased: false,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      producer: { select: { username: true } },
+      licenses: {
+        select: {
+          id: true,
+          price: true,
+          licenseOption: {
+            select: { name: true, contents: true, usageTerms: true },
+          },
+        },
+        orderBy: { price: "asc" },
       },
-    }
-  );
-  const beats = await data.json();
-
-  const genres = await fetch(`${process.env.API_URL}/beats/genres`, {
-    next: {
-      tags: ["genres"],
-      revalidate: 3600 * 24, // 24 hours cached data validity
     },
   });
 
-  const uniqueGenres = await genres.json();
-
-  const bpms = await fetch(`${process.env.API_URL}/beats/bpms`, {
-    next: {
-      tags: ["bpms"],
-      revalidate: 3600 * 24, // 24 hours cached data validity
+  const genres = await prisma.beat.findMany({
+    select: {
+      genre: true,
     },
+    where: {
+      purchased: false,
+    },
+    orderBy: {
+      genre: "asc",
+    },
+    distinct: ["genre"],
   });
 
-  const uniqueBpms = await bpms.json();
+  const uniqueGenres = await genres.map((beat) => beat.genre);
+
+  const bpms = await prisma.beat.findMany({
+    select: {
+      bpm: true,
+    },
+    where: {
+      purchased: false,
+    },
+    orderBy: {
+      bpm: "asc",
+    },
+    distinct: ["bpm"],
+  });
+
+  const uniqueBpms = bpms.map((beat) => beat.bpm.toString());
 
   return (
     <div className="flex flex-col items-center">
@@ -45,7 +77,7 @@ export default async function BeatsPage({
         bpms={uniqueBpms}
         genres={uniqueGenres}
       />
-      <BeatList beats={beats} />
+      <BeatList beats={beats as unknown as Beat[]} />
       <Background />
     </div>
   );

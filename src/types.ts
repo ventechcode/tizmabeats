@@ -1,5 +1,3 @@
-import WaveSurfer from "wavesurfer.js";
-
 export interface Beat {
   beat: any;
   id: string;

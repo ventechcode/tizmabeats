@@ -93,6 +93,10 @@ export default function ProductTable({ products }: { products: Product[] }) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const router = useRouter();
 
+  useEffect(() => {
+    router.refresh();
+  }, []);
+
   const hasSearchFilter = Boolean(filterValue);
 
   const headerColumns = React.useMemo(() => {

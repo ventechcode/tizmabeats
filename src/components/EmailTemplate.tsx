@@ -152,7 +152,7 @@ export const OrderConfirmationEmail = ({
       </div>
 
       <a
-        href={`http://localhost:3000/orders/${orderId}`}
+        href={`${process.env.NEXTAUTH_URL}/orders/${orderId}`}
         style={{
           display: "inline-block",
           padding: "10px 20px",
@@ -176,7 +176,8 @@ export const OrderConfirmationEmail = ({
       />
 
       <p style={{ fontSize: "14px", color: "#5c5f77", textAlign: "center" }}>
-        If you have any questions or need help, don&apos;t hesitate to contact us at{" "}
+        If you have any questions or need help, don&apos;t hesitate to contact
+        us at{" "}
         <a href={`mailto:support@tizmabeats.com`} style={{ color: "#1e66f5" }}>
           support@tizmabeats.com
         </a>

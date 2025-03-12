@@ -608,10 +608,12 @@ export default function NewProductForm({
   return (
     <div className="w-full flex flex-col items-center">
       <div className="w-full max-w-[95%] sm:max-w-[90%] md:max-w-[90%] xl:max-w-[75%] mx-auto mb-4 flex flex-row items-center justify-start">
-        <button onClick={() => {
-          router.push("/dashboard/products");
-          router.refresh();
-        }}>
+        <button
+          onClick={() => {
+            router.push("/dashboard/products");
+            router.refresh();
+          }}
+        >
           <ArrowLeft className="w-8 h-8 cursor-pointer mt-4 xl:mt-0 lg:ml-0 ml-4 hover:text-accentColor duration-300" />
         </button>
       </div>

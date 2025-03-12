@@ -2,7 +2,7 @@ import ProductTable from "@/components/ProductTable";
 import { getProducts } from "@/app/actions";
 import DashboardHeader from "@/components/dashboard/dashboard-header";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 export default async function ProductsPage() {
   const products = await getProducts();
